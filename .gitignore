@@ -6,6 +6,8 @@ UI/.packages
 UI/.pub-cache/
 UI/.pub/
 UI/build/
+# ignore env var
+UI/.env
 
 # Android related
 UI/android/app/debug
