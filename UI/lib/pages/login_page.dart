@@ -68,16 +68,16 @@ class LoginPage extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: screenWidth * 0.05,
+                            fontSize: screenWidth * 0.03,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.03),
+                  SizedBox(height: screenHeight * 0.01),
                   Icon(
                     Icons.lock,
-                    size: screenWidth * 0.2,
+                    size: screenWidth * 0.1,
                   ),
                   SizedBox(height: screenHeight * 0.03),
                   Text(
