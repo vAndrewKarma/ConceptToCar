@@ -64,7 +64,7 @@ class LoginPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          'Company NameDDDe',
+                          'Company Name',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
