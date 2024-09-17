@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // Import the http package
+import 'package:http/http.dart' as http; 
 import 'package:aplication/components/my_button.dart';
 import 'package:aplication/components/my_textfield.dart';
-import 'dart:convert'; // Import to handle JSON
+import 'dart:convert'; 
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
-  // Controllers for the text fields
   final shopidController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
-  // This function will be called when the button is pressed
   void signUserIn() async {
-    // Get the user input from the controllers
+
     final shopId = shopidController.text;
     final username = usernameController.text;
     final password = passwordController.text;
 
-    // API URL (replace with your actual API endpoint)
     final url = Uri.parse('https://your-api-endpoint.com/login');
 
     try {
-      // Making a POST request to the API
       final response = await http.post(
         url,
         headers: {
@@ -36,7 +32,6 @@ class LoginPage extends StatelessWidget {
         }),
       );
 
-      // Printing the status code and response body to the console
       if (response.statusCode == 200) {
         print('Request successful: ${response.statusCode}');
         print('Response: ${response.body}');
@@ -112,7 +107,7 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: screenHeight * 0.03),
                   MyButton(
-                    onTap: signUserIn, // Call the function when the button is tapped
+                    onTap: signUserIn, 
                   ),
                   SizedBox(height: screenHeight * 0.03),
                 ],
