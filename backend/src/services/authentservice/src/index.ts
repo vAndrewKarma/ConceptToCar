@@ -3,7 +3,7 @@ import config from './config'
 const server = fastify({ logger: true })
 
 server.get('/', (_request, reply) => {
-  reply.status(200).send('Hello World')
+  reply.status(200).send('Hel     lo World')
 })
 
 server.log.info(config)

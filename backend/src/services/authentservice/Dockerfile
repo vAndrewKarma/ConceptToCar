@@ -1,14 +1,14 @@
 FROM node:21-alpine3.18 
 
-WORKDIR /backend
+USER node
+RUN mkdir /home/node/app
+WORKDIR /home/node/app
 
-COPY ./package*.json ./
+EXPOSE 3000
+ARG ENV=production
+ENV NODE_ENV $ENV
+CMD npm run $NODE_ENV
 
-RUN npm install
-
-COPY ./ .
-
-RUN npm run build
-
-
-CMD ["npm", "run", "dev"]
+COPY --chown=node:node package* ./
+RUN npm install 
+COPY --chown=node:node . .

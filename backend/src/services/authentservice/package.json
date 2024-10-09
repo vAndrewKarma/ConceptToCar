@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon -L --watch . --polling",
+    "development": "nodemon -L --watch . --polling",
     "build": "tsc -p tsconfig.json"
   },
   "keywords": [],
