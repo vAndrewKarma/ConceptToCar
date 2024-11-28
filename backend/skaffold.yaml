@@ -13,7 +13,7 @@ build:
 manifests:
   kustomize:
     paths:
-      - kubernetes-manifests
+      - kubernetes-manifests-dev
 deploy:
   kubectl: {}
 profiles:
@@ -40,12 +40,22 @@ profiles:
       - command: dev
     build:
       artifacts:
-      - image: andrewkarma/authentservice
-        context: src/services/authentservice
-        docker:
-          buildArgs:
-            ENV: development
-        sync:
-          manual:
-          - src: 'src/**/*.ts'
-            dest: .
+        - image: andrewkarma/authentservice
+          context: src/services/authentservice
+          docker:
+            buildArgs:
+              ENV: development
+          sync:
+            manual:
+              - src: 'src/**/*.ts'
+                dest: .
+  - name: kai
+    activation:
+      - command: kai
+    build:
+      artifacts:
+        - image: andrewkarma/authentservice
+          context: src/services/authentservice
+          docker:
+            buildArgs:
+              ENV: kai
