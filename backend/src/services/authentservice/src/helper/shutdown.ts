@@ -1,6 +1,6 @@
-import server from '..'
+import { FastifyInstance } from "fastify"
 
-const shutdown = async () => {
+const shutdown = async (server: FastifyInstance) => {
   try {
     await server.close()
     server.log.info('server closed')
@@ -10,5 +10,7 @@ const shutdown = async () => {
     process.exit(1)
   }
 }
+
+
 
 export default shutdown
