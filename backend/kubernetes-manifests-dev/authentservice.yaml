@@ -43,7 +43,7 @@ spec:
   selector:
     app: authentservice
   ports:
-    - name: grpc
+    - name: port
       port: 80
       targetPort: 50051
 

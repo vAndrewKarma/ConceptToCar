@@ -6,7 +6,7 @@ import { FastifyInstance } from 'fastify';
 export default async function InitMongo(server: FastifyInstance) {
   try {
     const { connection } = await mongoose.connect(
-      `mongodb://auth-mongo-srv:27017/authenthication`
+      `mongodb://auth-mongo-srv:27017/authenthication` // TODO: add env
     )
     server.log.info(`Succesfully connected ${connection.db.databaseName}`)
   } catch (err) {

@@ -13,6 +13,6 @@ const getPodIP = () => {
 
 const podIP = getPodIP();
 export default podIP
-
+ 
 // TODO: test on multipe ports
 // TODO: configure k8s to avoid port conflicts

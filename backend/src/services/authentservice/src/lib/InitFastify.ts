@@ -6,7 +6,7 @@ const server: FastifyInstance = fastify({ logger: true,  maxParamLength: 256,
     trustProxy: true,
     bodyLimit: 1000000 })
     await server.register(helmet);
-
+ // TODO: add cors
     await start(server)
     
 return server
