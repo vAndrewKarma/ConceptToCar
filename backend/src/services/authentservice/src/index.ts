@@ -11,16 +11,13 @@
 
 */
 import loader from './lib/loader'
-import shutdown from './helper/shutdown';
-(async ()=>{
-    const server = await loader()
-    
-    const shutdownHandler = async () => await shutdown(server);
+import shutdown from './helper/shutdown'
+;(async () => {
+  const server = await loader()
 
-    //listeners
-    process.once('SIGTERM', shutdownHandler)
-    process.once('SIGINT',  shutdownHandler)
-})() 
+  const shutdownHandler = async () => await shutdown(server)
 
-
-
+  //listeners
+  process.once('SIGTERM', shutdownHandler)
+  process.once('SIGINT', shutdownHandler)
+})()
