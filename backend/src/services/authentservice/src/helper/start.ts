@@ -11,7 +11,6 @@ const start = async (server: FastifyInstance) => {
           server.log.error(err)
           process.exit(1)
         }
-        server.log.info(_address)
       }
     )
   } catch (err) {
