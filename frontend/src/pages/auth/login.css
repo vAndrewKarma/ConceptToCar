@@ -1,7 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
 .color-overlay {
-  background: linear-gradient(to bottom, #e6e0e0, #02598b);
+  background: rgb(34, 193, 195);
+  background: linear-gradient(
+    0deg,
+    rgba(34, 193, 195, 1) 20%,
+    rgba(5, 10, 17, 1) 75%
+  );
   height: 100vh;
 }
 
@@ -43,6 +48,6 @@ form {
   width: 125px;
 }
 
-span {
+.error-message {
   color: red;
 }

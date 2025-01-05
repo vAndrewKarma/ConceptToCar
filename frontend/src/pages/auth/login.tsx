@@ -1,5 +1,5 @@
 import './login.css'
-import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Form, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -12,17 +12,17 @@ type FormData = {
 
 function Login() {
   const schema: ZodType<FormData> = z.object({
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    email: z.string().email({ message: 'Invalid credentials.' }),
     password: z
       .string()
-      .min(8, { message: 'Password must be at least 8 characters long.' })
-      .max(16, { message: 'Password must not exceed 16 characters.' })
+      .min(8, { message: 'Invalid credentials.' })
+      .max(16, { message: 'Invalid credentials.' })
       .regex(/[A-Z]/, {
-        message: 'Password must contain at least one uppercase letter.',
+        message: 'Invalid credentials.',
       })
-      .regex(/[0-9]/, { message: 'Password must contain at least one number.' })
+      .regex(/[0-9]/, { message: 'Invalid credentials.' })
       .regex(/[\W_]/, {
-        message: 'Password must contain at least one special character.',
+        message: 'Invalid credentials.',
       }),
   })
 
@@ -64,10 +64,6 @@ function Login() {
                   placeholder="Enter Email"
                   {...register('email')}
                 />
-
-                {errors.email && (
-                  <span className="error-message"> {errors.email.message}</span>
-                )}
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -80,24 +76,23 @@ function Login() {
                     <a href="d"> Forgot password?</a>
                   </Form.Label>
                 </div>
-                <OverlayTrigger
+                {/* <OverlayTrigger
                   placement="top"
                   overlay={
                     <Tooltip>
                       Between 8-16, 1 upper, 1 number, 1 special character.
                     </Tooltip>
                   }
-                >
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter Password"
-                    {...register('password')}
-                  />
-                </OverlayTrigger>
-                {errors.password && (
+                > */}
+                <Form.Control
+                  type="password"
+                  placeholder="Enter Password"
+                  {...register('password')}
+                />
+                {/* </OverlayTrigger> */}
+                {(errors.password || errors.email) && (
                   <span className="error-message">
-                    {' '}
-                    {errors.password.message}
+                    {errors.password?.message || errors.email?.message}
                   </span>
                 )}
               </Form.Group>
