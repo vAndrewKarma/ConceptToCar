@@ -1,16 +1,24 @@
-import mongoose from 'mongoose'
+import fastifyMongo from '@fastify/mongodb'
+import fastifyPlugin from 'fastify-plugin'
 import config from '../config'
 
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance } from 'fastify'
 
-export default async function InitMongo(server: FastifyInstance) {
+async function InitMongo(server: FastifyInstance) {
   try {
-    const { connection } = await mongoose.connect(
-      `mongodb://auth-mongo-srv:27017/authenthication` // TODO: add env
-    )
-    server.log.info(`Succesfully connected ${connection.db.databaseName}`)
+    await server.register(fastifyMongo, {
+      url: config.app.DB,
+      forceClose: true,
+      maxPoolSize: 100,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      //  tls: true,
+    })
+    server.log.info(`Succesfully connected to ${config.app.DB}`)
   } catch (err) {
     console.log(err)
     process.exit(1)
   }
 }
+
+export default fastifyPlugin(InitMongo)

@@ -42,6 +42,7 @@ web_modules/
 .env.local
 .cache
 .parcel-cache
+package-lock.json
 .next
 out
 .nuxt
