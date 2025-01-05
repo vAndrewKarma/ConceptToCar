@@ -1,14 +1,53 @@
 import './login.css'
 import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { z, ZodType } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+type FormData = {
+  email: string
+  password: string
+}
 
 function Login() {
+  const schema: ZodType<FormData> = z.object({
+    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters long.' })
+      .max(16, { message: 'Password must not exceed 16 characters.' })
+      .regex(/[A-Z]/, {
+        message: 'Password must contain at least one uppercase letter.',
+      })
+      .regex(/[0-9]/, { message: 'Password must contain at least one number.' })
+      .regex(/[\W_]/, {
+        message: 'Password must contain at least one special character.',
+      }),
+  })
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  })
+
+  const submitData = (data: FormData) => {
+    console.log('it worked', data)
+  }
+
   return (
     <div className="color-overlay d-flex justify-content-center align-items-center">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-md-6 col-lg-5">
-            <Form className="rounded p-4 p-sm-3">
+            <Form
+              className="rounded p-4 p-sm-3"
+              onSubmit={handleSubmit(submitData)}
+              noValidate
+            >
               <div className="d-flex justify-content-center">
                 <Form.Label className="custom-title">Welcome back</Form.Label>
               </div>
@@ -18,12 +57,17 @@ function Login() {
               </Form.Label>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label className="custom-label">Email Address</Form.Label>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip>Enter a valid email address.</Tooltip>}
-                >
-                  <Form.Control type="email" placeholder="Enter Email" />
-                </OverlayTrigger>
+
+                <Form.Control
+                  className="cb-b"
+                  type="email"
+                  placeholder="Enter Email"
+                  {...register('email')}
+                />
+
+                {errors.email && (
+                  <span className="error-message"> {errors.email.message}</span>
+                )}
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -40,13 +84,22 @@ function Login() {
                   placement="top"
                   overlay={
                     <Tooltip>
-                      Password must be 8-16 characters long and contain one
-                      uppercase and one special character.
+                      Between 8-16, 1 upper, 1 number, 1 special character.
                     </Tooltip>
                   }
                 >
-                  <Form.Control type="password" placeholder="Enter Password" />
+                  <Form.Control
+                    type="password"
+                    placeholder="Enter Password"
+                    {...register('password')}
+                  />
                 </OverlayTrigger>
+                {errors.password && (
+                  <span className="error-message">
+                    {' '}
+                    {errors.password.message}
+                  </span>
+                )}
               </Form.Group>
 
               <Form.Group className="mb-3 cb-b" controlId="formBasicCheckbox">
