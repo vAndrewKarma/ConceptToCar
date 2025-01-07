@@ -1,15 +1,22 @@
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Login from './pages/auth/login'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import NavScrollExample from './components/navbar'
+import Login from './pages/auth/login'
+import Home from './pages/home'
+import SignUp from './pages/sign-up'
+import Contact from './pages/contact'
 
 function App() {
   return (
     <BrowserRouter>
+      <NavScrollExample />
+
       <Routes>
-        <Route path="/login" element={<Login></Login>}>
-          {' '}
-        </Route>
+        <Route path="/home" element={<Home />} />
+        <Route path="/sign-in" element={<Login />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </BrowserRouter>
   )

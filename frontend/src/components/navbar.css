@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden; /* elimina scrollul; */
+}
+
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.content {
+  z-index: 1;
+  color: black;
+  text-align: center;
+}

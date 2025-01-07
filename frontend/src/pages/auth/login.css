@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
 .color-overlay {
-  background: rgb(34, 193, 195);
+  background: rgb(5, 10, 17);
   background: linear-gradient(
-    0deg,
-    rgba(34, 193, 195, 1) 20%,
+    208deg,
+    rgba(5, 10, 17, 1) 25%,
+    rgba(14, 69, 74, 1) 50%,
     rgba(5, 10, 17, 1) 75%
   );
   height: 100vh;
