@@ -13,7 +13,7 @@ const NavScrollExample: React.FC = () => {
       data-bs-theme="dark"
     >
       <Container fluid>
-        <Navbar.Brand as={Link} to="/home">
+        <Navbar.Brand as={Link} to="/">
           ConceptToCar
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
@@ -23,7 +23,7 @@ const NavScrollExample: React.FC = () => {
             style={{ maxHeight: '100px' }}
             navbarScroll
           >
-            <Nav.Link as={Link} to="/home">
+            <Nav.Link as={Link} to="/">
               Home
             </Nav.Link>
             <Nav.Link as={Link} to="/sign-in">

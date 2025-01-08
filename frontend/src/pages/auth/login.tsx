@@ -51,7 +51,6 @@ function Login() {
               <div className="d-flex justify-content-center">
                 <Form.Label className="custom-title">Welcome back</Form.Label>
               </div>
-              <br />
               <Form.Label className="extra">
                 Please enter your details
               </Form.Label>

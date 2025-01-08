@@ -6,6 +6,7 @@ import Login from './pages/auth/login'
 import Home from './pages/home'
 import SignUp from './pages/sign-up'
 import Contact from './pages/contact'
+import PageNotFound from './pages/404'
 
 function App() {
   return (
@@ -13,10 +14,11 @@ function App() {
       <NavScrollExample />
 
       <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<Login />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
   )
