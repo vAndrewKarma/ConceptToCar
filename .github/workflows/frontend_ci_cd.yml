@@ -44,4 +44,4 @@ jobs:
 
       # Step 7: Deploy to Google Cloud Storage
       - name: Deploy to GCS
-        run: gsutil -m cp -r frontend/dist/* gs://your-bucket-name
+        run: gsutil -m cp -r frontend/dist/* gs://karma-bucket
