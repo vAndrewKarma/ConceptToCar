@@ -23,27 +23,23 @@ jobs:
       # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
-        working-directory: ./frontend # Ensure we're in the frontend directory
 
       # Step 4: Build the project
       - name: Build the project
         run: npm run build
-        working-directory: ./frontend # Ensure we're in the frontend directory
 
-      # Step 5: Authenticate with GCP
-      - name: Authenticate with GCP
+      # Step 5: Authenticate with Google Cloud
+      - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Step 6: Authenticate gsutil explicitly
-      - name: Authenticate gsutil
-        run: |
-          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > $HOME/gcp-key.json
-          gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
-          gcloud auth application-default login --quiet
+      # Step 6: Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      # Step 7: Deploy to GCS
+      # Step 7: Deploy to Google Cloud Storage
       - name: Deploy to GCS
-        run: |
-          gsutil -m rsync -r ./frontend/dist/ gs://karma-bucket/
+        run: gsutil -m cp -r dist/* gs://karma-bucket
