@@ -38,9 +38,3 @@ jobs:
 
       - name: Deploy to GCS
         run: gsutil -m cp -r frontend/dist/* gs://karma-bucket
-
-      - name: Invalidate Cloud CDN Cache
-        run: |
-          gcloud compute url-maps invalidate-cdn-cache my-url-map \
-            --path "/*" \
-            --project ${{ secrets.GCP_PROJECT_ID }}
