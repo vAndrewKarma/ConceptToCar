@@ -10,38 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
         working-directory: frontend
 
-      # Step 4: Build the project
       - name: Build the project
         run: npm run build
         working-directory: frontend
 
-      # Step 5: Authenticate with Google Cloud
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Step 6: Set up Google Cloud SDK
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      # Step 7: Deploy to Google Cloud Storage
       - name: Deploy to GCS
         run: gsutil -m cp -r frontend/dist/* gs://karma-bucket
