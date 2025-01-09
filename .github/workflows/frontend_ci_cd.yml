@@ -23,10 +23,12 @@ jobs:
       # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
+        working-directory: frontend
 
       # Step 4: Build the project
       - name: Build the project
         run: npm run build
+        working-directory: frontend
 
       # Step 5: Authenticate with Google Cloud
       - name: Authenticate to Google Cloud
@@ -42,4 +44,4 @@ jobs:
 
       # Step 7: Deploy to Google Cloud Storage
       - name: Deploy to GCS
-        run: gsutil -m cp -r dist/* gs://karma-bucket
+        run: gsutil -m cp -r frontend/dist/* gs://your-bucket-name
