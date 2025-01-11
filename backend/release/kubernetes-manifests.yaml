@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentservice
+  labels:
+    app: authentservice
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: authentservice
+  template:
+    metadata:
+      labels:
+        app: authentservice
+    spec:
+      containers:
+      - name: authentservice
+        image: gcr.io/YOUR_PROJECT_ID/authentservice:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentservice-external
+spec:
+  type: LoadBalancer
+  selector:
+    app: authentservice
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080

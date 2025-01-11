@@ -11,7 +11,6 @@ export default async function fastify_loader() {
   })
   await server.register(helmet)
   await server.register(cors)
-  // TODO: add cors
   await start(server)
   server.get('/', function (request, reply) {
     request.log.info(
