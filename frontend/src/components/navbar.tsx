@@ -5,7 +5,7 @@ import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import './navbar.css'
 
-const NavScrollExample: React.FC = () => {
+const NavScroll: React.FC = () => {
   return (
     <Navbar
       expand="lg"
@@ -42,4 +42,4 @@ const NavScrollExample: React.FC = () => {
   )
 }
 
-export default NavScrollExample
+export default NavScroll

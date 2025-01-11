@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import './auth/login.css'
+import './login.css'
 
 export default class Home extends Component {
   render() {

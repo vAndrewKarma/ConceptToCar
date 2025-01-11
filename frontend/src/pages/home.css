@@ -1,0 +1,34 @@
+.home {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 58px;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+}
+
+.home-logo {
+  max-height: 200px;
+  margin-bottom: 300px;
+}
+
+@media (max-width: 768px) {
+  .home {
+    font-size: 1.8rem;
+  }
+
+  .home-logo {
+    max-height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    font-size: 1.4rem;
+  }
+
+  .home-logo {
+    max-height: 100px;
+  }
+}

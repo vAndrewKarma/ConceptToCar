@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from 'react-router-dom'
 
 type FormData = {
   email: string
@@ -103,8 +104,8 @@ function Login() {
                     label="Remember Me"
                     style={{ fontSize: '12px' }}
                   />
-                  <Form.Label className="extra">
-                    Don't have an account? <a href="d">Sign up</a>
+                  <Form.Label className="extra cb-b">
+                    Don't have an account? <Link to="/sign-up">Sign up</Link>
                   </Form.Label>
                 </div>
               </Form.Group>

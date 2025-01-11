@@ -1,17 +1,18 @@
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import NavScrollExample from './components/navbar'
+import NavScroll from './components/navbar'
 import Login from './pages/auth/login'
 import Home from './pages/home'
-import SignUp from './pages/sign-up'
+import SignUp from './pages/auth/sign-up'
 import Contact from './pages/contact'
 import PageNotFound from './pages/404'
+import Copyright from './components/copyright'
 
 function App() {
   return (
     <BrowserRouter>
-      <NavScrollExample />
+      <NavScroll />
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -20,6 +21,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
+      <Copyright />
     </BrowserRouter>
   )
 }
