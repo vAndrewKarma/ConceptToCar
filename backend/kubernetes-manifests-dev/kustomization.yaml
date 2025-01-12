@@ -3,3 +3,5 @@ kind: Kustomization
 resources:
   - authentservice.yaml
   - authmongo.yaml
+  - rabbitmq.yaml
+  - redis.yaml
