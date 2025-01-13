@@ -13,19 +13,21 @@ export default class Home extends Component {
           <img src={logo} alt="ConceptToCar Logo" className="home-logo" />
         </div>
         <div className="home d-flex justify-content-center align-items-center">
-          <Typewriter
-            words={[
-              'Design. Innovate. Drive.',
-              'Turning Concepts into Reality.',
-              'Where Ideas Meet the Road.',
-            ]}
-            loop={true}
-            cursor
-            cursorStyle="|"
-            typeSpeed={100}
-            deleteSpeed={50}
-            delaySpeed={3000}
-          ></Typewriter>
+          <span>
+            <Typewriter
+              words={[
+                'Design. Innovate. Drive.',
+                'Turning Concepts into Reality.',
+                'Where Ideas Meet the Road.',
+              ]}
+              loop={true}
+              cursor
+              cursorStyle="|"
+              typeSpeed={100}
+              deleteSpeed={50}
+              delaySpeed={3000}
+            ></Typewriter>
+          </span>
         </div>
       </div>
     )
