@@ -14,7 +14,7 @@ const NavScroll: React.FC = () => {
     >
       <Container fluid>
         <Navbar.Brand as={Link} to="/">
-          ConceptToCar
+          ConceptToCarz
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
