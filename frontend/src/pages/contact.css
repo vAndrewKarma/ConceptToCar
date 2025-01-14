@@ -1,0 +1,16 @@
+.contact {
+  color: white;
+  font-family: Roboto;
+  font-size: 24px;
+}
+
+.scrollable-content {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .scrollable-content {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
