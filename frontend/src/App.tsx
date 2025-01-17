@@ -8,6 +8,7 @@ import SignUp from './pages/auth/sign-up'
 import Contact from './pages/contact'
 import PageNotFound from './pages/404'
 import Copyright from './components/copyright'
+import Recover from './pages/auth/forgot-password/recover.tsx'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<Login />} />
+        <Route path="/recover" element={<Recover />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<PageNotFound />} />

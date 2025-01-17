@@ -13,17 +13,18 @@ type FormData = {
 
 function Login() {
   const schema: ZodType<FormData> = z.object({
-    email: z.string().email({ message: 'Invalid credentials.' }),
+    email: z.string().email({ message: 'Invalid credentials' }),
     password: z
       .string()
-      .min(8, { message: 'Invalid credentials.' })
-      .max(16, { message: 'Invalid credentials.' })
+      .nonempty({ message: 'Invalid credentials' })
+      .min(8, { message: 'Invalid credentials' })
+      .max(16, { message: 'Invalid credentials' })
       .regex(/[A-Z]/, {
-        message: 'Invalid credentials.',
+        message: 'Invalid credentials',
       })
-      .regex(/[0-9]/, { message: 'Invalid credentials.' })
+      .regex(/[0-9]/, { message: 'Invalid credentials' })
       .regex(/[\W_]/, {
-        message: 'Invalid credentials.',
+        message: 'Invalid credentials',
       }),
   })
 
@@ -62,6 +63,7 @@ function Login() {
                   className="cb-b"
                   type="email"
                   placeholder="Enter Email"
+                  isInvalid={!!errors.email}
                   {...register('email')}
                 />
               </Form.Group>
@@ -73,7 +75,7 @@ function Login() {
                     className="text-right cb-b"
                     style={{ fontSize: '12px' }}
                   >
-                    <a href="d"> Forgot password?</a>
+                    <Link to="/recover"> Forgot password?</Link>
                   </Form.Label>
                 </div>
                 {/* <OverlayTrigger
@@ -87,9 +89,11 @@ function Login() {
                 <Form.Control
                   type="password"
                   placeholder="Enter Password"
+                  isInvalid={!!errors.password}
                   {...register('password')}
                 />
                 {/* </OverlayTrigger> */}
+
                 {(errors.password || errors.email) && (
                   <span className="error-message">
                     {errors.password?.message || errors.email?.message}
