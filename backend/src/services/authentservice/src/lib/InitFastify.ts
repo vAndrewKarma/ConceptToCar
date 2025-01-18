@@ -4,7 +4,11 @@ import cors from '@fastify/cors'
 import start from '../helper/start'
 import InitRedis from './InitRedis'
 import InitRabbit from './InitRabbitMq'
+import config from '../config'
 export default async function fastify_loader() {
+  console.log(config.app.ENV)
+  console.log(config.app.ENV)
+  console.log(config.app.ENV)
   const server: FastifyInstance = fastify({
     logger: true,
     maxParamLength: 256,
@@ -17,6 +21,12 @@ export default async function fastify_loader() {
   await server.register(helmet)
   await server.register(cors)
   await start(server)
+  server.get('/health', function (request, reply) {
+    request.log.info(
+      'includes request information, but is the same logger instance as `log`'
+    )
+    reply.send({ hello: 'world' })
+  })
   server.get('/', function (request, reply) {
     request.log.info(
       'includes request information, but is the same logger instance as `log`'

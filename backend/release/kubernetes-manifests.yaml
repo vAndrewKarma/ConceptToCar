@@ -112,21 +112,16 @@ spec:
             claimName: mongo-pvc
 
 ---
-apiVersion: v1
-kind: PersistentVolume
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: mongo-pv
-spec:
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ''
-  gcePersistentDisk:
-    pdName: mongo-disk
-    fsType: ext4
+  name: standard-storage
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard # Use 'pd-ssd' for faster disks if needed
+  fsType: ext4
+reclaimPolicy: Retain # Retain disk data after PVC deletion
+volumeBindingMode: WaitForFirstConsumer # Delay binding until the pod is scheduled
 
 ---
 apiVersion: v1
@@ -140,6 +135,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  storageClassName: standard-storage
 
 ---
 apiVersion: v1
@@ -199,6 +195,25 @@ spec:
               value: 'redis-service.authenthication-service.svc.cluster.local'
             - name: REDIS_PORT
               value: '6379'
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 50051
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 50051
+            initialDelaySeconds: 15
+            periodSeconds: 20
 
 ---
 apiVersion: v1
@@ -246,3 +261,57 @@ spec:
                 name: authentservice
                 port:
                   number: 80
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: authenthication-service
+  name: authentservice-role
+rules:
+  - apiGroups: ['']
+    resources: ['pods', 'services', 'endpoints', 'configmaps', 'secrets']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: authentservice-rolebinding
+  namespace: authenthication-service
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: authenthication-service
+roleRef:
+  kind: Role
+  name: authentservice-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# # #ADD THIS TO PROD INSTEAD OF CURRENT RBAC MINIMAL REQ FOR PROD
+
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   namespace: authentservice-namespace
+#   name: authentservice-role
+# rules:
+#   - apiGroups: ['']
+#     resources: ['configmaps', 'secrets']
+#     verbs: ['get', 'list']
+#   - apiGroups: ['']
+#     resources: ['pods']
+#     verbs: ['get', 'list', 'watch']
+
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: authentservice-rolebinding
+#   namespace: authentservice-namespace
+# subjects:
+#   - kind: ServiceAccount
+#     name: authentservice-sa
+#     namespace: authentservice-namespace
+# roleRef:
+#   kind: Role
+#   name: authentservice-role
+#   apiGroup: rbac.authorization.k8s.io
