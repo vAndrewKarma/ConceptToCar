@@ -158,7 +158,7 @@ metadata:
   name: authentservice-deployment
   namespace: authenthication-service
 spec:
-  replicas: 1
+  replicas: 1 # Start with one pod; it will scale automatically
   selector:
     matchLabels:
       app: authentservice
@@ -182,7 +182,7 @@ spec:
               drop:
                 - ALL
             privileged: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true # Set filesystem to read-only for security
           image: gcr.io/ferrous-kayak-447111-i4/authentservice:latest
           ports:
             - containerPort: 50051
@@ -286,6 +286,26 @@ roleRef:
   name: authentservice-role
   apiGroup: rbac.authorization.k8s.io
 ---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: authentservice-hpa
+  namespace: authenthication-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: authentservice-deployment
+  minReplicas: 1
+  maxReplicas: 30
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50 # Scale when CPU exceeds 50% average utilization
+
 # # #ADD THIS TO PROD INSTEAD OF CURRENT RBAC MINIMAL REQ FOR PROD
 
 # apiVersion: rbac.authorization.k8s.io/v1
