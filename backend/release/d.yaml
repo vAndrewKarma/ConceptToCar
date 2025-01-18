@@ -1,0 +1,375 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authentservice-namespace
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard # Changed to GKE's standard storage class
+  gcePersistentDisk:
+    pdName: mongo-disk # You can create a Persistent Disk in GCP or remove this line to auto-create
+    fsType: ext4
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+  namespace: authentservice-namespace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard # Changed to standard storage class
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authmongo-deployment
+  namespace: authentservice-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-mongo
+  template:
+    metadata:
+      labels:
+        app: auth-mongo
+    spec:
+      containers:
+        - name: auth-mongo
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+          resources:
+            requests:
+              memory: '128Mi'
+              cpu: '100m'
+            limits:
+              memory: '256Mi'
+              cpu: '200m'
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-mongo-srv
+  namespace: authentservice-namespace
+spec:
+  selector:
+    app: auth-mongo
+  ports:
+    - name: mongo
+      port: 27017
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-deployment
+  namespace: authentservice-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+  namespace: authentservice-namespace
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: management
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  namespace: authentservice-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: authentservice-namespace
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentservice-deployment
+  namespace: authentservice-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentservice
+  template:
+    metadata:
+      labels:
+        app: authentservice
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: server
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+          image: gcr.io/ferrous-kayak-447111-i4/authentservice:latest
+          ports:
+            - containerPort: 50051
+          env:
+            - name: PORT
+              value: '50051'
+            - name: MONGO_DB
+              value: 'mongodb://auth-mongo-srv:27017/authenthication'
+            - name: REDIS_HOST
+              value: 'redis-service'
+            - name: REDIS_PORT
+              value: '6379'
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 50051
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 50051
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentservice
+  namespace: authentservice-namespace
+spec:
+  type: ClusterIP
+  selector:
+    app: authentservice
+  ports:
+    - name: http
+      port: 80
+      targetPort: 50051
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentservice-external
+  namespace: authentservice-namespace
+spec:
+  type: ClusterIP
+  selector:
+    app: authentservice
+  ports:
+    - name: http
+      port: 80
+      targetPort: 50051
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: authentservice-cert-renamed
+  namespace: authentservice-namespace
+spec:
+  domains:
+    - backend.conceptocar.xyz
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authentservice-ingress
+  namespace: authentservice-namespace
+  annotations:
+    kubernetes.io/ingress.class: 'gce'
+    networking.gke.io/managed-certificates: 'authentservice-cert-renamed'
+spec:
+  rules:
+    - host: backend.conceptocar.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: authentservice
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - backend.conceptocar.xyz
+      secretName: tls-secret # Ensure this secret exists or remove if not needed
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: authentservice-namespace
+data:
+  redis.conf: |
+    maxmemory 256mb
+    maxmemory-policy allkeys-lru
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: authentservice-namespace
+  name: authentservice-role
+rules:
+  - apiGroups: ['']
+    resources: ['pods', 'services', 'endpoints', 'configmaps', 'secrets']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: authentservice-rolebinding
+  namespace: authentservice-namespace
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: authentservice-namespace
+roleRef:
+  kind: Role
+  name: authentservice-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-authentservice
+  namespace: authentservice-namespace
+spec:
+  podSelector:
+    matchLabels:
+      app: authentservice
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 50051
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379

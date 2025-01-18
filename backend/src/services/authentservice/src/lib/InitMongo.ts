@@ -6,13 +6,14 @@ import { FastifyInstance } from 'fastify'
 
 async function InitMongo(server: FastifyInstance) {
   try {
+    const isProduction = config.app.ENV === 'kai'
     await server.register(fastifyMongo, {
-      url: config.app.DB,
+      url: 'mongodb://auth-mongo-srv.authenthication-service.svc.cluster.local:27017/authenthication',
       forceClose: true,
-      maxPoolSize: 100,
-      socketTimeoutMS: 45000,
-      connectTimeoutMS: 10000,
-      //  tls: true,
+      maxPoolSize: isProduction ? 200 : 50,
+      socketTimeoutMS: isProduction ? 30000 : 60000,
+      connectTimeoutMS: isProduction ? 5000 : 20000,
+      retryWrites: true,
     })
     server.log.info(`Succesfully connected to ${config.app.DB}`)
   } catch (err) {

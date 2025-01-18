@@ -1,11 +1,168 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authenthication-service
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: authentservice
-  labels:
-    app: authentservice
+  name: rabbitmq-deployment
+  namespace: authenthication-service
 spec:
-  replicas: 3
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+  namespace: authenthication-service
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: management
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  namespace: authenthication-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: authenthication-service
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authmongo-deployment
+  namespace: authenthication-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-mongo
+  template:
+    metadata:
+      labels:
+        app: auth-mongo
+    spec:
+      containers:
+        - name: auth-mongo
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ''
+  gcePersistentDisk:
+    pdName: mongo-disk
+    fsType: ext4
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+  namespace: authenthication-service
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-mongo-srv
+  namespace: authenthication-service
+spec:
+  selector:
+    app: auth-mongo
+  ports:
+    - name: mongo
+      port: 27017
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentservice-deployment
+  namespace: authenthication-service
+spec:
+  replicas: 1
   selector:
     matchLabels:
       app: authentservice
@@ -14,21 +171,78 @@ spec:
       labels:
         app: authentservice
     spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
-      - name: authentservice
-        image: gcr.io/YOUR_PROJECT_ID/authentservice:latest
-        ports:
-        - containerPort: 8080
+        - name: server
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+          image: gcr.io/ferrous-kayak-447111-i4/authentservice:latest
+          ports:
+            - containerPort: 50051
+          env:
+            - name: PORT
+              value: '50051'
+            - name: MONGO_DB
+              value: 'mongodb://auth-mongo-srv.authenthication-service.svc.cluster.local:27017/authenthication'
+            - name: REDIS_HOST
+              value: 'redis-service.authenthication-service.svc.cluster.local'
+            - name: REDIS_PORT
+              value: '6379'
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: authentservice-external
+  name: authentservice
+  namespace: authenthication-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: authentservice
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8080
+    - name: http
+      port: 80
+      targetPort: 50051
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: authentservice-cert-renamed
+  namespace: authenthication-service
+spec:
+  domains:
+    - backend.conceptocar.xyz
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authentservice-ingress
+  namespace: authenthication-service
+  annotations:
+    kubernetes.io/ingress.class: gce
+    networking.gke.io/managed-certificates: authentservice-cert-renamed
+spec:
+  rules:
+    - host: backend.conceptocar.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: authentservice
+                port:
+                  number: 80

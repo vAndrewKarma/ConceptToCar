@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "development": "nodemon -L --watch . --polling",
+    "production": "npm run start",
     "build": "tsc -p tsconfig.json",
     "kai": "npm run build && npm run start"
   },

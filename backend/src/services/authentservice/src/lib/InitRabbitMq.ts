@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import fastifyAmqpAsync from 'fastify-amqp-async'
+import config from '../config'
 async function InitRabbit(server: FastifyInstance) {
   try {
     await server.register(fastifyAmqpAsync, {
-      connectionString: 'amqp://guest:guest@rabbitmq:5672',
+      connectionString: 'amqp://rabbitmq-service:5672',
       useConfirmChannel: false,
       useRegularChannel: true,
     })

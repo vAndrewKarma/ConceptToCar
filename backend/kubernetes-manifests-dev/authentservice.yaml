@@ -28,6 +28,13 @@ spec:
             privileged: false
             readOnlyRootFilesystem: false # change sum things here to make it work better :)
           image: andrewkarma/authentservice
+          resources:
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
           ports:
             - containerPort: 50051
           env:
@@ -35,6 +42,10 @@ spec:
               value: '50051'
             - name: MONGO_DB
               value: 'mongodb://auth-mongo-srv:27017/authenthication'
+            - name: RabbitMQ
+              value: 'amqp://guest:guest@auth-rabbitmq-srv:5672/'
+            - name: REDIS
+              value: 'redis://auth-redis-srv:6379/'
 ---
 apiVersion: v1
 kind: Service
