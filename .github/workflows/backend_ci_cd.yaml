@@ -46,7 +46,7 @@ jobs:
           sudo mv skaffold /usr/local/bin
 
       - name: Run Skaffold in Background
-        run: skaffold dev --port-forward &
+        run: skaffold dev -p kai --port-forward &
         working-directory: backend
 
       - name: Wait for service to be ready
