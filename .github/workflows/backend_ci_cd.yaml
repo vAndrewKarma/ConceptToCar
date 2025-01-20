@@ -23,12 +23,26 @@ jobs:
       #     uses: google-github-actions/setup-gcloud@v1
       #     with:
       #       project_id: ${{ secrets.GCP_PROJECT_ID }}
+
       - name: Install Skaffold
         run: |
           curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
           chmod +x skaffold
           sudo mv skaffold /usr/local/bin
         working-directory: backend
+
+      - name: Authenticate Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      # Uncomment if using Google Container Registry (GCR) instead of Docker Hub
+      # - name: Authenticate Google Cloud Container Registry
+      #   uses: google-github-actions/auth@v1
+      #   with:
+      #     credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Start Skaffold
         run: |
