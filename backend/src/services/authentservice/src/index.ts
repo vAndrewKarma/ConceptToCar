@@ -12,8 +12,8 @@
 */
 import loader from './lib/loader'
 import shutdown from './helper/shutdown'
-;(async () => {
-  const server = await loader()
+;(async () => { 
+  const server = await loader() 
    
   const shutdownHandler = async () => await shutdown(server)
 

@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Run CI Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate with Google Cloud
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        run: |
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > /tmp/key.json
+          gcloud auth activate-service-account --key-file=/tmp/key.json
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+          chmod +x skaffold
+          sudo mv skaffold /usr/local/bin
+
+      - name: Start Skaffold
+        run: |
+          skaffold dev --profile dev &
+          sleep 30
+
+      - name: Test /health Endpoint
+        run: |
+          if curl -s http://localhost:8080/health | grep "OK"; then
+            echo "Health check passed."
+          else
+            echo "Health check failed."
+            exit 1
+          fi
+
+  cd:
+    name: Deploy to GCR and Redeploy Backend
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate with Google Cloud
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        run: |
+          echo

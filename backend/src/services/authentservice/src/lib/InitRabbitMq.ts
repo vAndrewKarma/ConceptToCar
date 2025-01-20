@@ -4,7 +4,7 @@ import config from '../config'
 async function InitRabbit(server: FastifyInstance) {
   try {
     await server.register(fastifyAmqpAsync, {
-      connectionString: 'amqp://rabbitmq-service:5672',
+      connectionString: config.app.MQ,
       useConfirmChannel: false,
       useRegularChannel: true,
     })
