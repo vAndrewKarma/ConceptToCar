@@ -52,15 +52,7 @@ jobs:
       - name: Wait for service to be ready
         run: |
           echo "Waiting for service to be ready..."
-          sleep 70
-
-      - name: kubectl pods
-        run: |
-          kubectl get pods
-
-      - name: kubectl pods
-        run: |
-          kubectl get services authentservice
+          sleep 240
 
       - name: Test /health endpoint
         run: |
