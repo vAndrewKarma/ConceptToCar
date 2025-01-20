@@ -1,18 +1,33 @@
-name: CI/CD Pipeline
+name: Backend CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   ci:
-    name: Run CI Tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: backend/src/services/authentservice
+
+      - name: Build the project
+        run: npm run build
+        working-directory: backend/src/services/authentservice
 
       - name: Install Skaffold
         run: |
@@ -21,43 +36,15 @@ jobs:
           sudo mv skaffold /usr/local/bin
         working-directory: backend
 
-      - name: Authenticate Docker Hub
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-      - name: Start Skaffold
-        run: |
-          skaffold dev --profile dev &
-          sleep 10
+      - name: Run Skaffold
+        run: skaffold dev --port-forward
         working-directory: backend
 
-      - name: Wait until the deployment is ready
-        env:
-          DEPLOYMENT_NAME: authentservice
+      - name: Wait for service to be ready
         run: |
-          kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=120s
-        working-directory: backend
+          echo "Waiting for service to be ready..."
+          sleep 30
 
-      - name: Port Forward Service
+      - name: Test /health endpoint
         run: |
-          kubectl port-forward svc/authentservice 8080:50051 &
-          sleep 5
-        working-directory: backend
-
-      - name: Test /health Endpoint
-        run: |
-          echo "Waiting for health check to pass..."
-          for i in {1..10}; do
-            if curl -s http://localhost:8080/health | grep "OK"; then
-              echo "Health check passed."
-              exit 0
-            fi
-            echo "Health check failed. Retrying in 5 seconds..."
-            sleep 5
-          done
-          echo "Health check failed after multiple attempts."
-          exit 1
-        working-directory: backend
+          curl -f http://localhost:50051/health || exit 1
