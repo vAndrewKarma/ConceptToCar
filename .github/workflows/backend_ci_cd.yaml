@@ -47,7 +47,7 @@ jobs:
         working-directory: backend
 
       - name: Run Skaffold
-        run: skaffold dev -p kai --port-forward
+        run: skaffold run -p kai --port-forward
         working-directory: backend
 
       - name: Wait for service to be ready
