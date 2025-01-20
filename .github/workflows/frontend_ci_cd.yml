@@ -1,5 +1,10 @@
 name: Deploy to GCS
 
+# on:
+#   push:
+#     branches:
+#       - main
+
 on:
   release:
     types: [published]
