@@ -46,7 +46,7 @@ jobs:
           sudo mv skaffold /usr/local/bin
 
       - name: Run Skaffold in Background
-        run: skaffold dev -p kai --port-forward &
+        run: skaffold dev -p kai --port-forward --log-level debug &
         working-directory: backend
 
       - name: Wait for service to be ready
@@ -58,8 +58,12 @@ jobs:
         run: |
           kubectl get pods
 
+      - name: kubectl pods
+        run: |
+          kubectl get services authentservice
+
       - name: Test /health endpoint
         run: |
-          kubectl port-forward svc/authentservice 50051:50051 &
+          kubectl port-forward svc/authentservice 50051:50051 --log-level debug &
           sleep 5
           curl -f http://localhost:50051/health || exit 1
