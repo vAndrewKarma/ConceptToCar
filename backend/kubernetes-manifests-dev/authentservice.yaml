@@ -1,75 +1,77 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: authentservice
-spec:
-  selector:
-    matchLabels:
-      app: authentservice
-  template:
-    metadata:
-      labels:
-        app: authentservice
-    spec:
-      serviceAccountName: default
-      terminationGracePeriodSeconds: 5
-      securityContext:
-        fsGroup: 1000
-        runAsGroup: 1000
-        runAsNonRoot: true
-        runAsUser: 1000
-      containers:
-        - name: server
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            privileged: false
-            readOnlyRootFilesystem: false # change sum things here to make it work better :)
-          image: andrewkarma/authentservice
-          resources:
-            limits:
-              memory: '512Mi'
-              cpu: '500m'
-            requests:
-              memory: '256Mi'
-              cpu: '250m'
-          ports:
-            - containerPort: 50051
-          env:
-            - name: PORT
-              value: '50051'
-            - name: MONGO_DB
-              value: 'mongodb://auth-mongo-srv:27017/authenthication'
-            - name: RabbitMQ
-              value: 'amqp://guest:guest@auth-rabbitmq-srv:5672/'
-            - name: REDIS_HOST
-              value: 'redis://auth-redis-srv:6379'
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: authentservice
-spec:
-  type: ClusterIP
-  selector:
-    app: authentservice
-  ports:
-    - name: port
-      port: 80
-      targetPort: 50051
+name: CI/CD Pipeline
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: authentservice-external
-spec:
-  type: LoadBalancer
-  selector:
-    app: authentservice
-  ports:
-    - name: http
-      port: 80
-      targetPort: 50051
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Run CI Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      #   - name: Authenticate to Google Cloud
+      #     uses: google-github-actions/auth@v1
+      #     with:
+      #       credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      #   - name: Set up Google Cloud SDK
+      #     uses: google-github-actions/setup-gcloud@v1
+      #     with:
+      #       project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+          chmod +x skaffold
+          sudo mv skaffold /usr/local/bin
+        working-directory: backend
+
+      - name: Authenticate Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      # Uncomment if using Google Container Registry (GCR) instead of Docker Hub
+      # - name: Authenticate Google Cloud Container Registry
+      #   uses: google-github-actions/auth@v1
+      #   with:
+      #     credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Start Skaffold
+        run: |
+          skaffold dev --profile dev &
+          sleep 10
+        working-directory: backend
+
+      - name: Wait until the deployment is ready
+        run: |
+          kubectl rollout status deployment/authentservice --timeout=120s
+        working-directory: backend
+
+      - name: Port Forward Service
+        run: |
+          kubectl port-forward svc/authentservice 8080:50051 &
+          sleep 5
+        working-directory: backend
+
+      - name: Test /health Endpoint
+        run: |
+          echo "Waiting for health check to pass..."
+          for i in {1..10}; do
+            if curl -s http://localhost:8080/health | grep "OK"; then
+              echo "Health check passed."
+              exit 0
+            fi
+            echo "Health check failed. Retrying in 5 seconds..."
+            sleep 5
+          done
+          echo "Health check failed after multiple attempts."
+          exit 1
+        working-directory: backend
