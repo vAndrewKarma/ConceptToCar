@@ -47,15 +47,32 @@ jobs:
       - name: Start Skaffold
         run: |
           skaffold dev --profile dev &
-          sleep 30
+          sleep 10
+        working-directory: backend
+
+      - name: Wait for Application to be Ready
+        run: |
+          # Wait until the deployment is ready
+          kubectl rollout status deployment <deployment-name> --timeout=120s
+        working-directory: backend
+
+      - name: Port Forward Service
+        run: |
+          kubectl port-forward svc/<service-name> 8080:3000 &
+          sleep 5
         working-directory: backend
 
       - name: Test /health Endpoint
         run: |
-          if curl -s http://localhost:8080/health | grep "OK"; then
-            echo "Health check passed."
-          else
-            echo "Health check failed."
-            exit 1
-          fi
+          echo "Waiting for health check to pass..."
+          for i in {1..10}; do
+            if curl -s http://localhost:8080/health | grep "OK"; then
+              echo "Health check passed."
+              exit 0
+            fi
+            echo "Health check failed. Retrying in 5 seconds..."
+            sleep 5
+          done
+          echo "Health check failed after multiple attempts."
+          exit 1
         working-directory: backend
