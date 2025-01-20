@@ -21,12 +21,8 @@ jobs:
         with:
           node-version: 18
 
-      - name: Set up Minikube
-        run: |
-          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-          chmod +x minikube-linux-amd64
-          sudo mv minikube-linux-amd64 /usr/local/bin/minikube
-          minikube start --driver=virtualbox --memory=4g --cpus=2
+      - name: Start minikube
+        uses: medyagh/setup-minikube@master
 
       - name: Authenticate Docker Hub
         env:
