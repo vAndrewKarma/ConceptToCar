@@ -54,6 +54,10 @@ jobs:
           echo "Waiting for service to be ready..."
           sleep 30
 
+      - name: kubectl pods
+        run: |
+          kubectl get pods
+
       - name: Test /health endpoint
         run: |
           kubectl port-forward svc/authentservice 50051:50051 &
