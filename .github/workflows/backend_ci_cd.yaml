@@ -31,8 +31,6 @@ jobs:
         run: npm install
         working-directory: backend/src/services/authentservice
 
-      - name: Install gke-gcloud-auth-plugin
-        run: gcloud components install gke-gcloud-auth-plugin --quiet
       - name: Build the project
         run: npm run build
         working-directory: backend/src/services/authentservice
@@ -46,6 +44,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: focus-vim-448513-a1
+      - name: Install gke-gcloud-auth-plugin
+        run: gcloud components install gke-gcloud-auth-plugin --quiet
 
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
