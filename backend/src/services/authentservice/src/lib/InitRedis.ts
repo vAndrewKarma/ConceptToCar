@@ -3,10 +3,9 @@ import fastifyRedis from '@fastify/redis'
 import config from '../config'
 async function InitRedis(server: FastifyInstance) {
   try {
-
     console.log(config.app.REDIS)
     await server.register(fastifyRedis, {
-      url: "redis://auth-redis-srv:6379",
+      url: config.app.REDIS,
       closeClient: true,
       namespace: 'authCache',
     })

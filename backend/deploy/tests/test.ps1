@@ -1,9 +1,9 @@
 
-$PROJECT_ID = "ferrous-kayak-447111-i4"
+$PROJECT_ID = "focus-vim-448513-a1"
 $REGION = "europe-west1"
 $ZONE = "europe-west1-b"
-$CLUSTER_NAME = "conceptocar"
-$MANIFESTS_PATH = "..\release\kubernetes-manifests.yaml"
+$CLUSTER_NAME = "doarptteste"
+$MANIFESTS_PATH = "deploy_tester.yaml"
 
 
 function Handle-Error {
@@ -45,9 +45,9 @@ if ($clusterExist -like "*Not found*") {
     Write-Host "Cluster '$CLUSTER_NAME' does not exist. Creating GKE cluster..."
 
 gcloud container clusters create $CLUSTER_NAME --region=europe-west1 `
-    --num-nodes=2 `
-    --machine-type=e2-medium `
-    --enable-autoscaling --min-nodes=2 --max-nodes=4 `
+    --num-nodes=1 `
+    --machine-type=e2-standard-2 `
+    --enable-autoscaling --min-nodes=1 --max-nodes=4 `
     --enable-network-policy `
     --enable-ip-alias `
     --enable-autorepair `

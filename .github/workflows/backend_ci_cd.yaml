@@ -1,4 +1,4 @@
-name: Backend CI Pipeline
+name: Backend CI/CD Pipeline
 
 on:
   push:
@@ -21,16 +21,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Start Minikube
-        uses: medyagh/setup-minikube@master
-
-      - name: Authenticate Docker Hub
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
       - name: Install dependencies
         run: npm install
         working-directory: backend/src/services/authentservice
@@ -39,23 +29,72 @@ jobs:
         run: npm run build
         working-directory: backend/src/services/authentservice
 
-      - name: Install Skaffold
-        run: |
-          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
-          chmod +x skaffold
-          sudo mv skaffold /usr/local/bin
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Run Skaffold in Background
-        run: skaffold dev -p kai --port-forward --log-level debug &
-        working-directory: backend
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: focus-vim-448513-a1
 
-      - name: Wait for service to be ready
+      - name: Configure Docker
+        run: gcloud auth configure-docker
+
+      - name: Build Docker image
+        run: docker build -t gcr.io/focus-vim-448513-a1/authentservice:latest .
+        working-directory: backend/src/services/authentservice
+
+      - name: Push Docker image to GCR
+        run: docker push gcr.io/focus-vim-448513-a1/authentservice:latest
+
+      - name: Get GKE credentials
+        run: gcloud container clusters get-credentials conceptocar --region europe-west1-b
+
+      - name: Update Kubernetes deployment
+        run: kubectl set image deployment/authentservice-deployment authentservice=gcr.io/focus-vim-448513-a1/authentservice:latest -n deployments
+
+      - name: Wait for deployment to be ready
         run: |
-          echo "Waiting for service to be ready..."
-          sleep 240
+          kubectl rollout status deployment/authentservice-deployment -n deployments
 
       - name: Test /health endpoint
         run: |
-          kubectl port-forward svc/authentservice 50051:50051 --log-level debug &
+          kubectl port-forward svc/authentservice 50051:50051 -n deployments &
           sleep 5
           curl -f http://localhost:50051/health || exit 1
+
+  cd:
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker
+
+      - name: Build Docker image
+        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest .
+        working-directory: backend/src/services/authentservice
+
+      - name: Push Docker image to GCR
+        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest
+
+      - name: Get GKE credentials
+        run: gcloud container clusters get-credentials conceptocar-release --region europe-west1-b
+
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f backend/release/kubernetes-manifests.yaml

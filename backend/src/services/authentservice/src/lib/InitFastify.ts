@@ -9,6 +9,9 @@ export default async function fastify_loader() {
   console.log(config.app.ENV)
   console.log(config.app.ENV)
   console.log(config.app.ENV)
+  console.log(config.app.DB)
+  console.log(config.app.MQ)
+  console.log(config.app.REDIS)
   const server: FastifyInstance = fastify({
     logger: true,
     maxParamLength: 256,
