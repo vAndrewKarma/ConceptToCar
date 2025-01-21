@@ -56,7 +56,7 @@ jobs:
         run: docker push gcr.io/focus-vim-448513-a1/authentservice:latest
 
       - name: Get GKE credentials
-        run: gcloud container clusters get-credentials conceptocar --region europe-west1-b
+        run: gcloud container clusters get-credentials doarptteste --region europe-west1-b
 
       - name: Update Kubernetes deployment with the new image
         run: |
