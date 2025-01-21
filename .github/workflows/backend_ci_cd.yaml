@@ -90,6 +90,10 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ferrous-kayak-447111-i4
+
+      - name: Install gke-gcloud-auth-plugin
+        run: gcloud components install gke-gcloud-auth-plugin --quiet
+
       - name: Authenticate Docker Hub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
