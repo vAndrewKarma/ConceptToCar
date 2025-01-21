@@ -40,7 +40,7 @@ jobs:
           project_id: focus-vim-448513-a1
 
       - name: Configure Docker
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker --quiet
 
       - name: Build Docker image
         run: docker build -t gcr.io/focus-vim-448513-a1/authentservice:latest .
@@ -52,8 +52,10 @@ jobs:
       - name: Get GKE credentials
         run: gcloud container clusters get-credentials conceptocar --region europe-west1-b
 
-      - name: Update Kubernetes deployment
-        run: kubectl set image deployment/authentservice-deployment authentservice=gcr.io/focus-vim-448513-a1/authentservice:latest -n deployments
+      - name: Update Kubernetes deployment with the new image
+        run: |
+          kubectl set image deployment/authentservice-deployment authentservice=gcr.io/focus-vim-448513-a1/authentservice:latest -n deployments
+          kubectl rollout restart deployment authentservice-deployment -n deployments
 
       - name: Wait for deployment to be ready
         run: |
@@ -83,7 +85,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Configure Docker
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker --quiet
 
       - name: Build Docker image
         run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest .
@@ -95,5 +97,16 @@ jobs:
       - name: Get GKE credentials
         run: gcloud container clusters get-credentials conceptocar-release --region europe-west1-b
 
-      - name: Apply Kubernetes manifests
-        run: kubectl apply -f backend/release/kubernetes-manifests.yaml
+      - name: Restart deployments with the new image
+        run: |
+          kubectl set image deployment/authentservice-deployment authentservice=gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest -n deployments
+          kubectl rollout restart deployment authentservice-deployment -n deployments
+
+      - name: Wait for deployment to be ready
+        run: |
+          kubectl rollout status deployment/authentservice-deployment -n deployments
+
+      - name: Test /health endpoint on HTTPS cluster
+        run: |
+          sleep 30
+          curl -f https://backend-tests.conceptocar.xyz/health || exit 1
