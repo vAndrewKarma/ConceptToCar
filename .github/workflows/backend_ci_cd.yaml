@@ -101,7 +101,7 @@ jobs:
         run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest
 
       - name: Get GKE credentials
-        run: gcloud container clusters get-credentials conceptocar-release --region europe-west1-b
+        run: gcloud container clusters get-credentials conceptocar-release --region europe-west1
 
       - name: Restart deployments with the new image
         run: |
