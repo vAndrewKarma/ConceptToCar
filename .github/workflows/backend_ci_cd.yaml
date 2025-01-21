@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
       - name: Authenticate Docker Hub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -32,6 +31,8 @@ jobs:
         run: npm install
         working-directory: backend/src/services/authentservice
 
+      - name: Install gke-gcloud-auth-plugin
+        run: gcloud components install gke-gcloud-auth-plugin --quiet
       - name: Build the project
         run: npm run build
         working-directory: backend/src/services/authentservice
@@ -44,27 +45,25 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Install gke-gcloud-auth-plugin
-        run: gcloud components install gke-gcloud-auth-plugin --quiet
+          project_id: focus-vim-448513-a1
 
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
 
       - name: Build Docker image
-        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest .
+        run: docker build -t gcr.io/focus-vim-448513-a1/authentservice:latest .
         working-directory: backend/src/services/authentservice
 
       - name: Push Docker image to GCR
-        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest
+        run: docker push gcr.io/focus-vim-448513-a1/authentservice:latest
 
       - name: Get GKE credentials
-        run: gcloud container clusters get-credentials doarptteste --zone europe-west1-b
+        run: gcloud container clusters get-credentials doarptteste --region europe-west1
 
       - name: Update Kubernetes deployment with the new image
         run: |
-          kubectl set image deployment/authentservice-deployment authentservice=gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest -n deployments
+          kubectl set image deployment/authentservice-deployment authentservice=gcr.io/focus-vim-448513-a1/authentservice:latest -n deployments
+          kubectl rollout restart deployment authentservice-deployment -n deployments
 
       - name: Wait for deployment to be ready
         run: |
@@ -93,9 +92,6 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Install gke-gcloud-auth-plugin
-        run: gcloud components install gke-gcloud-auth-plugin --quiet
-
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
 
@@ -107,12 +103,18 @@ jobs:
         run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest
 
       - name: Get GKE credentials
-        run: gcloud container clusters get-credentials conceptocar-release --zone europe-west1-b
+        run: gcloud container clusters get-credentials conceptocar-release --region europe-west1
 
-      - name: Update Kubernetes deployment with the new image
+      - name: Restart deployments with the new image
         run: |
           kubectl set image deployment/authentservice-deployment authentservice=gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest -n deployments
+          kubectl rollout restart deployment authentservice-deployment -n deployments
 
       - name: Wait for deployment to be ready
         run: |
           kubectl rollout status deployment/authentservice-deployment -n deployments
+
+      - name: Test /health endpoint on HTTPS cluster
+        run: |
+          sleep 30
+          curl -f https://backend-tests.conceptocar.xyz/health || exit 1
