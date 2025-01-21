@@ -28,7 +28,7 @@ export default async function fastify_loader() {
     request.log.info(
       'includes request information, but is the same logger instance as `log`'
     )
-    reply.send({ hello: 'world' })
+    reply.send({ hello: 'worldz' })
   })
   server.get('/', function (request, reply) {
     request.log.info(
