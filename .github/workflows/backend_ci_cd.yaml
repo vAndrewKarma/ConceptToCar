@@ -20,6 +20,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Authenticate Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
       - name: Install dependencies
         run: npm install
@@ -32,22 +38,24 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GC_SA_T }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: focus-vim-448513-a1
+      - name: Install gke-gcloud-auth-plugin
+        run: gcloud components install gke-gcloud-auth-plugin --quiet
 
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
 
       - name: Build Docker image
-        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest .
+        run: docker build -t gcr.io/focus-vim-448513-a1/authentservice:latest .
         working-directory: backend/src/services/authentservice
 
       - name: Push Docker image to GCR
-        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest
+        run: docker push gcr.io/focus-vim-448513-a1/authentservice:latest
 
       - name: Get GKE credentials
         run: gcloud container clusters get-credentials doarptteste --region europe-west1
@@ -76,25 +84,36 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY_RELEASE }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID_RELEASE }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
 
       - name: Build Docker image
-        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID_RELEASE }}/authentservice:latest .
+        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest .
         working-directory: backend/src/services/authentservice
 
       - name: Push Docker image to GCR
-        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID_RELEASE }}/authentservice:latest
+        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest
 
       - name: Get GKE credentials
-        run: gcloud container clusters get-credentials conceptocar-release --region europe-west1-b
+        run: gcloud container clusters get-credentials conceptocar-release --region europe-west1
 
-      - name: Apply Kubernetes manifests
-        run: kubectl apply -f backend/release/kubernetes-manifests.yaml
+      - name: Restart deployments with the new image
+        run: |
+          kubectl set image deployment/authentservice-deployment authentservice=gcr.io/${{ secrets.GCP_PROJECT_ID }}/authentservice:latest -n deployments
+          kubectl rollout restart deployment authentservice-deployment -n deployments
+
+      - name: Wait for deployment to be ready
+        run: |
+          kubectl rollout status deployment/authentservice-deployment -n deployments
+
+      - name: Test /health endpoint on HTTPS cluster
+        run: |
+          sleep 30
+          curl -f https://backend-tests.conceptocar.xyz/health || exit 1
