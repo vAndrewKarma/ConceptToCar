@@ -9,73 +9,73 @@ on:
       - main
 
 jobs:
-  # ci:
-  #   runs-on: ubuntu-latest
+  ci:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #     - name: Authenticate Docker Hub
-  #       env:
-  #         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  #         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  #       run: |
-  #         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Authenticate Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-  #     - name: Install dependencies
-  #       run: npm install
-  #       working-directory: backend/src/services/authentservice
+      - name: Install dependencies
+        run: npm install
+        working-directory: backend/src/services/authentservice
 
-  #     - name: Build the project
-  #       run: npm run build
-  #       working-directory: backend/src/services/authentservice
+      - name: Build the project
+        run: npm run build
+        working-directory: backend/src/services/authentservice
 
-  #     - name: Authenticate to Google Cloud
-  #       uses: google-github-actions/auth@v1
-  #       with:
-  #         credentials_json: ${{ secrets.GC_SA_T }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GC_SA_T }}
 
-  #     - name: Set up Google Cloud SDK
-  #       uses: google-github-actions/setup-gcloud@v1
-  #       with:
-  #         project_id: focus-vim-448513-a1
-  #     - name: Install gke-gcloud-auth-plugin
-  #       run: gcloud components install gke-gcloud-auth-plugin --quiet
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: focus-vim-448513-a1
+      - name: Install gke-gcloud-auth-plugin
+        run: gcloud components install gke-gcloud-auth-plugin --quiet
 
-  #     - name: Configure Docker
-  #       run: gcloud auth configure-docker --quiet
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
 
-  #     - name: Build Docker image
-  #       run: docker build -t gcr.io/focus-vim-448513-a1/authentservice:latest .
-  #       working-directory: backend/src/services/authentservice
+      - name: Build Docker image
+        run: docker build -t gcr.io/focus-vim-448513-a1/authentservice:latest .
+        working-directory: backend/src/services/authentservice
 
-  #     - name: Push Docker image to GCR
-  #       run: docker push gcr.io/focus-vim-448513-a1/authentservice:latest
+      - name: Push Docker image to GCR
+        run: docker push gcr.io/focus-vim-448513-a1/authentservice:latest
 
-  #     - name: Get GKE credentials
-  #       run: gcloud container clusters get-credentials doarptteste --region europe-west1
+      - name: Get GKE credentials
+        run: gcloud container clusters get-credentials doarptteste --region europe-west1
 
-  #     - name: Restart Kubernetes deployments
-  #       run: |
-  #         kubectl rollout restart deployment/authentservice-deployment -n deployments
+      - name: Restart Kubernetes deployments
+        run: |
+          kubectl rollout restart deployment/authentservice-deployment -n deployments
 
-  #     - name: Wait for deployments to be ready
-  #       run: |
-  #         kubectl rollout status deployment/authentservice-deployment -n deployments
+      - name: Wait for deployments to be ready
+        run: |
+          kubectl rollout status deployment/authentservice-deployment -n deployments
 
-  #     - name: Test /health endpoint
-  #       run: |
-  #         sleep 30
-  #         curl -f https://backend-tests.conceptocar.xyz/health || exit 1
+      - name: Test /health endpoint
+        run: |
+          sleep 30
+          curl -f https://backend-tests.conceptocar.xyz/health || exit 1
 
   cd:
     runs-on: ubuntu-latest
-    # needs: ci
+    needs: ci
 
     steps:
       - name: Checkout code
