@@ -4,7 +4,8 @@ import cors from '@fastify/cors'
 import start from '../helper/start'
 import InitRedis from './InitRedis'
 import InitRabbit from './InitRabbitMq'
-import Checks from '../plugins/checks_route'
+import RouteCore from '../plugins/route_core/core'
+import ErrorHandler from '../errors/handler'
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,
@@ -17,7 +18,8 @@ export default async function fastify_loader() {
   await InitRabbit(server)
   await server.register(helmet)
   await server.register(cors)
-  await server.register(Checks) // de regandit cand ajung la authroutes si scheme pt auth
+  RouteCore(server)
+  server.register(ErrorHandler)
   await start(server)
   return server
 }

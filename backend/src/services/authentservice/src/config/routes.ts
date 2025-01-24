@@ -1,7 +1,16 @@
+import authcontroller from '../controllers/authController'
 import checksController from '../controllers/checkController'
+import { registerSchema } from '../schemas/auth_validation'
 
 const routes = {
-  authRoutes: {},
+  authRoutes: {
+    register: {
+      method: 'POST',
+      routeName: '/register',
+      controller: authcontroller.RegisterController,
+      schema: registerSchema,
+    },
+  },
   healthRoutes: {
     healthCheck: {
       method: 'GET',
@@ -11,7 +20,7 @@ const routes = {
     indexCheck: {
       method: 'GET',
       routeName: '/',
-      controller: checksController.healthcheck,
+      controller: checksController.healthcheck, // todo add metrics
     },
   },
   userRoute: null, // todo may not need it, vad pe viitor

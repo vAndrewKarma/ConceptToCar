@@ -1,6 +1,0 @@
-{
-    "watch": ["src", ".env"],
-    "ext": "ts,js,json",
-    "ignore": ["node_modules", "src/**/*.spec.ts"],
-    "exec": "ts-node --transpile-only  src/index.ts"
-  }

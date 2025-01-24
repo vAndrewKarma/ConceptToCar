@@ -1,7 +1,0 @@
-node_modules
-pnpm-lock.yaml
-logs
-coverage
-.vercel
-tests
-.env
