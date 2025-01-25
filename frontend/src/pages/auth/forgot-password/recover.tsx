@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import '../login.css'
 import '../../styles.css'
+import './recover.css'
 
 type FormData = {
   email: string
@@ -38,9 +39,9 @@ function Recover() {
             >
               <div className="d-flex justify-content-center">
                 <Form.Label
-                  className="font"
+                  className="font title"
                   style={{
-                    fontSize: '40px',
+                    fontSize: '30px',
                     fontWeight: '600',
                   }}
                 >

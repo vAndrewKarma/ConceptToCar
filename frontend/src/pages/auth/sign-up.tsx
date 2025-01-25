@@ -6,7 +6,7 @@ import './login.css'
 function SignUp() {
   const [selectedRole, setSelectedRole] = useState('Roles')
 
-  const handleRoleSelect = (role) => {
+  const handleRoleSelect = (role: string) => {
     setSelectedRole(role)
   }
 
