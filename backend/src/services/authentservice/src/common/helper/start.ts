@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import config from '../config'
+import config from '../../config'
 import podIP from './getPodIps'
 
 const start = async (server: FastifyInstance) => {
