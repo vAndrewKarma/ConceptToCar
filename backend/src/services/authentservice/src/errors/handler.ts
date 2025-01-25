@@ -7,15 +7,35 @@ function ErrorHandler(server: FastifyInstance) {
     throw new NotFoundError(`${req.url} - ${req.method} not found`)
   })
 
-  server.setErrorHandler((error: FastifyError, _req, res) => {
-    console.error(JSON.stringify(error, null, 2)) // Log the full error object
+  const contextErrorMessages: Record<string, string> = {
+    '/login': 'Invalid credentials',
+  }
 
+  function formatValidationErrors(
+    error: FastifyError
+  ): { field: string; message: string }[] {
+    return (
+      error.validation?.flatMap((err) =>
+        (err.params.errors as any[]).map((validationErr) => ({
+          field:
+            validationErr.params?.missingProperty ||
+            err.instancePath.replace('/', ''),
+          message: err.message,
+        }))
+      ) || []
+    )
+  }
+
+  server.setErrorHandler((error: FastifyError, req, res) => {
+    console.error(JSON.stringify(error, null, 2))
     if (error.validation) {
-      const validationErrors = error.validation.map((err) => ({
-        field: err.instancePath.replace('/', ''), // Extract field name
-        message: err.message, // Error message
-      }))
+      const context = req.url
 
+      if (contextErrorMessages[context]) {
+        return res.status(400).send({ message: contextErrorMessages[context] })
+      }
+
+      const validationErrors = formatValidationErrors(error)
       return res.status(400).send({ errors: validationErrors })
     }
 
@@ -28,7 +48,12 @@ function ErrorHandler(server: FastifyInstance) {
 }
 const schemaErrorFormatter = (errors) => {
   return new Error(
-    errors.map((err) => `${err.instancePath} ${err.message}`).join(', ')
+    errors
+      .map(
+        (err: { instancePath: string; message: string }) =>
+          `${err.instancePath} ${err.message}`
+      )
+      .join(', ')
   )
 }
 
