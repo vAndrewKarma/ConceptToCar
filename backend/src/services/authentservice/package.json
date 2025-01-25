@@ -9,8 +9,8 @@
     "production": "npm run start",
     "build": "tsc -p tsconfig.json",
     "kai": "npm run build && npm run start"
-  }, 
-  "keywords": [], 
+  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -18,6 +18,10 @@
     "@fastify/helmet": "^13.0.0",
     "@fastify/mongodb": "^9.0.1",
     "@fastify/redis": "^7.0.1",
+    "ajv": "^8.17.1",
+    "ajv-errors": "^3.0.0",
+    "ajv-formats": "^3.0.1",
+    "ajv-keywords": "^5.1.0",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.0",
     "fastify-amqp-async": "^1.0.1",
@@ -25,6 +29,7 @@
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
+    "@types/ajv": "^0.0.5",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
