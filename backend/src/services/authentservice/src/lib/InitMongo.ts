@@ -1,7 +1,7 @@
 import fastifyMongo from '@fastify/mongodb'
 import fastifyPlugin from 'fastify-plugin'
 import config from '../config'
-
+import { createUserModel } from '../db/m_m'
 import { FastifyInstance } from 'fastify'
 
 async function InitMongo(server: FastifyInstance) {
@@ -16,6 +16,7 @@ async function InitMongo(server: FastifyInstance) {
       retryWrites: true,
     })
     server.log.info(`Succesfully connected to ${config.app.DB}`)
+    server.decorate('userModel', createUserModel(server))
   } catch (err) {
     console.log(err)
     process.exit(1)

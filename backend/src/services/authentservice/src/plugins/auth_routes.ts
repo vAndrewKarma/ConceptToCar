@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifySchema } from 'fastify'
-import routes from '../config/routes' 
+import routes from '../config/routes'
 
 async function AuthRoutes(fastify: FastifyInstance) {
   Object.values(routes.authRoutes).forEach((route) => {
@@ -7,7 +7,7 @@ async function AuthRoutes(fastify: FastifyInstance) {
       method: route.method,
       url: route.routeName,
       handler: route.controller,
-      schema: { body: route.schema } as FastifySchema
+      schema: { body: route.schema } as FastifySchema,
     })
   })
 }
