@@ -1,0 +1,57 @@
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .custom-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .custom-label {
+    font-size: 0.9rem;
+  }
+
+  .custom-button {
+    width: 100%;
+  }
+
+  .extra {
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  .cb-b {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}
+
+/* Ajustări pentru rezoluții mai mici de 576px */
+@media (max-width: 576px) {
+  .container {
+    padding: 10px;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+
+  .col-6 {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .custom-title {
+    font-size: 1.2rem;
+  }
+
+  .custom-label {
+    font-size: 0.8rem;
+  }
+
+  .custom-button {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+  }
+}

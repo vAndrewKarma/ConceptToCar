@@ -53,3 +53,18 @@ form {
   color: red;
   font-family: Roboto;
 }
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #000;
+  font-size: 1.2rem;
+}
+
+.custom-error-border {
+  border-color: red !important;
+  box-shadow: none !important;
+}

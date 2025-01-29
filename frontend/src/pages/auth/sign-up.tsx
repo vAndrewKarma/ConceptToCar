@@ -1,13 +1,93 @@
 import { useState } from 'react'
 import { Form, Button } from 'react-bootstrap'
 import Dropdown from 'react-bootstrap/Dropdown'
+import { z, ZodType } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { Eye, EyeOff } from 'lucide-react'
 import './login.css'
+import './sign-up.css'
 
 function SignUp() {
   const [selectedRole, setSelectedRole] = useState('Roles')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev)
+  }
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prev) => !prev)
+  }
+
+  type FormData = {
+    email: string
+    password: string
+    confirmPassword: string
+    firstName: string
+    lastName: string
+    key: string
+  }
+
+  const schema: ZodType<FormData> = z
+    .object({
+      email: z
+        .string()
+        .nonempty({ message: 'Please enter your email address' })
+        .email(),
+      password: z
+        .string()
+        .nonempty({ message: 'Please enter your password' })
+        .min(8, { message: 'Password too short (min. 8 chr.)' })
+        .max(16, { message: 'Too much characters (max. 16 chr.)' })
+        .regex(/[A-Z]/, {
+          message: 'You must have at least one uppercase character',
+        })
+        .regex(/[0-9]/, { message: 'You must have at least one number' })
+        .regex(/[\W_]/, {
+          message: 'You must have at least one special character',
+        }),
+      confirmPassword: z
+        .string()
+        .nonempty({ message: 'Please confirm your password' }),
+      firstName: z
+        .string()
+        .nonempty({ message: 'Please enter your first name' })
+        .max(30, { message: 'First name is too long' })
+        .regex(
+          /^[a-zA-Z\s]+$/,
+          'First name must not contain special characters or numbers.'
+        ),
+      lastName: z
+        .string()
+        .nonempty({ message: 'Please enter your last name' })
+        .max(30, { message: 'Last name is too long' })
+        .regex(
+          /^[a-zA-Z\s]+$/,
+          'Last name must not contain special characters or numbers.'
+        ),
+      key: z.string().nonempty({ message: 'Please enter your access key' }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: 'Passwords do not match',
+      path: ['confirmPassword'],
+    })
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  })
+
+  const submitData = (data: FormData) => {
+    console.log('it worked', data)
   }
 
   return (
@@ -15,7 +95,11 @@ function SignUp() {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-md-6 col-lg-5">
-            <Form className="rounded p-4 p-sm-3" noValidate>
+            <Form
+              className="rounded p-4 p-sm-3"
+              onSubmit={handleSubmit(submitData)}
+              noValidate
+            >
               <div className="d-flex justify-content-center">
                 <Form.Label className="custom-title">Sign Up</Form.Label>
               </div>
@@ -25,7 +109,15 @@ function SignUp() {
                     <Form.Label className="custom-label">
                       First name <span style={{ color: 'red' }}>*</span>
                     </Form.Label>
-                    <Form.Control className="cb-b" type="text" />
+                    <Form.Control
+                      className="cb-b"
+                      type="text"
+                      isInvalid={!!errors.firstName}
+                      {...register('firstName')}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.firstName?.message}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </div>
 
@@ -34,7 +126,15 @@ function SignUp() {
                     <Form.Label className="custom-label">
                       Last name <span style={{ color: 'red' }}>*</span>
                     </Form.Label>
-                    <Form.Control className="cb-b" type="text" />
+                    <Form.Control
+                      className="cb-b"
+                      type="text"
+                      isInvalid={!!errors.lastName}
+                      {...register('lastName')}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.lastName?.message}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </div>
               </div>
@@ -46,8 +146,12 @@ function SignUp() {
                 <Form.Control
                   className="cb-b"
                   type="email"
-                  placeholder="Enter Email"
+                  isInvalid={!!errors.email}
+                  {...register('email')}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {errors.email?.message}
+                </Form.Control.Feedback>
               </Form.Group>
               <div className="row">
                 <div className="col-6">
@@ -55,21 +159,66 @@ function SignUp() {
                     <Form.Label className="custom-label">
                       Password <span style={{ color: 'red' }}>*</span>
                     </Form.Label>
-                    <Form.Control className="cb-b" type="text" />
+                    <div className="position-relative">
+                      <Form.Control
+                        className={`cb-b ${errors.password ? 'custom-error-border' : ''}`}
+                        type={showPassword ? 'text' : 'password'}
+                        {...register('password')}
+                      />
+                      <Button
+                        variant="link"
+                        className="position-absolute end-0 top-50 translate-middle-y me-2"
+                        style={{ color: 'black' }}
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </Button>
+                    </div>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password?.message}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </div>
 
                 <div className="col-6">
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
+                  <Form.Group
+                    className="mb-3"
+                    controlId="formBasicConfirmPassword"
+                  >
                     <Form.Label className="custom-label">
                       Confirm Password <span style={{ color: 'red' }}>*</span>
                     </Form.Label>
-                    <Form.Control className="cb-b" type="text" />
+                    <div className="position-relative">
+                      <Form.Control
+                        className={`cb-b ${errors.confirmPassword ? 'custom-error-border' : ''}`}
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        {...register('confirmPassword')}
+                      />
+                      <Button
+                        variant="link"
+                        className="position-absolute end-0 top-50 translate-middle-y me-2"
+                        style={{ color: 'black' }}
+                        onClick={toggleConfirmPasswordVisibility}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </Button>
+                    </div>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.confirmPassword?.message}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </div>
               </div>
               <div className="row">
-                <div className="col-6">
+                <div className="col-6" style={{ paddingTop: '20px' }}>
                   <Dropdown>
                     <Dropdown.Toggle
                       id="dropdown-autoclose-true"
@@ -106,16 +255,21 @@ function SignUp() {
                     <span style={{ color: 'red' }}>*</span>" are mandatory
                   </Form.Label>
                 </div>
-                {selectedRole === 'Admin' && (
-                  <div className="col-6">
-                    <Form.Group className="mb-3" controlId="formBasicAdmin">
-                      <Form.Label className="custom-label">
-                        Admin Key
-                      </Form.Label>
-                      <Form.Control className="cb-b" type="text" />
-                    </Form.Group>
-                  </div>
-                )}
+
+                <div className="col-6">
+                  <Form.Group className="mb-3" controlId="formBasicAdmin">
+                    <Form.Label className="custom-label">Access Key</Form.Label>
+                    <Form.Control
+                      className="cb-b"
+                      type="text"
+                      isInvalid={!!errors.key}
+                      {...register('key')}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.key?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </div>
               </div>
               <div className="d-flex justify-content-center cb-b">
                 <Button
