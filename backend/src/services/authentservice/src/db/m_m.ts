@@ -16,6 +16,7 @@ interface User {
   firstName: string
   lastName: string
   password: string
+  key: string
   role: Roles
   ip: string
   verified: boolean
@@ -35,6 +36,7 @@ class UserModel {
         memoryCost: 2 ** 15,
         timeCost: 2,
         parallelism: 2,
+        type: argon2.argon2id,
       })
 
       const user: User = {
@@ -46,6 +48,7 @@ class UserModel {
         updatedAt: new Date(),
         password: password,
         verified: false,
+        key: D_user.key,
         ip: D_user.ip,
       }
       const { insertedId } = await this.collection.insertOne(user)

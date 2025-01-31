@@ -5,3 +5,4 @@ resources:
   - authmongo.yaml
   - rabbitmq.yaml
   - redis.yaml
+  - keys.yaml
