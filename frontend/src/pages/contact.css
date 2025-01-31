@@ -10,8 +10,8 @@
 
 @media (max-width: 768px) {
   .scrollable-content {
-    max-height: 85vh;
+    max-height: 78vh;
     overflow-y: auto;
-    margin-bottom: 65px;
+    margin-bottom: 20px;
   }
 }

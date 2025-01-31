@@ -12,9 +12,11 @@ function SignUp() {
   const [selectedRole, setSelectedRole] = useState('Roles')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [roleError, setRoleError] = useState<string | null>(null)
 
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role)
+    setRoleError(null)
   }
 
   const togglePasswordVisibility = () => {
@@ -44,7 +46,7 @@ function SignUp() {
         .string()
         .nonempty({ message: 'Please enter your password' })
         .min(8, { message: 'Password too short (min. 8 chr.)' })
-        .max(16, { message: 'Too much characters (max. 16 chr.)' })
+        .max(16, { message: 'Too many characters (max. 16 chr.)' })
         .regex(/[A-Z]/, {
           message: 'You must have at least one uppercase character',
         })
@@ -78,209 +80,243 @@ function SignUp() {
       path: ['confirmPassword'],
     })
 
+  const karmalerezolva = async (
+    data: FormData,
+    context: object,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options: any
+  ) => {
+    console.log('test')
+    if (selectedRole === 'Roles') {
+      setRoleError('Please select a role.')
+      console.log('🔴 Role error set:', roleError)
+    }
+    const result = await zodResolver(schema)(data, context, options)
+    return result
+  }
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: karmalerezolva,
   })
 
   const submitData = (data: FormData) => {
-    console.log('it worked', data)
-  }
+    // console.log('saal')
 
+    console.log('✅ Form submitted with:', { ...data, role: selectedRole })
+  }
   return (
     <div className="color-overlay d-flex justify-content-center align-items-center">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-6 col-lg-5">
-            <Form
-              className="rounded p-4 p-sm-3"
-              onSubmit={handleSubmit(submitData)}
-              noValidate
-            >
-              <div className="d-flex justify-content-center">
-                <Form.Label className="custom-title">Sign Up</Form.Label>
-              </div>
-              <div className="row" style={{ paddingTop: '30px' }}>
-                <div className="col-6">
-                  <Form.Group className="mb-3" controlId="formBasicName">
-                    <Form.Label className="custom-label">
-                      First name <span style={{ color: 'red' }}>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="cb-b"
-                      type="text"
-                      isInvalid={!!errors.firstName}
-                      {...register('firstName')}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.firstName?.message}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+      <div className="scrollable-content">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-12 col-md-6 col-lg-5">
+              <Form
+                className="rounded p-4 p-sm-3"
+                onSubmit={handleSubmit(submitData)}
+                noValidate
+              >
+                <div className="d-flex justify-content-center">
+                  <Form.Label className="custom-title">Sign Up</Form.Label>
                 </div>
-
-                <div className="col-6">
-                  <Form.Group className="mb-3" controlId="formBasicSurname">
-                    <Form.Label className="custom-label">
-                      Last name <span style={{ color: 'red' }}>*</span>
-                    </Form.Label>
-                    <Form.Control
-                      className="cb-b"
-                      type="text"
-                      isInvalid={!!errors.lastName}
-                      {...register('lastName')}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.lastName?.message}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </div>
-              </div>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label className="custom-label">
-                  Email Address <span style={{ color: 'red' }}>*</span>
-                </Form.Label>
-
-                <Form.Control
-                  className="cb-b"
-                  type="email"
-                  isInvalid={!!errors.email}
-                  {...register('email')}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.email?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-              <div className="row">
-                <div className="col-6">
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label className="custom-label">
-                      Password <span style={{ color: 'red' }}>*</span>
-                    </Form.Label>
-                    <div className="position-relative">
+                <div className="row" style={{ paddingTop: '30px' }}>
+                  <div className="col-6">
+                    <Form.Group className="mb-3" controlId="formBasicName">
+                      <Form.Label className="custom-label">
+                        First name
+                      </Form.Label>
                       <Form.Control
-                        className={`cb-b ${errors.password ? 'custom-error-border' : ''}`}
-                        type={showPassword ? 'text' : 'password'}
-                        {...register('password')}
+                        className="cb-b"
+                        type="text"
+                        isInvalid={!!errors.firstName}
+                        {...register('firstName')}
                       />
-                      <Button
-                        variant="link"
-                        className="position-absolute end-0 top-50 translate-middle-y me-2"
-                        style={{ color: 'black' }}
-                        onClick={togglePasswordVisibility}
-                      >
-                        {showPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
-                      </Button>
-                    </div>
-                    <Form.Control.Feedback type="invalid">
-                      {errors.password?.message}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </div>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.firstName?.message}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </div>
 
-                <div className="col-6">
-                  <Form.Group
-                    className="mb-3"
-                    controlId="formBasicConfirmPassword"
-                  >
-                    <Form.Label className="custom-label">
-                      Confirm Password <span style={{ color: 'red' }}>*</span>
-                    </Form.Label>
-                    <div className="position-relative">
+                  <div className="col-6">
+                    <Form.Group className="mb-3" controlId="formBasicSurname">
+                      <Form.Label className="custom-label">
+                        Last name
+                      </Form.Label>
                       <Form.Control
-                        className={`cb-b ${errors.confirmPassword ? 'custom-error-border' : ''}`}
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        {...register('confirmPassword')}
+                        className="cb-b"
+                        type="text"
+                        isInvalid={!!errors.lastName}
+                        {...register('lastName')}
                       />
-                      <Button
-                        variant="link"
-                        className="position-absolute end-0 top-50 translate-middle-y me-2"
-                        style={{ color: 'black' }}
-                        onClick={toggleConfirmPasswordVisibility}
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
-                      </Button>
-                    </div>
-                    <Form.Control.Feedback type="invalid">
-                      {errors.confirmPassword?.message}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.lastName?.message}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </div>
                 </div>
-              </div>
-              <div className="row">
-                <div className="col-6" style={{ paddingTop: '20px' }}>
-                  <Dropdown>
-                    <Dropdown.Toggle
-                      id="dropdown-autoclose-true"
-                      className="w-75 btn-warning"
-                      style={{ fontWeight: 'bold' }}
-                    >
-                      {selectedRole}
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                      <Dropdown.Item onClick={() => handleRoleSelect('Admin')}>
-                        Admin
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        onClick={() => handleRoleSelect('Designer')}
-                      >
-                        Designer
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        onClick={() => handleRoleSelect('Portofolio manager')}
-                      >
-                        Portofolio manager
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleRoleSelect('Seller')}>
-                        Seller
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                  <Form.Label
-                    className="extra"
-                    style={{ fontSize: '14px', paddingTop: '5px' }}
-                  >
-                    **Notice: The fields marked with "
-                    <span style={{ color: 'red' }}>*</span>" are mandatory
+                <Form.Group className="mb-3" controlId="formBasicEmail">
+                  <Form.Label className="custom-label">
+                    Email Address
                   </Form.Label>
-                </div>
 
-                <div className="col-6">
-                  <Form.Group className="mb-3" controlId="formBasicAdmin">
-                    <Form.Label className="custom-label">Access Key</Form.Label>
-                    <Form.Control
-                      className="cb-b"
-                      type="text"
-                      isInvalid={!!errors.key}
-                      {...register('key')}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.key?.message}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+                  <Form.Control
+                    className="cb-b"
+                    type="email"
+                    isInvalid={!!errors.email}
+                    {...register('email')}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <div className="row">
+                  <div className="col-6">
+                    <Form.Group className="mb-3" controlId="formBasicPassword">
+                      <Form.Label className="custom-label">Password</Form.Label>
+                      <div className="position-relative">
+                        <Form.Control
+                          className={`cb-b ${errors.password ? 'custom-error-border' : ''}`}
+                          type={showPassword ? 'text' : 'password'}
+                          {...register('password')}
+                        />
+                        <Button
+                          variant="link"
+                          className="position-absolute end-0 top-50 translate-middle-y me-2"
+                          style={{ color: 'black' }}
+                          onClick={togglePasswordVisibility}
+                        >
+                          {showPassword ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </Button>
+                      </div>
+                      {errors.password && (
+                        <div
+                          className="text-danger mt-1 cb-b small"
+                          style={{ fontSize: '13px' }}
+                        >
+                          {errors.password.message}
+                        </div>
+                      )}
+                    </Form.Group>
+                  </div>
+
+                  <div className="col-6">
+                    <Form.Group
+                      className="mb-3"
+                      controlId="formBasicConfirmPassword"
+                    >
+                      <Form.Label className="custom-label">
+                        Confirm Password
+                      </Form.Label>
+                      <div className="position-relative">
+                        <Form.Control
+                          className={`cb-b ${errors.confirmPassword ? 'custom-error-border' : ''}`}
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          {...register('confirmPassword')}
+                        />
+                        <Button
+                          variant="link"
+                          className="position-absolute end-0 top-50 translate-middle-y me-2"
+                          style={{ color: 'black' }}
+                          onClick={toggleConfirmPasswordVisibility}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </Button>
+                      </div>
+                      {errors.confirmPassword && (
+                        <div
+                          className="text-danger mt-1 cb-b "
+                          style={{ fontSize: '13px' }}
+                        >
+                          {errors.confirmPassword.message}
+                        </div>
+                      )}
+                    </Form.Group>
+                  </div>
                 </div>
-              </div>
-              <div className="d-flex justify-content-center cb-b">
-                <Button
-                  className="custom-button"
-                  variant="primary"
-                  type="submit"
-                >
-                  Sign Up
-                </Button>
-              </div>
-            </Form>
+                <div className="row">
+                  <div className="col-6" style={{ paddingTop: '20px' }}>
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        id="dropdown-autoclose-true"
+                        className="w-75 btn-warning"
+                        style={{ fontWeight: 'bold' }}
+                      >
+                        {selectedRole}
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          onClick={() => handleRoleSelect('Admin')}
+                        >
+                          Admin
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => handleRoleSelect('Designer')}
+                        >
+                          Designer
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => handleRoleSelect('Portofolio manager')}
+                        >
+                          Portofolio manager
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => handleRoleSelect('Seller')}
+                        >
+                          Seller
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {roleError && (
+                      <div
+                        className="text-danger mt-1 cb-b"
+                        style={{ fontSize: '13px' }}
+                      >
+                        {roleError}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="col-6">
+                    <Form.Group className="mb-3" controlId="formBasicAdmin">
+                      <Form.Label className="custom-label">
+                        Access Key
+                      </Form.Label>
+                      <Form.Control
+                        className="cb-b"
+                        style={{ fontSize: '13px' }}
+                        type="text"
+                        isInvalid={!!errors.key}
+                        {...register('key')}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.key?.message}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </div>
+                </div>
+                <div className="d-flex justify-content-center cb-b">
+                  <Button
+                    className="custom-button"
+                    variant="primary"
+                    type="submit"
+                  >
+                    Sign Up
+                  </Button>
+                </div>
+              </Form>
+            </div>
           </div>
         </div>
       </div>
