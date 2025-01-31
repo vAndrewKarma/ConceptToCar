@@ -5,10 +5,10 @@ import start from '../common/helper/start'
 import ajvErrors from 'ajv-errors'
 import ajvKeywords from 'ajv-keywords'
 import InitRedis from './InitRedis'
-import { FastifySSEPlugin } from 'fastify-sse-v2'
 import InitRabbit from './InitRabbitMq'
 import RouteCore from '../plugins/route_core/core'
 import { ErrorHandler } from '../common/errors/handler'
+import { FastifyRedis } from '@fastify/redis'
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,
@@ -29,14 +29,10 @@ export default async function fastify_loader() {
   ErrorHandler(server)
   await InitRedis(server) // IMPORTANT  redis must be initialized here for plugin to boot. ( NU SCHIMBA NMK )
   await InitRabbit(server)
-  await server.register(FastifySSEPlugin)
   await server.register(helmet)
   await server.register(cors)
-  RouteCore(server)
 
+  RouteCore(server)
   await start(server)
   return server
-}
-function ajvFormats(ajv: any) {
-  throw new Error('Function not implemented.')
 }

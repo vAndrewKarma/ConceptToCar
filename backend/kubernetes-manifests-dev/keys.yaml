@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keys
+spec:
+  selector:
+    matchLabels:
+      app: keys
+  template:
+    metadata:
+      labels:
+        app: keys
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: server
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false # change sum things here to make it work better :)
+          image: andrewkarma/keys
+          resources:
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+          ports:
+            - containerPort: 50051
+          env:
+            - name: PORT
+              value: '50052'
+            - name: MONGO_DB
+              value: 'mongodb://auth-mongo-srv:27017/authenthication'
+            - name: RabbitMQ
+              value: 'amqp://guest:guest@auth-rabbitmq-srv:5672/'
+            - name: REDIS_HOST
+              value: 'redis://auth-redis-srv:6379'
+            - name: SECRET_KEY
+              value: 'teapa'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keys
+spec:
+  type: ClusterIP
+  selector:
+    app: keys
+  ports:
+    - name: port
+      port: 81
+      targetPort: 50052
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keys-external
+spec:
+  type: LoadBalancer
+  selector:
+    app: keys
+  ports:
+    - name: http
+      port: 81
+      targetPort: 50052

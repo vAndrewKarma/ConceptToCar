@@ -49,6 +49,15 @@ profiles:
             manual:
               - src: 'src/**/*.ts'
                 dest: .
+        - image: andrewkarma/keys
+          context: src/services/keyservice
+          docker:
+            buildArgs:
+              ENV: development
+          sync:
+            manual:
+              - src: 'src/**/*.ts'
+                dest: .
   - name: kai
     activation:
       - command: kai

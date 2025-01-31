@@ -1,0 +1,56 @@
+name: rate-limit-policy-prod
+description: Rate limiting policy for production environment.
+rules:
+  - name: limit-post-requests-per-ip
+    description: More restrictive rate limiting for POST requests per IP.
+    action: "rate_based_ban"
+    rateLimitOptions:
+      enforcementMode: ENFORCED
+      rateLimitThreshold:
+        count: 20
+        intervalSec: 10
+      banDurationSec: 600
+      conformAction: "allow"
+      exceedAction: "deny(403)"
+      key: REMOTE_IP
+      rateScope: PER_IP
+      keyProperties:
+        httpMethod: POST
+    preview: false
+    priority: 1001
+    match:
+      versionedExpr: "SRC_IPS_V1"
+      config:
+        srcIpRanges:
+          - "0.0.0.0/0"
+  - name: limit-get-requests-per-ip
+    description: More restrictive rate limiting for GET requests per IP.
+    action: "rate_based_ban"
+    rateLimitOptions:
+      enforcementMode: ENFORCED
+      rateLimitThreshold:
+        count: 100
+        intervalSec: 10
+      banDurationSec: 600
+      conformAction: "allow"
+      exceedAction: "deny(403)"
+      key: REMOTE_IP
+      rateScope: PER_IP
+      keyProperties:
+        httpMethod: GET
+    preview: false
+    priority: 1002
+    match:
+      versionedExpr: "SRC_IPS_V1"
+      config:
+        srcIpRanges:
+          - "0.0.0.0/0"
+  - name: default-rule
+    description: Default rule to deny all other requests.
+    action: "deny(403)"
+    priority: 2147483647
+    match:
+      versionedExpr: "SRC_IPS_V1"
+      config:
+        srcIpRanges:
+          - "*"

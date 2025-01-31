@@ -7,6 +7,7 @@ export const registerSchema = {
     'role',
     'firstName',
     'lastName',
+    'key',
   ],
   properties: {
     email: {
@@ -35,6 +36,17 @@ export const registerSchema = {
       const: { $data: '1/password' },
       errorMessage: {
         const: 'Passwords do not match.',
+      },
+    },
+    key: {
+      type: 'string',
+      minLength: 64,
+      maxLength: 64,
+      pattern: '^[a-zA-Z0-9]+$',
+      errorMessage: {
+        minLength: 'Invalid secret key.',
+        maxLength: 'Invalid secret key.',
+        pattern: 'Invalid secret key.',
       },
     },
     role: {
@@ -76,6 +88,7 @@ export const registerSchema = {
       role: 'Role is required.',
       firstName: 'First name is required.',
       lastName: 'Last name is required.',
+      key: 'Key is required.',
     },
     additionalProperties: 'Invalid additional fields provided.',
   },
