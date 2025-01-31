@@ -1,22 +1,7 @@
 export const rabbitConfig = {
   queues: {
-    AUTH_VALIDATE_KEY: {
-      name: 'auth.validateKey',
-
-      options: {
-        durable: true,
-        autoDelete: false,
-        arguments: {
-          //   'x-dead-letter-exchange': 'dlx_exchange',
-          'x-message-ttl': 60000,
-
-          'x-expires': 3600000,
-        },
-      },
-    },
-    AUTH_VALIDATE_KEY_RESPONSE: {
-      name: 'auth.validateKeyResponse',
-
+    AUTH_CREATE_USER_SESSION: {
+      name: 'auth.createSession',
       options: {
         durable: true,
         autoDelete: false,

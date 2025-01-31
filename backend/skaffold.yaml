@@ -50,7 +50,7 @@ profiles:
               - src: 'src/**/*.ts'
                 dest: .
         - image: andrewkarma/keys
-          context: src/services/keyservice
+          context: src/services/user_registration_keyservice
           docker:
             buildArgs:
               ENV: development
