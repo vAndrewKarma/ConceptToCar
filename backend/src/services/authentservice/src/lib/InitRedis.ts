@@ -8,7 +8,7 @@ async function InitRedis(server: FastifyInstance) {
       url: config.app.REDIS,
       closeClient: true,
     })
-    server.redis.set('s', 's')
+    await server.redis.set('s', 's')
     server.log.info('Redis initialized in development mode')
   } catch (err) {
     server.log.error(err)
