@@ -1,0 +1,29 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: authentservice-cert-renamed
+  namespace: deployments
+spec:
+  domains:
+    - backend-tests.conceptocar.xyz
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authentservice-ingress
+  namespace: deployments
+  annotations:
+    kubernetes.io/ingress.class: gce
+    networking.gke.io/managed-certificates: authentservice-cert-renamed
+spec:
+  rules:
+    - host: backend-tests.conceptocar.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: authentservice
+                port:
+                  number: 80

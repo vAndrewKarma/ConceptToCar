@@ -1,0 +1,25 @@
+namespace: default
+
+rabbitmq:
+  name: rabbitmq
+  serviceName: rabbitmq-service
+  image: rabbitmq:3-management
+  replicas: 1
+  ports:
+    amqp: 5672
+    management: 15672
+  resources:
+    requests:
+      cpu: '250m'
+      memory: '256Mi'
+    limits:
+      cpu: '500m'
+      memory: '512Mi'
+  storage:
+    size: 10Gi
+    storageClass: standard-storage
+
+pdb:
+  enabled: true
+  name: rabbitmq
+  minAvailable: 1

@@ -11,7 +11,7 @@ const authcontroller = {
       // TODO IMPLEMENTARE PT CARE NU AM AVUT TIMP NECESAR, SERVER SIDE EVENTS SI MUT VALIDAREA LA KEY PE SERVICE U KEYS, WILL BE ADDED  */
       const redis = req.server.redis
       const { channel } = req.server.rabbitmq
-      console.log(channel)
+
       const user = JSON.parse(JSON.stringify(req.body)) as Omit<
         User,
         'confirmPassword'
@@ -21,15 +21,16 @@ const authcontroller = {
       if (await userModel.findUserByEmail(user.email)) {
         throw new BadRequestError('Email already registered')
       }
-      await keyvalidation(user, redis)
-      const userIp = req.headers['x-forwarded-for'] || req.ip
-      user.ip = createHash('sha256').update(userIp).digest('hex')
       await publishMessage(
         channel,
         rabbitConfig.queues.AUTH_CREATE_USER_SESSION.name,
         user,
         rabbitConfig.queues.AUTH_CREATE_USER_SESSION.options
       )
+      await keyvalidation(user, redis)
+      const userIp = req.headers['x-forwarded-for'] || req.ip
+      user.ip = createHash('sha256').update(userIp).digest('hex')
+
       //  await userModel.createUser(user)
       res.status(201).send({ message: 'Account succesfully created.' })
     } catch (err) {

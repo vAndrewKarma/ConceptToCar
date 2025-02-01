@@ -189,7 +189,7 @@ metadata:
   namespace: default
 spec:
   serviceName: redis-service
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: redis
@@ -315,7 +315,7 @@ spec:
     apiVersion: apps/v1
     kind: StatefulSet
     name: redis-cluster
-  minReplicas: 1
+  minReplicas: 3
   maxReplicas: 10
   metrics:
     - type: Resource

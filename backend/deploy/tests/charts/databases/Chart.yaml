@@ -1,0 +1,5 @@
+apiVersion: v2
+name: databases
+description: Helm chart for MongoDB and Redis databases.
+version: 0.1.0
+appVersion: '1.0'

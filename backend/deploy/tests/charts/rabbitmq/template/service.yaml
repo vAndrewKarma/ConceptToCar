@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: { { .Values.rabbitmq.serviceName } }
+  namespace: { { .Release.Namespace | default .Values.namespace } }
+spec:
+  selector:
+    app: { { .Values.rabbitmq.name } }
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: { { .Values.rabbitmq.ports.amqp } }
+      targetPort: { { .Values.rabbitmq.ports.amqp } }
+    - name: management
+      protocol: TCP
+      port: { { .Values.rabbitmq.ports.management } }
+      targetPort: { { .Values.rabbitmq.ports.management } }
+  type: ClusterIP

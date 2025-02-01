@@ -1,0 +1,36 @@
+namespace: databases
+
+mongo:
+  name: auth-mongo
+  serviceName: auth-mongo-srv
+  image: mongo:latest
+  port: 27017
+  replicas: 1
+  storage:
+    size: 10Gi
+    storageClass: standard-storage
+
+redis:
+  name: redis
+  serviceName: redis-service
+  image: redis:latest
+  port: 6379
+  replicas: 3
+  storage:
+    size: 10Gi
+    storageClass: standard-storage
+  config: |
+    appendonly yes
+    protected-mode no
+    bind 0.0.0.0
+    port 6379
+    dir /var/lib/redis
+
+pdb:
+  enabled: true
+  mongo:
+    name: auth-mongo
+    minAvailable: 1
+  redis:
+    name: redis
+    minAvailable: 1

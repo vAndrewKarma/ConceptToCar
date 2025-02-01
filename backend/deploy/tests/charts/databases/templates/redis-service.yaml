@@ -1,0 +1,19 @@
+{{- /* Precompute the service name and port for Redis */ -}}
+{{- $redisServiceName := .Values.redis.serviceName | default "redis-service" -}}
+{{- $redisPort := .Values.redis.port | default 6379 | int -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $redisServiceName | quote }}
+  namespace: {{ default "default" .Release.Namespace | quote }}
+  labels:
+    name: {{ $redisServiceName | quote }}
+spec:
+  selector:
+    app: {{ .Values.redis.name | quote }}
+  ports:
+    - name: "redis"
+      protocol: TCP
+      port: {{ $redisPort }}
+      targetPort: {{ $redisPort }}
+  type: ClusterIP

@@ -1,0 +1,15 @@
+{{- /* Precompute the port value as an integer with a default of 27017 */ -}}
+{{- $mongoPort := .Values.mongo.port | default 27017 | int -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.mongo.serviceName }}"
+  namespace: "{{ .Release.Namespace | default .Values.namespace }}"
+spec:
+  selector:
+    app: "{{ .Values.mongo.name }}"
+  ports:
+    - name: "mongo"
+      port: {{ $mongoPort }}
+      targetPort: {{ $mongoPort }}
+  type: ClusterIP

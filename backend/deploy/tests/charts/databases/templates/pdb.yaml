@@ -1,0 +1,24 @@
+{{- if .Values.pdb.enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.pdb.mongo.name }}-pdb
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+spec:
+  minAvailable: {{ .Values.pdb.mongo.minAvailable }}
+  selector:
+    matchLabels:
+      app: {{ .Values.pdb.mongo.name }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.pdb.redis.name }}-pdb
+  namespace: {{ .Release.Namespace | default "default" }}
+spec:
+  minAvailable: {{ .Values.pdb.redis.minAvailable }}
+  selector:
+    matchLabels:
+      app: {{ .Values.redis.name }}
+{{- end }}

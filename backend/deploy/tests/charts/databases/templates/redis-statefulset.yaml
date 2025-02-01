@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.redis.name }}-statefulset
+  namespace: {{ .Release.Namespace | default "default" }}
+  labels:
+    app: {{ .Values.redis.name }}
+spec:
+  serviceName: "{{ .Values.redis.name }}"
+  replicas: {{ .Values.redis.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.redis.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redis.name }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: redis
+          image: "{{ .Values.redis.image }}"
+          command: ["redis-server"]
+          args:
+            - "/etc/redis/redis.conf"
+          ports:
+            - containerPort: {{ .Values.redis.port }}
+              name: redis
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+          volumeMounts:
+            - name: redis-data
+              mountPath: /var/lib/redis
+            - name: redis-conf
+              mountPath: /etc/redis
+      volumes:
+        - name: redis-conf
+          configMap:
+            name: redis-conf
+            items:
+              - key: redis.conf
+                path: redis.conf
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+        annotations:
+          volume.beta.kubernetes.io/storage-class: "{{ .Values.redis.storage.storageClass }}"
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.redis.storage.size }}

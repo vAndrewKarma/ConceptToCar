@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import fastifyAmqpAsync from 'fastify-amqp-async'
-import config from '../config' //import { startKeyConsumers } from '../rabbitmq/consumer'
+import config from '../config'
+import { startKeyConsumers } from '../rabbitmq/consumer'
 async function InitRabbit(server: FastifyInstance) {
   try {
     await server.register(fastifyAmqpAsync, {
@@ -11,7 +12,7 @@ async function InitRabbit(server: FastifyInstance) {
 
     const channel = server.amqp.channel
     if (!channel) throw new Error('RabbitMQ channel is not available')
-    // await startKeyConsumers(channel, server)
+    await startKeyConsumers(channel, server)
   } catch (err) {
     server.log.error(err)
   }
