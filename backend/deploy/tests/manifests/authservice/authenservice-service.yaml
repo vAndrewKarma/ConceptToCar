@@ -4,7 +4,7 @@ metadata:
   name: authentservice
   namespace: deployments
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: authentservice
   ports:

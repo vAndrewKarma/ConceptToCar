@@ -20,10 +20,17 @@ spec:
     - host: backend-tests.conceptocar.xyz
       http:
         paths:
-          - path: /
+          - path: /auth
             pathType: Prefix
             backend:
               service:
                 name: authentservice
+                port:
+                  number: 80
+          - path: /keys
+            pathType: Prefix
+            backend:
+              service:
+                name: keyservice
                 port:
                   number: 80

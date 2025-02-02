@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keyservice-deployment
+  namespace: deployments
+  labels:
+    app: keyservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keyservice
+  template:
+    metadata:
+      labels:
+        app: keyservice
+    spec:
+      containers:
+        - name: server
+          image: gcr.io/focus-vim-448513-a1/keys:latest
+          ports:
+            - containerPort: 50051
+          envFrom:
+            - secretRef:
+                name: authservice-secrets
+          resources:
+            requests:
+              cpu: '250m'
+              memory: '256Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 50052
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 50052
+            initialDelaySeconds: 15
+            periodSeconds: 20
