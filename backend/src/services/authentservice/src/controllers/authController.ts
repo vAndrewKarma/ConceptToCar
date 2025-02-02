@@ -21,18 +21,18 @@ const authcontroller = {
       if (await userModel.findUserByEmail(user.email)) {
         throw new BadRequestError('Email already registered')
       }
+
+      await keyvalidation(user, redis)
+      const userIp = req.headers['x-forwarded-for'] || req.ip
+      user.ip = createHash('sha256').update(userIp).digest('hex')
+
       await publishMessage(
         channel,
         rabbitConfig.queues.AUTH_CREATE_USER_SESSION.name,
         user,
         rabbitConfig.queues.AUTH_CREATE_USER_SESSION.options
       )
-      await keyvalidation(user, redis)
-      const userIp = req.headers['x-forwarded-for'] || req.ip
-      user.ip = createHash('sha256').update(userIp).digest('hex')
-
-      //  await userModel.createUser(user)
-      res.status(201).send({ message: 'Account succesfully created.' })
+      res.status(201).send({ message: 'Check your email for validation.' })
     } catch (err) {
       console.log(err)
       throw err

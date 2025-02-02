@@ -9,5 +9,5 @@ spec:
     app: keyservice
   ports:
     - name: http
-      port: 80
-      targetPort: 50052
+      port: 81
+      targetPort: 50051 # FIXED: Use correct container port

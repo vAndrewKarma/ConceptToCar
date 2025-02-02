@@ -19,7 +19,7 @@ spec:
         - name: server
           image: gcr.io/focus-vim-448513-a1/keys:latest
           ports:
-            - containerPort: 50051
+            - containerPort: 50051 # Ensure this is correct
           envFrom:
             - secretRef:
                 name: authservice-secrets
@@ -33,12 +33,12 @@ spec:
           readinessProbe:
             httpGet:
               path: /health
-              port: 50052
+              port: 50051 # FIXED: Use correct container port
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /health
-              port: 50052
-            initialDelaySeconds: 15
+              port: 50051 # FIXED: Use correct container port
+            initialDelaySeconds: 30 # FIXED: Increased delay
             periodSeconds: 20

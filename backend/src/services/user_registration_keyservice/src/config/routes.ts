@@ -6,7 +6,7 @@ const routes = {
   authRoutes: {
     register: {
       method: 'POST',
-      routeName: '/register-key',
+      routeName: '/keys/register-key',
       controller: keyController.RegisterController,
       schema: keySchema,
     },
@@ -14,7 +14,7 @@ const routes = {
   healthRoutes: {
     healthCheck: {
       method: 'GET',
-      routeName: '/healthz',
+      routeName: '/keys/healthz',
       controller: checksController.healthcheck,
     },
     indexCheck: {

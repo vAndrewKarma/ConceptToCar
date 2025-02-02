@@ -10,4 +10,4 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 50051
+      targetPort: 50051 # Ensure this matches the container's exposed port

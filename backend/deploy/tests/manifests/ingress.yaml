@@ -1,12 +1,3 @@
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: authentservice-cert-renamed
-  namespace: deployments
-spec:
-  domains:
-    - backend-tests.conceptocar.xyz
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -33,4 +24,4 @@ spec:
               service:
                 name: keyservice
                 port:
-                  number: 80
+                  number: 81
