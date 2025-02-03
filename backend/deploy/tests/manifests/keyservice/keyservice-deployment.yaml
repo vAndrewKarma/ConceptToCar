@@ -6,7 +6,7 @@ metadata:
   labels:
     app: keyservice
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: keyservice
@@ -19,7 +19,7 @@ spec:
         - name: server
           image: gcr.io/focus-vim-448513-a1/keys:latest
           ports:
-            - containerPort: 50051 # Ensure this is correct
+            - containerPort: 50051
           envFrom:
             - secretRef:
                 name: authservice-secrets
@@ -32,13 +32,13 @@ spec:
               memory: '512Mi'
           readinessProbe:
             httpGet:
-              path: /health
-              port: 50051 # FIXED: Use correct container port
+              path: /keys/healthz
+              port: 50051
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /health
-              port: 50051 # FIXED: Use correct container port
-            initialDelaySeconds: 30 # FIXED: Increased delay
+              path: /keys/healthz
+              port: 50051
+            initialDelaySeconds: 30
             periodSeconds: 20

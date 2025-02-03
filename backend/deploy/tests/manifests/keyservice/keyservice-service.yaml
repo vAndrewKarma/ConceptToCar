@@ -3,11 +3,13 @@ kind: Service
 metadata:
   name: keyservice
   namespace: deployments
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: ClusterIP
   selector:
     app: keyservice
   ports:
     - name: http
-      port: 81
-      targetPort: 50051 # FIXED: Use correct container port
+      port: 80
+      targetPort: 50051

@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: authentservice
   namespace: deployments
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: ClusterIP
   selector:
@@ -10,4 +12,4 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 50051 # Ensure this matches the container's exposed port
+      targetPort: 50051
