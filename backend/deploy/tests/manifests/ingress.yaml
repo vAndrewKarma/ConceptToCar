@@ -13,22 +13,22 @@ metadata:
   name: authentservice-ingress
   namespace: deployments
   annotations:
-    kubernetes.io/ingress.class: 'nginx'
+    kubernetes.io/ingress.class: "nginx"
     networking.gke.io/managed-certificates: authentservice-cert-renamed
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-    - host: backend-tests.conceptocar.xyz
-      http:
+    - http:
         paths:
-          - path: /auth
-            pathType: Prefix
+          - path: /auth(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: authentservice
                 port:
                   number: 80
-          - path: /keys
-            pathType: Prefix
+          - path: /keys(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: keyservice

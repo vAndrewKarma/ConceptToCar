@@ -6,7 +6,7 @@ const routes = {
   authRoutes: {
     register: {
       method: 'POST',
-      routeName: '/keys/register-key',
+      routeName: '/register-key',
       controller: keyController.RegisterController,
       schema: keySchema,
     },
