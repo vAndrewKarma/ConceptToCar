@@ -8,7 +8,7 @@ async function InitMongo(server: FastifyInstance) {
   try {
     const isProduction = config.app.ENV === 'production'
     await server.register(fastifyMongo, {
-      url: config.app.DB,
+      url: config.app.DB + '?retryWrites=true&w=majority',
       forceClose: true,
       maxPoolSize: isProduction ? 200 : 50,
       socketTimeoutMS: isProduction ? 30000 : 60000,
