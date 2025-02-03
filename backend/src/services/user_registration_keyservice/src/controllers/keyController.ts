@@ -20,6 +20,8 @@ const authcontroller = {
         secret_key: string
       }
 
+      console.log(Buffer.from(key.secret_key, 'base64').toString('utf-8'))
+      console.log(config.app.SECRET_KEY)
       if (
         Buffer.from(key.secret_key, 'base64').toString('utf-8') !==
         config.app.SECRET_KEY
@@ -40,13 +42,13 @@ const authcontroller = {
       const hashedRedisKey = createHash('sha256').update(rawKey).digest('hex')
       const keyRedisKey = `keys:${hashedRedisKey}`
 
-      await redis.set(
+   const d=   await redis.set(
         keyRedisKey,
         JSON.stringify(keyData),
         'EX',
         7 * 24 * 60 * 60
       )
-
+console.log(d)
       req.log.info(`Key generated for email: ${key.email}, role: ${key.role}`)
 
       return res.status(201).send({
@@ -57,7 +59,7 @@ const authcontroller = {
       })
     } catch (err) {
       req.log.error(err)
-      return res.status(500).send({ error: 'Internal Server Error' })
+      throw err
     }
   },
 }

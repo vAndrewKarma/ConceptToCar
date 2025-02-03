@@ -11,6 +11,7 @@ export default async function keyvalidation(user: User, redis: FastifyRedis) {
     const keyData: { email: string; role: Roles } = JSON.parse(
       await redis.get(keyRedisKey)
     )
+    console.log(keyData)
     if (!keyData) throw new BadRequestError('Invalid key')
 
     if (keyData.email !== user.email || keyData.role !== user.role)
