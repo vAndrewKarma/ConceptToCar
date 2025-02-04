@@ -11,7 +11,9 @@ const authcontroller = {
       // TODO IMPLEMENTARE PT CARE NU AM AVUT TIMP NECESAR, SERVER SIDE EVENTS SI MUT VALIDAREA LA KEY PE SERVICE U KEYS, WILL BE ADDED  */
       const redis = req.server.redis
       const { channel } = req.server.rabbitmq
-
+console.log(req.headers['x-forwarded-for'] || req.ip)
+console.log(req.headers['x-forwarded-for'])
+console.log(req.ip)
       const user = JSON.parse(JSON.stringify(req.body)) as Omit<
         User,
         'confirmPassword'
