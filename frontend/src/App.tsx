@@ -9,6 +9,7 @@ import Contact from './pages/contact'
 import PageNotFound from './pages/404'
 import Copyright from './components/copyright'
 import Recover from './pages/auth/forgot-password/recover.tsx'
+import NewPassword from './pages/auth/forgot-password/new-password.tsx'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<Login />} />
         <Route path="/recover" element={<Recover />} />
+        <Route path="/new-password" element={<NewPassword />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<PageNotFound />} />

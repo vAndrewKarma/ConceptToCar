@@ -5,6 +5,7 @@ import { z, ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Eye, EyeOff } from 'lucide-react'
+import useAxios from 'axios-hooks'
 import './login.css'
 import './sign-up.css'
 
@@ -13,6 +14,14 @@ function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [roleError, setRoleError] = useState<string | null>(null)
+
+  const [, execute] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/auth/register',
+      method: 'POST',
+    },
+    { manual: true }
+  )
 
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role)
@@ -103,9 +112,30 @@ function SignUp() {
     resolver: karmalerezolva,
   })
 
-  const submitData = (data: FormData) => {
-    // console.log('saal')
+  const submitData = async (data: FormData) => {
+    const sData = { ...data, role: selectedRole }
+    try {
+      const response = await execute({ data: sData })
+      if (response?.data) {
+        console.log('Success:', response.data)
+        return { success: true, data: response.data }
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      if (err.response) {
+        let errorMessage = 'An error occurred. Please try again later.'
+        const responseData = err.response.data
 
+        if (responseData.errors && Array.isArray(responseData.errors)) {
+          errorMessage = responseData.errors // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((e: any) => e.message)
+            .join(', ')
+        } else if (responseData.message) {
+          errorMessage = responseData.message
+          console.error('Error:', errorMessage)
+        }
+      }
+    }
     console.log('✅ Form submitted with:', { ...data, role: selectedRole })
   }
   return (
@@ -181,6 +211,11 @@ function SignUp() {
                           className={`cb-b ${errors.password ? 'custom-error-border' : ''}`}
                           type={showPassword ? 'text' : 'password'}
                           {...register('password')}
+                          style={{
+                            paddingRight: '50px',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                          }}
                         />
                         <Button
                           variant="link"
@@ -219,6 +254,11 @@ function SignUp() {
                           className={`cb-b ${errors.confirmPassword ? 'custom-error-border' : ''}`}
                           type={showConfirmPassword ? 'text' : 'password'}
                           {...register('confirmPassword')}
+                          style={{
+                            paddingRight: '50px',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                          }}
                         />
                         <Button
                           variant="link"
