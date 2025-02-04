@@ -1,3 +1,4 @@
+# templates/mongo-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -6,7 +7,7 @@ metadata:
   labels:
     app: {{ .Values.mongo.name }}
 spec:
-  serviceName: "{{ .Values.mongo.name }}"
+  serviceName: "{{ .Values.mongo.serviceName }}"
   replicas: {{ .Values.mongo.replicas }}
   selector:
     matchLabels:
@@ -16,21 +17,36 @@ spec:
       labels:
         app: {{ .Values.mongo.name }}
     spec:
-      containers:
-        - name: {{ .Values.mongo.name }}
-          image: "{{ .Values.mongo.image }}"
-          ports:
-            - containerPort: {{ .Values.mongo.port }}
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
+      securityContext:
+        fsGroup: 999  # MongoDB container user's group
+      initContainers:
+        - name: fix-data-permissions
+          image: busybox:1.35
+          command: ['sh', '-c', 'chown -R 999:999 /data/db']
           volumeMounts:
             - name: mongo-storage
               mountPath: /data/db
+      containers:
+        - name: {{ .Values.mongo.name }}
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+          image: "{{ .Values.mongo.image }}"
+          ports:
+            - containerPort: {{ .Values.mongo.port }}
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+          livenessProbe:
+            exec:
+              command: ["mongosh", "--eval", "db.adminCommand('ping')"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["mongosh", "--eval", "db.adminCommand('ping')"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
   volumeClaimTemplates:
     - metadata:
         name: mongo-storage

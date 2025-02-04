@@ -4,5 +4,14 @@ metadata:
   name: redis-conf
   namespace: {{ .Release.Namespace | default "default" }}
 data:
-  redis.conf: |-
-{{ .Values.redis.config | indent 4 }}
+  redis.conf: |
+    bind 0.0.0.0
+    port 6379
+    dir /var/lib/redis
+    appendonly yes
+    appendfsync everysec
+    protected-mode no
+    loglevel notice
+    save 900 1
+    save 300 10
+    save 60 10000

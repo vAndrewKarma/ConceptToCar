@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.redis.name }}
 spec:
-  serviceName: "{{ .Values.redis.name }}"
+  serviceName: "{{ .Values.redis.serviceName }}"
   replicas: {{ .Values.redis.replicas }}
   selector:
     matchLabels:
@@ -16,39 +16,49 @@ spec:
       labels:
         app: {{ .Values.redis.name }}
     spec:
-      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 999  # Matches Redis container user
+      initContainers:
+        - name: fix-redis-permissions
+          image: busybox:1.35
+          command: ['sh', '-c', 'chown -R 999:999 /var/lib/redis']
+          volumeMounts:
+            - name: redis-data
+              mountPath: /var/lib/redis
       containers:
         - name: redis
           image: "{{ .Values.redis.image }}"
           command: ["redis-server"]
-          args:
-            - "/etc/redis/redis.conf"
+          args: ["/etc/redis/redis.conf"]
           ports:
             - containerPort: {{ .Values.redis.port }}
-              name: redis
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "100Mi"
           volumeMounts:
             - name: redis-data
               mountPath: /var/lib/redis
             - name: redis-conf
               mountPath: /etc/redis
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
       volumes:
         - name: redis-conf
           configMap:
             name: redis-conf
-            items:
-              - key: redis.conf
-                path: redis.conf
   volumeClaimTemplates:
     - metadata:
         name: redis-data
-        annotations:
-          volume.beta.kubernetes.io/storage-class: "{{ .Values.redis.storage.storageClass }}"
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
             storage: {{ .Values.redis.storage.size }}
+        storageClassName: {{ .Values.redis.storage.storageClass }}

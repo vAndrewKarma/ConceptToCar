@@ -14,6 +14,7 @@ const authcontroller = {
 console.log(req.headers['x-forwarded-for'] || req.ip)
 console.log(req.headers['x-forwarded-for'])
 console.log(req.ip)
+console.log(req.headers)
       const user = JSON.parse(JSON.stringify(req.body)) as Omit<
         User,
         'confirmPassword'
