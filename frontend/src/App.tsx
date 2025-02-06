@@ -10,6 +10,7 @@ import PageNotFound from './pages/404'
 import Copyright from './components/copyright'
 import Recover from './pages/auth/forgot-password/recover.tsx'
 import NewPassword from './pages/auth/forgot-password/new-password.tsx'
+import EmailVerification from './pages/auth/email-verification.tsx'
 
 function App() {
   return (
@@ -19,10 +20,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<Login />} />
-        <Route path="/recover" element={<Recover />} />
-        <Route path="/new-password" element={<NewPassword />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/recover" element={<Recover />} />
+        <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Copyright />

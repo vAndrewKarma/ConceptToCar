@@ -1,0 +1,8 @@
+@media (max-width: 576px) {
+  .small-devices {
+    font-size: 30px;
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 0 10px;
+  }
+}

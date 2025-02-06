@@ -86,7 +86,11 @@ function SignUp() {
           /^[a-zA-Z\s]+$/,
           'Last name must not contain special characters or numbers.'
         ),
-      key: z.string().nonempty({ message: 'Please enter your access key' }),
+      key: z
+        .string()
+        .nonempty({ message: 'Please enter your access key' })
+        .min(64, 'Access key is too short (64 chr.)')
+        .max(64, 'Access key is too long (64 chr.)'),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: 'Passwords do not match',
@@ -135,8 +139,8 @@ function SignUp() {
         let errorMessage = 'An error occurred. Please try again later.'
 
         if (responseData.errors && Array.isArray(responseData.errors)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           errorMessage = responseData.errors
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .map((e: any) => e.message)
             .join(', ')
         } else if (responseData.message) {
