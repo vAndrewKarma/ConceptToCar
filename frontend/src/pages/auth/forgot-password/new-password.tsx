@@ -94,7 +94,6 @@ function NewPassword() {
                     {...register('password')}
                     style={{
                       paddingRight: '50px',
-
                       overflow: 'hidden',
                       whiteSpace: 'nowrap',
                     }}
@@ -131,7 +130,6 @@ function NewPassword() {
                     {...register('confirmPassword')}
                     style={{
                       paddingRight: '50px',
-
                       overflow: 'hidden',
                       whiteSpace: 'nowrap',
                     }}

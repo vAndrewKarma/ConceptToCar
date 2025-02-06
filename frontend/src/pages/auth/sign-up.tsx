@@ -14,6 +14,10 @@ function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [roleError, setRoleError] = useState<string | null>(null)
+  const [consoleMessage, setConsoleMessage] = useState<{
+    type: string
+    text: string
+  } | null>(null)
 
   const [, execute] = useAxios(
     {
@@ -118,22 +122,29 @@ function SignUp() {
       const response = await execute({ data: sData })
       if (response?.data) {
         console.log('Success:', response.data)
+        setConsoleMessage({
+          type: 'success',
+          text: 'Check your email for validation.',
+        })
         return { success: true, data: response.data }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (err.response) {
-        let errorMessage = 'An error occurred. Please try again later.'
         const responseData = err.response.data
+        let errorMessage = 'An error occurred. Please try again later.'
 
         if (responseData.errors && Array.isArray(responseData.errors)) {
-          errorMessage = responseData.errors // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          errorMessage = responseData.errors
             .map((e: any) => e.message)
             .join(', ')
         } else if (responseData.message) {
           errorMessage = responseData.message
-          console.error('Error:', errorMessage)
         }
+
+        setConsoleMessage({ type: 'error', text: errorMessage })
+        console.error('Error:', errorMessage)
       }
     }
     console.log('✅ Form submitted with:', { ...data, role: selectedRole })
@@ -346,6 +357,22 @@ function SignUp() {
                     </Form.Group>
                   </div>
                 </div>
+                {consoleMessage && (
+                  <div
+                    className={`mt-1 p-2 text-center  ${
+                      consoleMessage.type === 'success'
+                        ? 'text-success'
+                        : 'text-danger'
+                    }`}
+                    style={{
+                      border: '1px solid',
+                      borderRadius: '4px',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    {consoleMessage.text}
+                  </div>
+                )}
                 <div className="d-flex justify-content-center cb-b">
                   <Button
                     className="custom-button"
