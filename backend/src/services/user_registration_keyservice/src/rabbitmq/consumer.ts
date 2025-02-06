@@ -17,7 +17,7 @@ async function startKeyConsumers(channel, server) {
         console.log('Received message:', message)
         try {
           const userModel = createUserModel(server)
-          userModel.createUser(message)
+       await userModel.createUser(message)
           console.log('acc created with data', JSON.stringify(message))
           channel.ack(msg)
         } catch (error) {

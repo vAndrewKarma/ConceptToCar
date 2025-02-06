@@ -48,6 +48,7 @@ const authcontroller = {
         'EX',
         7 * 24 * 60 * 60
       )
+      
 console.log(d)
       req.log.info(`Key generated for email: ${key.email}, role: ${key.role}`)
 

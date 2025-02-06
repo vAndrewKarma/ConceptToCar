@@ -12,6 +12,10 @@ export default async function keyvalidation(user: User, redis: FastifyRedis) {
       await redis.get(keyRedisKey)
     )
     console.log(keyData)
+    const foundkey =await redis.get(`locked_key:${hashedRedisKey}`)
+    if(foundkey)
+      throw new BadRequestError('Account is being created... Please wait for the validation email')
+    
     if (!keyData) throw new BadRequestError('Invalid key')
 
     if (keyData.email !== user.email || keyData.role !== user.role)

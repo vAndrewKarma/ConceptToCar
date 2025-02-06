@@ -14,14 +14,14 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    email: karma.andrew16@gmail.com 
+    email: karma.andrew16@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod-account-key
     solvers:
       - http01:
           ingress:
-            class: "nginx"
+            class: 'nginx'
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -29,32 +29,34 @@ metadata:
   name: authentservice-ingress
   namespace: deployments
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/ingress.class: 'nginx'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/limit-connections: "10"               # Limit to 10 concurrent connections per IP
-    nginx.ingress.kubernetes.io/limit-rps: "100"                     # Limit 100 requests per second per IP
-    nginx.ingress.kubernetes.io/limit-burst: "200"                   # Allow burst up to 200 requests per IP
-    nginx.ingress.kubernetes.io/limit-rate: "50"                     # Limit total requests rate to 50 requests per second per IP
-    nginx.ingress.kubernetes.io/limit-requests: "100"                 # Allow 100 requests per IP in the configured window (e.g., per second)
-    
+    nginx.ingress.kubernetes.io/limit-connections: '10' # Limit to 10 concurrent connections per IP
+    nginx.ingress.kubernetes.io/limit-rps: '100' # Limit 100 requests per second per IP
+    nginx.ingress.kubernetes.io/limit-burst: '200' # Allow burst up to 200 requests per IP
+    nginx.ingress.kubernetes.io/limit-rate: '50' # Limit total requests rate to 50 requests per second per IP
+    nginx.ingress.kubernetes.io/limit-requests: '100' # Allow 100 requests per IP in the configured window (e.g., per second)
+
     # Rate limit behavior
-    nginx.ingress.kubernetes.io/limit-req-status: "429"               # Return 429 Too Many Requests for IPs that exceed the limit
-    nginx.ingress.kubernetes.io/limit-req-zone: "req_limit_per_ip"    # Apply rate limit per IP
+    nginx.ingress.kubernetes.io/limit-req-status: '429' # Return 429 Too Many Requests for IPs that exceed the limit
+    nginx.ingress.kubernetes.io/limit-req-zone: 'req_limit_per_ip' # Apply rate limit per IP
 
     # Optional: Enable logging for rate limit hits for monitoring
-    nginx.ingress.kubernetes.io/enable-access-log: "true"
+    nginx.ingress.kubernetes.io/enable-access-log:
+      'true'
       # Enable real client IP headers
-    nginx.ingress.kubernetes.io/enable-real-ip: "true"
-    # Trust the CIDR of your load balancer/proxy (e.g., Cloudflare, AWS LB)
-    nginx.ingress.kubernetes.io/proxy-real-ip-cidr: "192.168.0.0/16, 10.0.0.0/8"
+    nginx.ingress.kubernetes.io/enable-real-ip: 'true'
+    nginx.ingress.kubernetes.io/proxy-real-ip-cidr: '192.168.0.0/16, 10.0.0.0/8, 130.211.0.0/22, 35.191.0.0/16'
     # Timeout adjustments (optional but recommended)
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
+    nginx.ingress.kubernetes.io/use-forwarded-headers: 'true'
+
 spec:
   tls:
     - hosts:
         - backend-tests.conceptocar.xyz
-      secretName: backend-tests-tls 
+      secretName: backend-tests-tls
   rules:
     - host: backend-tests.conceptocar.xyz
       http:

@@ -24,10 +24,12 @@ console.log(req.headers)
       if (await userModel.findUserByEmail(user.email)) {
         throw new BadRequestError('Email already registered')
       }
-
+    const hashedRedisKey = createHash('sha256').update(user.key).digest('hex')
+    
       await keyvalidation(user, redis)
       const userIp = req.headers['x-forwarded-for'] || req.ip
       user.ip = createHash('sha256').update(userIp).digest('hex')
+
 
       await publishMessage(
         channel,
@@ -35,6 +37,8 @@ console.log(req.headers)
         user,
         rabbitConfig.queues.AUTH_CREATE_USER_SESSION.options
       )
+      await redis.set(`locked_key:${hashedRedisKey}`,'proc','EX','30')
+      
       res.status(201).send({ message: 'Check your email for validation.' })
     } catch (err) {
       console.log(err)
