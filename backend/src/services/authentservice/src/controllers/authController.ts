@@ -75,6 +75,9 @@ const authcontroller = {
         throw new BadRequestError('Invalid or expired request')
 
       console.log('debug2')
+      console.log(JSON.parse(loginReq.challenge))
+
+      console.log(loginReq.challenge)
       if (!verifyPKCE(code_verifier, loginReq.challenge))
         throw new BadRequestError('Invalid or expired request')
 
