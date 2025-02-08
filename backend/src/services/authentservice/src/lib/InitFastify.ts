@@ -9,6 +9,8 @@ import { FastifySSEPlugin } from 'fastify-sse-v2'
 import InitRabbit from './InitRabbitMq'
 import RouteCore from '../plugins/route_core/core'
 import { ErrorHandler } from '../common/errors/handler'
+import fastifyCookie from '@fastify/cookie'
+import config from '../config'
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,
@@ -22,7 +24,18 @@ export default async function fastify_loader() {
         messages: true,
         $data: true,
       },
-      plugins: [ajvKeywords, ajvErrors], // Register AJV plugins
+      plugins: [ajvKeywords, ajvErrors],
+    },
+  })
+
+  await server.register(fastifyCookie, {
+    secret: 'secret', // TODO add env variable to change it
+    hook: 'onRequest',
+    parseOptions: {
+      httpOnly: true,
+      secure: config.app.ENV === 'production',
+      sameSite: config.app.ENV === 'production' ? 'strict' : 'lax',
+      path: '/',
     },
   })
 
@@ -36,7 +49,4 @@ export default async function fastify_loader() {
 
   await start(server)
   return server
-}
-function ajvFormats(ajv: any) {
-  throw new Error('Function not implemented.')
 }

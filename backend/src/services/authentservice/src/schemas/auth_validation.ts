@@ -93,3 +93,93 @@ export const registerSchema = {
     additionalProperties: 'Invalid additional fields provided.',
   },
 }
+
+export const loginSchema = {
+  type: 'object',
+  required: ['email', 'password', 'loginReqId', 'code_verifier'],
+  properties: {
+    email: {
+      type: 'string',
+      format: 'email',
+      maxLength: 40,
+      errorMessage: {
+        format: 'Invalid credentials.',
+        maxLength: 'Invalid credentials.',
+      },
+    },
+    password: {
+      type: 'string',
+      minLength: 8,
+      maxLength: 16,
+      pattern: '(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])',
+      errorMessage: {
+        minLength: 'Invalid credentials.',
+        maxLength: 'Invalid credentials.',
+        pattern: 'Invalid credentials.',
+      },
+    },
+    loginReqId: {
+      type: 'string',
+      minLength: 32,
+      maxLength: 32,
+      pattern: '^[a-zA-Z0-9]+$',
+      errorMessage: {
+        minLength: 'Invalid or expired request.',
+        maxLength: 'Invalid or expired request.',
+        pattern: 'Invalid or expired request.',
+      },
+    },
+    code_verifier: {
+      type: 'string',
+      minLength: 43,
+      maxLength: 128,
+      pattern: '^[a-zA-Z0-9-._~]+$',
+      errorMessage: {
+        minLength: 'Invalid or expired request.',
+        maxLength: 'Invalid or expired request.',
+        pattern: 'Invalid or expired request.',
+      },
+    },
+    rememberMe: {
+      type: 'boolean',
+      errorMessage: {
+        type: 'Remember me must be a boolean value.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      email: 'Invalid credentials.',
+      password: 'Invalid credentials.',
+      loginReqId: 'Invalid or expired request.',
+      code_verifier: 'Invalid or expired request.',
+    },
+    additionalProperties: 'Invalid additional fields provided.',
+  },
+}
+
+export const initiateAuthSessionSchema = {
+  type: 'object',
+  required: ['challenge'],
+  properties: {
+    challenge: {
+      type: 'string',
+      minLength: 43,
+      maxLength: 128,
+      pattern: '^[a-zA-Z0-9-._~]+$',
+      errorMessage: {
+        minLength: 'Invalid authentication challenge.',
+        maxLength: 'Invalid authentication challenge.',
+        pattern: 'Invalid authentication challenge.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      challenge: 'Authentication challenge is required.',
+    },
+    additionalProperties: 'Invalid additional fields provided.',
+  },
+}
