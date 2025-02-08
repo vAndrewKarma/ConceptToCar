@@ -69,9 +69,12 @@ const authcontroller = {
       const loginReq = JSON.parse(loginReqRaw)
       const boundDevice = getDeviceId(req)
       console.log(boundDevice, loginReq.fingerprint)
+
+      console.log('debug1')
       if (loginReq.fingerprint !== boundDevice)
         throw new BadRequestError('Invalid or expired request')
 
+      console.log('debug2')
       if (!verifyPKCE(code_verifier, loginReq.challenge))
         throw new BadRequestError('Invalid or expired request')
 
