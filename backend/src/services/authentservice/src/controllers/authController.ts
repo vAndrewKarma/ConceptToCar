@@ -2,6 +2,7 @@ import { BadRequestError } from '../common/errors/custom/errors'
 import { publishMessage } from '../common/rabbitmq/publish'
 import { rabbitConfig } from '../common/rabbitmq/queues'
 import { User } from '../db/m_m'
+import deleteOldTokens from '../common/helper/redis_scan'
 import keyvalidation from '../helper/keyValidation'
 import { createHash, createHmac } from 'crypto'
 import argon2 from 'argon2'
@@ -60,24 +61,18 @@ const authcontroller = {
       const redis = req.server.redis
 
       const { email, password, loginReqId, code_verifier, rememberMe } =
-        JSON.parse(JSON.stringify(req.body))
+        req.body
 
       const loginReqRaw = await redis.get(`login_request:${loginReqId}`)
-      console.log(loginReqRaw)
+
       if (!loginReqRaw) throw new BadRequestError('Invalid or expired request')
 
       const loginReq = JSON.parse(loginReqRaw)
       const boundDevice = getDeviceId(req)
-      console.log(boundDevice, loginReq.fingerprint)
 
-      console.log('debug1')
       if (loginReq.fingerprint !== boundDevice)
         throw new BadRequestError('Invalid or expired request')
 
-      console.log('debug2')
-      //      console.log(JSON.parse(loginReq.challenge))
-
-      console.log(loginReq.challenge)
       if (!verifyPKCE(code_verifier, loginReq.challenge))
         throw new BadRequestError('Invalid or expired request')
 
@@ -100,18 +95,17 @@ const authcontroller = {
 
       if (!(await argon2.verify(userfound.password, password)))
         throw new BadRequestError('Invalid credentials')
-
-      const userTokenKey = `user_refresh_tokens:${userfound._id}`
-      const userAccessTokenKey = `user_access_tokens:${userfound._id}`
-
-      await redis
-        .pipeline()
-        .del(`refresh_token:${userfound._id}:${boundDevice}`)
-        .del(`access_token:${userfound._id}:${boundDevice}`)
-        .exec()
-
+      const userId = userfound._id
       const accessToken = generateToken()
       const refreshToken = generateToken()
+
+      const [accessTokenHmac, refreshTokenHmac] = [
+        accessToken,
+        refreshToken,
+      ].map((token) =>
+        createHmac(HMAC_ALGORITHM, HMAC_SECRET).update(token).digest('hex')
+      )
+
       const sessionData = {
         email,
         firstName: userfound.firstName,
@@ -121,52 +115,57 @@ const authcontroller = {
         deviceId: boundDevice,
       }
 
-      const accessTokenHmac = createHmac(HMAC_ALGORITHM, HMAC_SECRET)
-        .update(accessToken)
-        .digest('hex')
-      const refreshTokenHmac = createHmac(HMAC_ALGORITHM, HMAC_SECRET)
-        .update(refreshToken)
-        .digest('hex')
+      const deviceKeyPart = `${userId}:${boundDevice}`
+      const userTokenKey = `user_refresh_tokens:${userId}`
+      const userAccessTokenKey = `user_access_tokens:${userId}`
+      const refreshTokenTTL = rememberMe ? 2592000 : 604800
+      const accessTokenTTL = 900
+
+      await Promise.all([
+        // TODO MOVE THEM TO KEYSERVICE
+        deleteOldTokens(redis, `refresh_token:${deviceKeyPart}-*`),
+        deleteOldTokens(redis, `access_token:${deviceKeyPart}-*`),
+      ])
 
       await redis
         .pipeline()
         .set(
-          `access_token:${userfound._id}:${boundDevice}`,
+          `access_token:${deviceKeyPart}-${accessToken}`,
           JSON.stringify(sessionData),
           'EX',
-          900
+          accessTokenTTL
         )
         .set(
-          `refresh_token:${userfound._id}:${boundDevice}`,
+          `refresh_token:${deviceKeyPart}-${refreshToken}`,
           JSON.stringify(sessionData),
           'EX',
-          rememberMe ? 2592000 : 604800
+          refreshTokenTTL
         )
         .sadd(userTokenKey, refreshToken)
         .sadd(userAccessTokenKey, accessToken)
-        .expire(userTokenKey, rememberMe ? 2592000 : 604800)
-        .expire(userAccessTokenKey, 900)
+        .expire(userTokenKey, refreshTokenTTL)
+        .expire(userAccessTokenKey, accessTokenTTL)
         .exec()
 
+      const cookieOptions = {
+        secure: config.app.ENV === 'production',
+        httpOnly: true,
+        sameSite: 'strict' as const,
+        path: '/',
+      }
+
       res
-        .setCookie('access_token', `${accessToken}.${accessTokenHmac}`, {
-          secure: config.app.ENV === 'production',
-          httpOnly: true,
-          sameSite: 'strict',
-          path: '/',
-        })
-        .setCookie('refresh_token', `${refreshToken}.${refreshTokenHmac}`, {
-          secure: config.app.ENV === 'production',
-          httpOnly: true,
-          sameSite: 'strict',
-          path: '/',
-        })
-        .setCookie('deviceId', boundDevice, {
-          secure: config.app.ENV === 'production',
-          httpOnly: true,
-          sameSite: 'strict',
-          path: '/',
-        })
+        .setCookie(
+          'access_token',
+          `${accessToken}.${accessTokenHmac}`,
+          cookieOptions
+        )
+        .setCookie(
+          'refresh_token',
+          `${refreshToken}.${refreshTokenHmac}`,
+          cookieOptions
+        )
+        .setCookie('deviceId', deviceKeyPart, cookieOptions)
         .send({ message: 'Login Successful' })
     } catch (err) {
       console.log(err)
@@ -186,6 +185,9 @@ const authcontroller = {
       300
     )
     res.send({ id: loginReqId })
+  },
+  async test(req, res) {
+    res.send({ ok: req.sessionData })
   },
 }
 

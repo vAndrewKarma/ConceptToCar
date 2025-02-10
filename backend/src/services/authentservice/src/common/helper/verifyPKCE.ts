@@ -9,6 +9,6 @@ export default function verifyPKCE(
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '')
-  console.log(`COMPUTED CHALLENGE -  ${codeChallenge} - ${computedChallenge} `)
+
   return codeChallenge === computedChallenge
 }

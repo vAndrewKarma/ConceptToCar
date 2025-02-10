@@ -11,6 +11,7 @@ import RouteCore from '../plugins/route_core/core'
 import { ErrorHandler } from '../common/errors/handler'
 import fastifyCookie from '@fastify/cookie'
 import config from '../config'
+import verifyAuth from '../hook/authVerify'
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,
@@ -45,6 +46,7 @@ export default async function fastify_loader() {
   await server.register(FastifySSEPlugin)
   await server.register(helmet)
   await server.register(cors)
+  server.addHook('preHandler', verifyAuth)
   RouteCore(server)
 
   await start(server)
