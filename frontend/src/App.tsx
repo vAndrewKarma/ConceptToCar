@@ -24,7 +24,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/recover" element={<Recover />} />
         <Route path="/new-password" element={<NewPassword />} />
-        <Route path="/email-verification" element={<EmailVerification />} />
+        <Route path="/email-verification/:id" element={<EmailVerification />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Copyright />

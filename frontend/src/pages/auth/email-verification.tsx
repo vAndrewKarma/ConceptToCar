@@ -1,8 +1,21 @@
 import './login.css'
 import './email-verification.css'
 import { Typewriter } from 'react-simple-typewriter'
-
+import { useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 function EmailVerification() {
+  const { id } = useParams()
+  const [isOk, setIsOk] = useState<boolean>(false)
+
+  useEffect(() => {
+    console.log(id)
+    if (id?.length === 64) {
+      setIsOk(true)
+    } else {
+      setIsOk(false)
+    }
+  }, [])
+
   return (
     <div
       className="color-overlay d-flex justify-content-center align-items-center"
