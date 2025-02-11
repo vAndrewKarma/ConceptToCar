@@ -1,7 +1,7 @@
 import './login.css'
 import { Form, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { useNavigate } from 'react-router-dom'
+import { redirect } from 'react-router-dom'
 import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -64,7 +64,6 @@ function Login() {
         message: 'Invalid credentials',
       }),
   })
-  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -75,7 +74,8 @@ function Login() {
 
   const submitData = async (data: FormData) => {
     try {
-      return navigate('/dashboard')
+      redirect('/dashboard')
+      return
       setError(null)
 
       // Generate PKCE code verifier and challenge
