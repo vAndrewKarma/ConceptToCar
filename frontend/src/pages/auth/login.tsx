@@ -74,7 +74,6 @@ function Login() {
   const navigate = useNavigate()
   const submitData = async (data: FormData) => {
     try {
-      return navigate(-1)
       setError(null)
 
       // Generate PKCE code verifier and challenge
@@ -96,7 +95,7 @@ function Login() {
         },
         withCredentials: true,
       })
-
+      return navigate(-1)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response.data.message)
