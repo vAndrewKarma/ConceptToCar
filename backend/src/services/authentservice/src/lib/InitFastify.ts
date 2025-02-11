@@ -39,13 +39,26 @@ export default async function fastify_loader() {
       path: '/',
     },
   })
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'https://backend-tests.conceptocar.xyz',
+  ]
 
   ErrorHandler(server)
   await InitRedis(server) // IMPORTANT  redis must be initialized here for plugin to boot. ( NU SCHIMBA NMK )
   await InitRabbit(server)
   await server.register(FastifySSEPlugin)
   await server.register(helmet)
-  await server.register(cors, { origin: '*', credentials: true }) // todo change for prod
+  await server.register(cors, {
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'), false)
+      }
+    },
+    credentials: true,
+  }) // todo change for prod
   server.addHook('preHandler', verifyAuth)
   RouteCore(server)
 
