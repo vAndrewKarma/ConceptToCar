@@ -89,10 +89,10 @@ const authcontroller = {
         .trim()
       const expectedIpHash = createHash('sha256').update(clientIp).digest('hex')
 
-      if (userfound.ip !== expectedIpHash) {
-        // TODO better ip implementation, urmeaza pt mobile networks etc, actuala e foarte rigida
-        throw new BadRequestError('Invalid login attempt')
-      }
+      // if (userfound.ip !== expectedIpHash) {
+      // TODO better ip implementation, urmeaza pt mobile networks etc, actuala e foarte rigida
+      //   throw new BadRequestError('Invalid login attempt')
+      // }
 
       if (!(await argon2.verify(userfound.password, password)))
         throw new BadRequestError('Invalid credentials')
