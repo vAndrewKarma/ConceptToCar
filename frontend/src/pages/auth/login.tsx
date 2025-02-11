@@ -86,7 +86,7 @@ function Login() {
       })
       const loginreqid = res.data.id
 
-      const test = await executeLogin({
+      await executeLogin({
         data: {
           email: data.email,
           password: data.password,
@@ -96,11 +96,9 @@ function Login() {
         },
         withCredentials: true,
       })
-      console.log(test)
-      console.log(error)
-      if (error === null) {
-        navigate('/dashboard')
-      }
+
+      navigate('/dashboard')
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response.data.message)
