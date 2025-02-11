@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     return <div>Loading...</div>
   }
 
-  if (!auth.data || !auth.data.auth) {
+  if (!auth?.data?.auth || !auth) {
     return <Navigate to="/sign-in" replace />
   }
 

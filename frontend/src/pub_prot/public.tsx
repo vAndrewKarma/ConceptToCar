@@ -11,7 +11,7 @@ const PublicRoute = ({ children }: { children: ReactNode }) => {
     return <div>Loading...</div>
   }
 
-  if (auth.data && auth.data.auth) {
+  if (auth?.data?.auth) {
     return <Navigate to="/dashboard" replace />
   }
 
