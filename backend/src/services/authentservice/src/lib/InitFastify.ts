@@ -39,10 +39,7 @@ export default async function fastify_loader() {
       path: '/',
     },
   })
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'https://backend-tests.conceptocar.xyz',
-  ]
+  const allowedOrigins = ['http://localhost:5173', 'https://conceptocar.xyz/']
 
   ErrorHandler(server)
   await InitRedis(server) // IMPORTANT  redis must be initialized here for plugin to boot. ( NU SCHIMBA NMK )
