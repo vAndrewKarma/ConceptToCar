@@ -13,56 +13,49 @@ import fastifyCookie from '@fastify/cookie'
 import config from '../config'
 import verifyAuth from '../common/hook/authVerify'
 export default async function fastify_loader() {
-  try {
-    const server: FastifyInstance = fastify({
-      logger: true,
-      maxParamLength: 256,
-      trustProxy: true,
-      bodyLimit: 1000000,
-      ajv: {
-        customOptions: {
-          allErrors: true,
-          useDefaults: true,
-          messages: true,
-          $data: true,
-        },
-        plugins: [ajvKeywords, ajvErrors],
+  const server: FastifyInstance = fastify({
+    logger: true,
+    maxParamLength: 256,
+    trustProxy: true,
+    bodyLimit: 1000000,
+    ajv: {
+      customOptions: {
+        allErrors: true,
+        useDefaults: true,
+        messages: true,
+        $data: true,
       },
-    })
+      plugins: [ajvKeywords, ajvErrors],
+    },
+  })
 
-    await server.register(fastifyCookie, {
-      secret: 'secret', // TODO add env variable to change it
-      hook: 'onRequest',
-      parseOptions: {
-        httpOnly: true,
-        secure: config.app.ENV === 'production',
-        sameSite: 'none',
-        path: '/',
-      },
-    })
-    const allowedOrigins = ['http://localhost:5173', 'https://conceptocar.xyz/']
+  await server.register(fastifyCookie, {
+    secret: 'secret', // TODO add env variable to change it
+    hook: 'onRequest',
+    parseOptions: {
+      httpOnly: true,
+      secure: config.app.ENV === 'production',
+      sameSite: 'none',
+      path: '/',
+    },
+  })
+  const allowedOrigins = ['http://localhost:5173', 'https://conceptocar.xyz/']
 
-    ErrorHandler(server)
-    await InitRedis(server) // IMPORTANT  redis must be initialized here for plugin to boot. ( NU SCHIMBA NMK )
-    await InitRabbit(server)
-    await server.register(FastifySSEPlugin)
-    await server.register(helmet)
-    await server.register(cors, {
-      origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true)
-        } else {
-          callback(new Error('Not allowed by CORS'), false)
-        }
-      },
-      credentials: true,
-    }) // todo change for prod
-    server.addHook('preHandler', verifyAuth)
-    RouteCore(server)
+  ErrorHandler(server)
+  await InitRedis(server) // IMPORTANT  redis must be initialized here for plugin to boot. ( NU SCHIMBA NMK )
+  await InitRabbit(server)
+  await server.register(FastifySSEPlugin)
+  await server.register(helmet)
+  await server.register(cors, {
+    origin: true,
+    methods: ['GET', 'PUT', 'POST', 'DELETE'],
+    allowedHeaders: ['content-type', 'accept', 'content-type'],
+    credentials: true,
+  })
+  // todo change for prod
+  server.addHook('preHandler', verifyAuth)
+  RouteCore(server)
 
-    await start(server)
-    return server
-  } catch (err) {
-    throw err
-  }
+  await start(server)
+  return server
 }
