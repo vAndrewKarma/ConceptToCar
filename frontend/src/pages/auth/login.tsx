@@ -1,6 +1,7 @@
 import './login.css'
 import { Form, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { useNavigate } from 'react-router-dom'
 import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -63,7 +64,7 @@ function Login() {
         message: 'Invalid credentials',
       }),
   })
-
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -96,11 +97,14 @@ function Login() {
         withCredentials: true,
       })
       console.log(test)
+      console.log(error)
+      if (error === null) {
+        navigate('/dashboard')
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setError(err.message)
+      setError(err.response.data.message)
     }
-    console.log('it worked', data)
   }
 
   return (

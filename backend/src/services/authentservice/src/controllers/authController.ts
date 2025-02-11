@@ -206,6 +206,7 @@ const authcontroller = {
       throw err
     }
   },
+
   async me(req, res) {
     try {
       if (!req.sessionData) return res.send({ auth: false })
