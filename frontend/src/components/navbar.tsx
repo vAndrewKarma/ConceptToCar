@@ -9,8 +9,10 @@ const NavScroll: React.FC = () => {
   const navbarRef = useRef<HTMLDivElement>(null)
   const toggleRef = useRef<HTMLButtonElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const auth: any = useAuthContext()
-  console.log(auth.data.auth)
+  const auth = useAuthContext()
+  console.log(auth)
+  console.log(auth?.data?.auth)
+
   const handleClickOutside = (event: MouseEvent) => {
     if (
       navbarRef.current &&
@@ -52,7 +54,7 @@ const NavScroll: React.FC = () => {
         </Navbar.Brand>
         <Navbar.Toggle ref={toggleRef} aria-controls="navbarScroll" />
         <Navbar.Collapse ref={navbarRef} id="navbarScroll">
-          {!auth.data.auth ? (
+          {!auth?.data?.auth ? (
             <Nav className="me-auto my-2 my-lg-0">
               <Nav.Link as={Link} to="/" onClick={closeNavbar}>
                 Home

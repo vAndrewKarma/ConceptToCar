@@ -1,6 +1,7 @@
 import React, { createContext } from 'react'
 
-export const AuthContext = createContext(null)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const AuthContext = createContext<any>(null)
 
 interface AuthProviderProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
