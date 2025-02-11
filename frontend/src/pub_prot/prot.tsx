@@ -1,5 +1,3 @@
-// src/components/PublicRoute.jsx
-
 import { Navigate } from 'react-router-dom'
 import { useAuthContext } from '../contexts/useAuthcontext'
 
