@@ -42,14 +42,14 @@ const authcontroller = {
       const hashedRedisKey = createHash('sha256').update(rawKey).digest('hex')
       const keyRedisKey = `keys:${hashedRedisKey}`
 
-   const d=   await redis.set(
+      const d = await redis.set(
         keyRedisKey,
         JSON.stringify(keyData),
         'EX',
         7 * 24 * 60 * 60
       )
-      
-console.log(d)
+
+      console.log(d)
       req.log.info(`Key generated for email: ${key.email}, role: ${key.role}`)
 
       return res.status(201).send({

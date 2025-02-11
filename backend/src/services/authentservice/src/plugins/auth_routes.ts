@@ -7,7 +7,9 @@ async function AuthRoutes(fastify: FastifyInstance) {
       method: route.method,
       url: route.routeName,
       handler: route.controller,
-      schema: { body: route.schema } as FastifySchema,
+      schema: route.schema
+        ? { body: route.schema as FastifySchema }
+        : undefined,
     })
   })
 }

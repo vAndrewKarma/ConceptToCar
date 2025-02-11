@@ -1,14 +1,46 @@
+import { FastifySchema } from 'fastify'
 import authcontroller from '../controllers/authController'
 import checksController from '../controllers/checkController'
-import { registerSchema } from '../schemas/auth_validation'
+import {
+  initiateAuthSessionSchema,
+  loginSchema,
+  registerSchema,
+} from '../schemas/auth_validation'
+interface AuthRoute {
+  method: string
+  routeName: string
+  controller: (req: any, res: any) => Promise<void>
+  schema?: any
+}
 
-const routes = {
+interface RouteGroup {
+  [key: string]: AuthRoute
+}
+
+const routes: Record<string, RouteGroup> = {
   authRoutes: {
     register: {
       method: 'POST',
       routeName: '/register',
       controller: authcontroller.RegisterController,
       schema: registerSchema,
+    },
+    login: {
+      method: 'POST',
+      routeName: '/login',
+      controller: authcontroller.LoginController,
+      schema: loginSchema,
+    },
+    initiateLogin: {
+      method: 'POST',
+      routeName: '/initiate_login',
+      controller: authcontroller.InitiateAuthSession,
+      schema: initiateAuthSessionSchema,
+    },
+    test: {
+      method: 'GET',
+      routeName: '/test',
+      controller: authcontroller.test,
     },
   },
   healthRoutes: {
