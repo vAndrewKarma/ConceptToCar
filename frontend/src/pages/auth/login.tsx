@@ -1,7 +1,7 @@
 import './login.css'
 import { Form, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { redirect } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -71,11 +71,10 @@ function Login() {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
-
+  const navigate = useNavigate()
   const submitData = async (data: FormData) => {
     try {
-      redirect('/dashboard')
-      return
+      return navigate('/')
       setError(null)
 
       // Generate PKCE code verifier and challenge
