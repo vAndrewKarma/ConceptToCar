@@ -35,7 +35,7 @@ export default async function fastify_loader() {
     parseOptions: {
       httpOnly: true,
       secure: config.app.ENV === 'production',
-      sameSite: config.app.ENV === 'production' ? 'strict' : 'lax',
+      sameSite: config.app.ENV === 'production' ? 'none' : 'lax',
       path: '/',
     },
   })

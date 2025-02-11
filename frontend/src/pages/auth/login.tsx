@@ -82,9 +82,6 @@ function Login() {
       const res = await executeInit({
         data: { challenge },
         withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
       const loginreqid = res.data.id
 
@@ -97,9 +94,6 @@ function Login() {
           rememberMe: true,
         },
         withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
       console.log(test)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
