@@ -75,6 +75,7 @@ function Login() {
 
   const submitData = async (data: FormData) => {
     try {
+      return navigate('/dashboard')
       setError(null)
 
       // Generate PKCE code verifier and challenge
@@ -96,9 +97,6 @@ function Login() {
         },
         withCredentials: true,
       })
-      window.location.reload()
-
-      return navigate('/dashboard')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
