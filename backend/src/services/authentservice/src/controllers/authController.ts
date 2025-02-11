@@ -165,7 +165,7 @@ const authcontroller = {
       const cookieOptions = {
         secure: config.app.ENV === 'production',
         httpOnly: true,
-        sameSite: 'strict' as const,
+        sameSite: 'none',
         path: '/',
       }
 

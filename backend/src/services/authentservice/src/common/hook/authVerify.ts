@@ -123,7 +123,7 @@ export default async function verifyAuth(req, res) {
       res.setCookie('access_token', `${newAccessToken}.${newAccessTokenHmac}`, {
         secure: config.app.ENV === 'production',
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'none',
         path: '/',
       })
       return
