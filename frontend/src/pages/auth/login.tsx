@@ -5,13 +5,49 @@ import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import useAxios from 'axios-hooks'
 
 type FormData = {
   email: string
   password: string
 }
+const generateCodeVerifier = (length: number): string => {
+  const allowedChars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
+  const randomArray = new Uint8Array(length)
+  crypto.getRandomValues(randomArray)
+  return Array.from(
+    randomArray,
+    (byte) => allowedChars[byte % allowedChars.length]
+  ).join('')
+}
+
+const generateCodeChallenge = async (verifier: string): Promise<string> => {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(verifier)
+  const digest = await crypto.subtle.digest('SHA-256', data)
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
 
 function Login() {
+  const [error, setError] = useState<string | null>(null)
+  const [, executeInit] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/auth/initiate_login',
+      method: 'POST',
+    },
+    { manual: true }
+  )
+  const [, executeLogin] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/auth/login',
+      method: 'POST',
+    },
+    { manual: true }
+  )
+
   const schema: ZodType<FormData> = z.object({
     email: z.string().email({ message: 'Invalid credentials' }),
     password: z
@@ -36,7 +72,30 @@ function Login() {
     resolver: zodResolver(schema),
   })
 
-  const submitData = (data: FormData) => {
+  const submitData = async (data: FormData) => {
+    try {
+      setError(null)
+
+      // Generate PKCE code verifier and challenge
+      const code_verifier = generateCodeVerifier(43)
+      const challenge = await generateCodeChallenge(code_verifier)
+      const res = await executeInit({ data: challenge, withCredentials: true })
+      const loginreqid = res.data.id
+
+      const test = await executeLogin({
+        data: {
+          email: data.email,
+          password: data.password,
+          loginreqid,
+          code_verifier,
+          rememberMe: true,
+        },
+      })
+      console.log(test)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setError(err.message)
+    }
     console.log('it worked', data)
   }
 
@@ -123,6 +182,7 @@ function Login() {
                   Log In
                 </Button>
               </div>
+              {error && <div className="error-message">{error}</div>}
             </Form>
           </div>
         </div>

@@ -45,7 +45,7 @@ export default async function fastify_loader() {
   await InitRabbit(server)
   await server.register(FastifySSEPlugin)
   await server.register(helmet)
-  await server.register(cors)
+  await server.register(cors, { origin: '*', credentials: true }) // todo change for prod
   server.addHook('preHandler', verifyAuth)
   RouteCore(server)
 
