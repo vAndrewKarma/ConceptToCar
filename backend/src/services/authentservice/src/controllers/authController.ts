@@ -206,8 +206,14 @@ const authcontroller = {
       throw err
     }
   },
-  async test(req, res) {
-    res.send({ ok: req.sessionData })
+  async me(req, res) {
+    try {
+      if (!req.sessionData) return res.send({ auth: false })
+      res.send({ auth: true, session: req.sessionData })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
   },
 }
 
