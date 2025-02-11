@@ -96,8 +96,9 @@ function Login() {
         },
         withCredentials: true,
       })
+      window.location.reload()
 
-      navigate('/dashboard')
+      return navigate('/dashboard')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
