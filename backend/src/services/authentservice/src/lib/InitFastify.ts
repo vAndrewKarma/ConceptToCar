@@ -11,7 +11,7 @@ import RouteCore from '../plugins/route_core/core'
 import { ErrorHandler } from '../common/errors/handler'
 import fastifyCookie from '@fastify/cookie'
 import config from '../config'
-import verifyAuth from '../hook/authVerify'
+import verifyAuth from '../common/hook/authVerify'
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,

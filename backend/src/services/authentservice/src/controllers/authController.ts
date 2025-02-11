@@ -10,6 +10,7 @@ import generateToken from '../common/helper/generateToken'
 import getDeviceId from '../common/helper/getDeviceId'
 import verifyPKCE from '../common/helper/verifyPKCE'
 import config from '../config'
+import removeOldTokensFromSet from '../common/helper/removeOldtokens'
 
 const HMAC_SECRET = config.app.SECRET
 const HMAC_ALGORITHM = 'sha256'
@@ -110,6 +111,7 @@ const authcontroller = {
         email,
         firstName: userfound.firstName,
         lastName: userfound.lastName,
+        id: userfound._id,
         role: userfound.role,
         ip: userfound.ip,
         deviceId: boundDevice,
@@ -125,6 +127,16 @@ const authcontroller = {
         // TODO MOVE THEM TO KEYSERVICE
         deleteOldTokens(redis, `refresh_token:${deviceKeyPart}-*`),
         deleteOldTokens(redis, `access_token:${deviceKeyPart}-*`),
+        removeOldTokensFromSet(
+          redis,
+          userAccessTokenKey,
+          `access_token:${deviceKeyPart}-*`
+        ),
+        removeOldTokensFromSet(
+          redis,
+          userTokenKey,
+          `refresh_token:${deviceKeyPart}-*`
+        ),
       ])
 
       await redis
@@ -141,8 +153,11 @@ const authcontroller = {
           'EX',
           refreshTokenTTL
         )
-        .sadd(userTokenKey, refreshToken)
-        .sadd(userAccessTokenKey, accessToken)
+        .sadd(userTokenKey, `refresh_token:${deviceKeyPart}-${refreshToken}`)
+        .sadd(
+          userAccessTokenKey,
+          `access_token:${deviceKeyPart}-${accessToken}`
+        )
         .expire(userTokenKey, refreshTokenTTL)
         .expire(userAccessTokenKey, accessTokenTTL)
         .exec()
