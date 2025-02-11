@@ -189,17 +189,22 @@ const authcontroller = {
   },
 
   async InitiateAuthSession(req, res) {
-    const { challenge } = JSON.parse(JSON.stringify(req.body))
-    const loginReqId = generateToken(16)
-    const redis = req.server.redis
-    const fingerprint = getDeviceId(req)
-    await redis.set(
-      `login_request:${loginReqId}`,
-      JSON.stringify({ challenge, fingerprint }),
-      'EX',
-      300
-    )
-    res.send({ id: loginReqId })
+    try {
+      const { challenge } = JSON.parse(JSON.stringify(req.body))
+      const loginReqId = generateToken(16)
+      const redis = req.server.redis
+      const fingerprint = getDeviceId(req)
+      await redis.set(
+        `login_request:${loginReqId}`,
+        JSON.stringify({ challenge, fingerprint }),
+        'EX',
+        300
+      )
+      res.send({ id: loginReqId })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
   },
   async test(req, res) {
     res.send({ ok: req.sessionData })

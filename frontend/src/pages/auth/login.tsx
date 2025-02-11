@@ -79,16 +79,26 @@ function Login() {
       // Generate PKCE code verifier and challenge
       const code_verifier = generateCodeVerifier(43)
       const challenge = await generateCodeChallenge(code_verifier)
-      const res = await executeInit({ data: challenge, withCredentials: true })
+      const res = await executeInit({
+        data: { challenge },
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       const loginreqid = res.data.id
 
       const test = await executeLogin({
         data: {
           email: data.email,
           password: data.password,
-          loginreqid,
+          loginReqId: loginreqid,
           code_verifier,
           rememberMe: true,
+        },
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
         },
       })
       console.log(test)

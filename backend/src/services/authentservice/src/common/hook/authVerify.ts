@@ -16,7 +16,7 @@ export default async function verifyAuth(req, res) {
       access_token: accessToken,
       refresh_token: refreshToken,
     } = req.cookies
-
+    console.log(JSON.stringify(req.cookies))
     const isPasgRoute = protected_routes.PASG.routes.includes(req.url)
 
     if (isPasgRoute) {
