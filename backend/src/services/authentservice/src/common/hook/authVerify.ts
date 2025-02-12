@@ -86,7 +86,11 @@ export default async function verifyAuth(req, res) {
         throw new BadRequestError('Invalid or expired session')
       }
       sessionData = JSON.parse(sessionData)
-
+      console.log(
+        sessionData.deviceId !== devicebound ||
+          sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
+          userid !== sessionData.id
+      )
       if (
         sessionData.deviceId !== devicebound ||
         sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
