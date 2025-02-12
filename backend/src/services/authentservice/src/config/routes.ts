@@ -37,10 +37,10 @@ const routes: Record<string, RouteGroup> = {
       controller: authcontroller.InitiateAuthSession,
       schema: initiateAuthSessionSchema,
     },
-    test: {
+    me: {
       method: 'GET',
-      routeName: '/test',
-      controller: authcontroller.test,
+      routeName: '/me',
+      controller: authcontroller.me,
     },
   },
   healthRoutes: {

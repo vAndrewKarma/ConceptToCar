@@ -10,6 +10,7 @@ import generateToken from '../common/helper/generateToken'
 import getDeviceId from '../common/helper/getDeviceId'
 import verifyPKCE from '../common/helper/verifyPKCE'
 import config from '../config'
+import removeOldTokensFromSet from '../common/helper/removeOldtokens'
 
 const HMAC_SECRET = config.app.SECRET
 const HMAC_ALGORITHM = 'sha256'
@@ -88,10 +89,10 @@ const authcontroller = {
         .trim()
       const expectedIpHash = createHash('sha256').update(clientIp).digest('hex')
 
-      if (userfound.ip !== expectedIpHash) {
-        // TODO better ip implementation, urmeaza pt mobile networks etc, actuala e foarte rigida
-        throw new BadRequestError('Invalid login attempt')
-      }
+      // if (userfound.ip !== expectedIpHash) {
+      // TODO better ip implementation, urmeaza pt mobile networks etc, actuala e foarte rigida
+      //   throw new BadRequestError('Invalid login attempt')
+      // }
 
       if (!(await argon2.verify(userfound.password, password)))
         throw new BadRequestError('Invalid credentials')
@@ -110,6 +111,7 @@ const authcontroller = {
         email,
         firstName: userfound.firstName,
         lastName: userfound.lastName,
+        id: userfound._id,
         role: userfound.role,
         ip: userfound.ip,
         deviceId: boundDevice,
@@ -125,6 +127,16 @@ const authcontroller = {
         // TODO MOVE THEM TO KEYSERVICE
         deleteOldTokens(redis, `refresh_token:${deviceKeyPart}-*`),
         deleteOldTokens(redis, `access_token:${deviceKeyPart}-*`),
+        removeOldTokensFromSet(
+          redis,
+          userAccessTokenKey,
+          `access_token:${deviceKeyPart}-*`
+        ),
+        removeOldTokensFromSet(
+          redis,
+          userTokenKey,
+          `refresh_token:${deviceKeyPart}-*`
+        ),
       ])
 
       await redis
@@ -141,8 +153,11 @@ const authcontroller = {
           'EX',
           refreshTokenTTL
         )
-        .sadd(userTokenKey, refreshToken)
-        .sadd(userAccessTokenKey, accessToken)
+        .sadd(userTokenKey, `refresh_token:${deviceKeyPart}-${refreshToken}`)
+        .sadd(
+          userAccessTokenKey,
+          `access_token:${deviceKeyPart}-${accessToken}`
+        )
         .expire(userTokenKey, refreshTokenTTL)
         .expire(userAccessTokenKey, accessTokenTTL)
         .exec()
@@ -150,7 +165,7 @@ const authcontroller = {
       const cookieOptions = {
         secure: config.app.ENV === 'production',
         httpOnly: true,
-        sameSite: 'strict' as const,
+        sameSite: 'none',
         path: '/',
       }
 
@@ -174,20 +189,32 @@ const authcontroller = {
   },
 
   async InitiateAuthSession(req, res) {
-    const { challenge } = JSON.parse(JSON.stringify(req.body))
-    const loginReqId = generateToken(16)
-    const redis = req.server.redis
-    const fingerprint = getDeviceId(req)
-    await redis.set(
-      `login_request:${loginReqId}`,
-      JSON.stringify({ challenge, fingerprint }),
-      'EX',
-      300
-    )
-    res.send({ id: loginReqId })
+    try {
+      const { challenge } = JSON.parse(JSON.stringify(req.body))
+      const loginReqId = generateToken(16)
+      const redis = req.server.redis
+      const fingerprint = getDeviceId(req)
+      await redis.set(
+        `login_request:${loginReqId}`,
+        JSON.stringify({ challenge, fingerprint }),
+        'EX',
+        300
+      )
+      res.send({ id: loginReqId })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
   },
-  async test(req, res) {
-    res.send({ ok: req.sessionData })
+
+  async me(req, res) {
+    try {
+      if (!req.sessionData) return res.send({ auth: false })
+      res.send({ auth: true, session: req.sessionData })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
   },
 }
 

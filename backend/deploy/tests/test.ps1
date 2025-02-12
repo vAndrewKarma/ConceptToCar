@@ -67,7 +67,7 @@ gcloud container clusters create $CLUSTER_NAME --region=europe-west1 `
 }
 
 Write-Host "Getting Kubernetes credentials for the cluster $CLUSTER_NAME..."
-gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION --project $PROJECT_ID --quiet
+gcloud container clusters get-credentials doarptteste --region europe-west1   --quiet
 
 if ($?) {
     Write-Host "Kubernetes credentials acquired successfully."
