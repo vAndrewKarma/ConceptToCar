@@ -3,7 +3,7 @@ import { createUserModel } from '../db/m_m'
 async function startKeyConsumers(channel, server) {
   try {
     const queue = rabbitConfig.queues.AUTH_CREATE_USER_SESSION.name
-
+    console.log(queue)
     await channel.assertQueue(
       queue,
       rabbitConfig.queues.AUTH_CREATE_USER_SESSION.options
@@ -12,12 +12,13 @@ async function startKeyConsumers(channel, server) {
     console.log(`Waiting for messages in ${queue}...`)
 
     channel.consume(queue, async (msg) => {
+      console.log('Sug pula romania sug pula')
       if (msg !== null) {
         const message = JSON.parse(msg.content.toString())
         console.log('Received message:', message)
         try {
           const userModel = createUserModel(server)
-       await userModel.createUser(message)
+          await userModel.createUser(message)
           console.log('acc created with data', JSON.stringify(message))
           channel.ack(msg)
         } catch (error) {

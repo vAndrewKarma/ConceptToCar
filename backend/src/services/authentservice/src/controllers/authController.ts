@@ -49,6 +49,7 @@ const authcontroller = {
         user,
         rabbitConfig.queues.AUTH_CREATE_USER_SESSION.options
       )
+
       await redis.set(`locked_key:${hashedRedisKey}`, 'proc', 'EX', '30')
 
       res.status(201).send({ message: 'Check your email for validation.' })
