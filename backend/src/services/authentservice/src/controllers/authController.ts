@@ -114,7 +114,7 @@ const authcontroller = {
         lastName: userfound.lastName,
         id: userfound._id,
         role: userfound.role,
-        ip: userfound.ip,
+        ip: req.headers['x-forwarded-for'] || req.ip,
         deviceId: boundDevice,
       }
 
