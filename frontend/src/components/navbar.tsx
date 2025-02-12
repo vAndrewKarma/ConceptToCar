@@ -8,7 +8,6 @@ import { useAuthContext } from '../contexts/useAuthcontext'
 const NavScroll: React.FC = () => {
   const navbarRef = useRef<HTMLDivElement>(null)
   const toggleRef = useRef<HTMLButtonElement>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const auth = useAuthContext()
   console.log(auth)
   console.log(auth?.data?.auth)
