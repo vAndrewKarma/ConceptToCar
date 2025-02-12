@@ -60,7 +60,7 @@ export default async function verifyAuth(req, res) {
     }
 
     const sessionKey = `access_token:${deviceIdCookie}-${rawAccessToken}`
-    const sessionData = await redis.get(sessionKey)
+    const sessionData = JSON.parse(await redis.get(sessionKey))
 
     if (!sessionData) {
       const [rawRefreshToken, refreshHmac] = refreshToken.split('.')
