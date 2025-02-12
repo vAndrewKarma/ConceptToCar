@@ -11,6 +11,7 @@ const HMAC_SECRET = config.app.SECRET
 export default async function verifyAuth(req, res) {
   try {
     const redis = req.server.redis
+
     const {
       deviceId: deviceIdCookie,
       access_token: accessToken,
@@ -86,14 +87,14 @@ export default async function verifyAuth(req, res) {
       }
       sessionData = JSON.parse(sessionData)
 
-      console.log(sessionData.deviceId !== devicebound)
-      console.log(sessionData.ip !== expectedIpHash)
-      console.log(userid !== sessionData.id)
       if (
         sessionData.deviceId !== devicebound ||
         sessionData.ip !== expectedIpHash ||
         userid !== sessionData.id
       ) {
+        console.log(sessionData.deviceId !== devicebound)
+        console.log(sessionData.ip !== expectedIpHash)
+        console.log(userid !== sessionData.id)
         await redis
           .pipeline()
           .del(`refresh_token:${deviceIdCookie}-${refreshToken}`)
@@ -134,7 +135,9 @@ export default async function verifyAuth(req, res) {
     }
 
     sessionData = JSON.parse(sessionData)
-
+    console.log(sessionData.deviceId !== devicebound)
+    console.log(sessionData.ip !== expectedIpHash)
+    console.log(userid !== sessionData.id)
     if (
       sessionData.deviceId !== devicebound ||
       sessionData.ip !== expectedIpHash ||
