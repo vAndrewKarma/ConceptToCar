@@ -89,7 +89,7 @@ export default async function verifyAuth(req, res) {
 
       if (
         sessionData.deviceId !== devicebound ||
-        sessionData.ip !== expectedIpHash ||
+        sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
         userid !== sessionData.id
       ) {
         await redis
@@ -131,21 +131,21 @@ export default async function verifyAuth(req, res) {
       return
     }
 
-    sessionData = JSON.parse(sessionData)
-    console.log(sessionData)
-    console.log('--------------------------------')
-    console.log(sessionData.ip === req.headers['x-forwarded-for'] || req.ip)
-    console.log(devicebound === sessionData.deviceId)
-    console.log(userid === sessionData.id)
-    console.log('--------------------------------')
-    console.log(sessionData.ip == req.headers['x-forwarded-for'] || req.ip)
-    console.log(devicebound == sessionData.deviceId)
-    console.log(userid == sessionData.id)
+    // sessionData = JSON.parse(sessionData)
+    // console.log(sessionData)
+    // console.log('--------------------------------')
+    // console.log(sessionData.ip === )
+    // console.log(devicebound === sessionData.deviceId)
+    // console.log(userid === sessionData.id)
+    // console.log('--------------------------------')
+    // console.log(sessionData.ip == req.headers['x-forwarded-for'] || req.ip)
+    // console.log(devicebound == sessionData.deviceId)
+    // console.log(userid == sessionData.id)
 
-    console.log('--------------------------------')
+    // console.log('--------------------------------')
     if (
       sessionData.deviceId !== devicebound ||
-      sessionData.ip !== expectedIpHash ||
+      sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
       userid !== sessionData.id
     ) {
       await redis
