@@ -1,14 +1,12 @@
 import './login.css'
 import { Form, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Navigate } from 'react-router-dom'
 import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import useAxios from 'axios-hooks'
-
 type FormData = {
   email: string
   password: string
@@ -48,7 +46,6 @@ function Login() {
     },
     { manual: true }
   )
-
   const schema: ZodType<FormData> = z.object({
     email: z.string().email({ message: 'Invalid credentials' }),
     password: z
@@ -94,10 +91,11 @@ function Login() {
         },
         withCredentials: true,
       })
-      return <Navigate to="/dashboard" />
+      window.location.reload()
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setError(err.response.data.message)
+      setError(err.response?.data?.message)
     }
   }
 
