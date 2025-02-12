@@ -94,7 +94,7 @@ function Login() {
         },
         withCredentials: true,
       })
-      return <Navigate to="/" />
+      return <Navigate to="/dashboard" />
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response.data.message)
