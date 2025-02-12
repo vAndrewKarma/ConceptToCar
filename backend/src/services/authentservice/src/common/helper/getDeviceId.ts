@@ -5,8 +5,8 @@ const getDeviceId = (req) => {
   console.log(ua)
   return createHash('sha256')
     .update(
-      (req.headers['x-forwarded-for'] || req.ip) + ua.family ||
-        'unknown' + ua.os.family ||
+      (req.headers['x-forwarded-for'] || req.ip) + ua.fullName ||
+        'unknown' + ua.fullName ||
         'unknown'
     )
     .digest('hex')
