@@ -60,7 +60,7 @@ export default async function verifyAuth(req, res) {
     }
 
     const sessionKey = `access_token:${deviceIdCookie}-${rawAccessToken}`
-    let sessionData = await redis.get(sessionKey)
+    const sessionData = await redis.get(sessionKey)
 
     if (!sessionData) {
       const [rawRefreshToken, refreshHmac] = refreshToken.split('.')
@@ -79,13 +79,16 @@ export default async function verifyAuth(req, res) {
       }
 
       const refreshKey = `refresh_token:${deviceIdCookie}-${rawRefreshToken}`
-      sessionData = await redis.get(refreshKey)
+      let sessionData = await redis.get(refreshKey)
 
       if (!sessionData) {
         clearCookie(res)
         throw new BadRequestError('Invalid or expired session')
       }
       sessionData = JSON.parse(sessionData)
+      console.log(
+        '-------------------------------- REFRESH TOKEN --------------------------------'
+      )
       console.log(
         sessionData.deviceId !== devicebound ||
           sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
@@ -96,6 +99,7 @@ export default async function verifyAuth(req, res) {
         sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
         userid !== sessionData.id
       ) {
+        console.log('entered here')
         await redis
           .pipeline()
           .del(`refresh_token:${deviceIdCookie}-${refreshToken}`)
@@ -146,7 +150,14 @@ export default async function verifyAuth(req, res) {
     // console.log(devicebound == sessionData.deviceId)
     // console.log(userid == sessionData.id)
 
-    // console.log('--------------------------------')
+    console.log(
+      '-------------------------------- ACCESS TOKEN --------------------------------'
+    )
+    console.log(
+      sessionData.deviceId !== devicebound ||
+        sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
+        userid !== sessionData.id
+    )
     if (
       sessionData.deviceId !== devicebound ||
       sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
