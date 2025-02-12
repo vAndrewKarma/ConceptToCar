@@ -154,9 +154,9 @@ export default async function verifyAuth(req, res) {
       '-------------------------------- ACCESS TOKEN --------------------------------'
     )
     console.log(
-      sessionData.deviceId !== devicebound ||
-        sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
-        userid !== sessionData.id
+      sessionData.deviceId != devicebound ||
+        sessionData.ip != (req.headers['x-forwarded-for'] || req.ip) ||
+        userid != sessionData.id
     )
     console.log(sessionData.deviceId != devicebound)
     console.log(sessionData.ip != (req.headers['x-forwarded-for'] || req.ip))
