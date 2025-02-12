@@ -18,7 +18,7 @@ export default async function verifyAuth(req, res) {
     } = req.cookies
     console.log(JSON.stringify(req.cookies))
     const isPasgRoute = protected_routes.PASG.routes.includes(req.url)
-
+    console.log(`PASG ROUTE` + isPasgRoute)
     if (isPasgRoute) {
       if (accessToken || refreshToken) {
         throw new BadRequestError('User already authenticated')
