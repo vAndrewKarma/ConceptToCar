@@ -133,8 +133,16 @@ export default async function verifyAuth(req, res) {
 
     sessionData = JSON.parse(sessionData)
     console.log(sessionData)
+    console.log('--------------------------------')
     console.log(sessionData.ip)
     console.log(req.headers['x-forwarded-for'] || req.ip)
+    console.log('--------------------------------')
+    console.log(devicebound)
+    console.log(sessionData.deviceId)
+    console.log('--------------------------------')
+    console.log(userid)
+    console.log(sessionData.id)
+    console.log('--------------------------------')
     if (
       sessionData.deviceId !== devicebound ||
       sessionData.ip !== expectedIpHash ||
