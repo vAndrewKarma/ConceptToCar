@@ -163,6 +163,7 @@ export default async function verifyAuth(req, res) {
       sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
       userid !== sessionData.id
     ) {
+      console.log('entered here23')
       await redis
         .pipeline()
         .del(sessionKey)
@@ -181,6 +182,7 @@ export default async function verifyAuth(req, res) {
 
     req.sessionData = sessionData
     req.auth = true
+    return
   } catch (err) {
     console.error(err)
     throw err
