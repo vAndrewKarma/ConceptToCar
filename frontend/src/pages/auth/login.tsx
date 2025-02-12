@@ -1,7 +1,7 @@
 import './login.css'
 import { Form, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { z, ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -71,7 +71,6 @@ function Login() {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
-  const navigate = useNavigate()
   const submitData = async (data: FormData) => {
     try {
       setError(null)
@@ -95,7 +94,7 @@ function Login() {
         },
         withCredentials: true,
       })
-      return navigate(-1)
+      return <Navigate to="/" />
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response.data.message)
