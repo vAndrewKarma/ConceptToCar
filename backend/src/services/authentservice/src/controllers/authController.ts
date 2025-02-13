@@ -226,6 +226,12 @@ const authcontroller = {
         access_token: accessToken,
         refresh_token: refreshToken,
       } = req.cookies
+
+      if (!deviceIdCookie || !accessToken || !refreshToken) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed request')
+      }
+
       const [rawAccessToken, accessHmac] = accessToken.split('.')
 
       if (!rawAccessToken || !accessHmac) {
