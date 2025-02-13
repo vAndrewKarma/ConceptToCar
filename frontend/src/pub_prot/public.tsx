@@ -7,8 +7,8 @@ const PublicRoute = ({ children }: { children: ReactNode }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const auth: any = useAuthContext()
 
-  if (!auth || auth.loading) {
-    return <div>Loading...</div>
+  if (!auth || auth.isLoading) {
+    return <div>Loading...</div> // Or a proper loading spinner
   }
 
   if (auth?.data?.auth) {
