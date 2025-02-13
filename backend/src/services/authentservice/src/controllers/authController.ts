@@ -11,6 +11,7 @@ import getDeviceId from '../common/helper/getDeviceId'
 import verifyPKCE from '../common/helper/verifyPKCE'
 import config from '../config'
 import removeOldTokensFromSet from '../common/helper/removeOldtokens'
+import clearCookie from '../common/helper/clearCookies'
 
 const HMAC_SECRET = config.app.SECRET
 const HMAC_ALGORITHM = 'sha256'
@@ -212,6 +213,15 @@ const authcontroller = {
     try {
       if (!req.sessionData) return res.send({ auth: false })
       res.send({ auth: true, session: req.sessionData })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
+  },
+  async logout(req, res) {
+    try {
+      clearCookie(req)
+      res.send({ message: 'Logged out' })
     } catch (err) {
       console.log(err)
       throw err
