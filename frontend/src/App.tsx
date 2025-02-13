@@ -1,6 +1,8 @@
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useAuth } from './hook/useAuth.tsx'
+import { AuthProvider } from './contexts/authContext.tsx'
 import NavScroll from './components/navbar'
 import Login from './pages/auth/login'
 import Home from './pages/home'
@@ -11,13 +13,12 @@ import Copyright from './components/copyright'
 import Recover from './pages/auth/forgot-password/recover.tsx'
 import NewPassword from './pages/auth/forgot-password/new-password.tsx'
 import EmailVerification from './pages/auth/email-verification.tsx'
-import { useAuth } from './hook/useAuth.tsx'
-import { AuthProvider } from './contexts/authContext.tsx'
 import PublicRoute from './pub_prot/public.tsx'
 import ProtectedRoute from './pub_prot/prot.tsx'
+import Dashboard from './pages/functionality/dashboard.tsx'
+import Products from './pages/functionality/products.tsx'
 
 function App() {
-  // Call the hook once at the top level.
   const auth = useAuth()
 
   return (
@@ -48,7 +49,15 @@ function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Contact />
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <Products />
               </ProtectedRoute>
             }
           />
