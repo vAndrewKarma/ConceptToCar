@@ -1,21 +1,23 @@
-import { useEffect } from 'react'
-import useAxios from 'axios-hooks'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios' // axios instead of alalaltu gen axios-hooks ca sa ii dau sho cache
+
+const fetchAuth = async () => {
+  const { data } = await axios.get(
+    'https://backend-tests.conceptocar.xyz/auth/me',
+    {
+      withCredentials: true,
+    }
+  )
+  return data
+}
 
 export const useAuth = () => {
-  const [{ data, loading, error }] = useAxios({
-    url: 'https://backend-tests.conceptocar.xyz/auth/me',
-    method: 'GET',
-    withCredentials: true,
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['authUser'],
+    queryFn: fetchAuth,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   })
 
-  useEffect(() => {
-    if (!loading && data) {
-      console.log('Auth response:', data)
-    }
-    if (!loading && error) {
-      console.error('Auth error:', error)
-    }
-  }, [loading, data, error])
-
-  return { data, loading, error }
+  return { data, isLoading, error }
 }
