@@ -21,6 +21,9 @@ import Products from './pages/functionality/products.tsx'
 function App() {
   const auth = useAuth()
 
+  if (auth.isLoading) {
+    return <div>Loading app...</div>
+  }
   return (
     <AuthProvider auth={auth}>
       <BrowserRouter>
