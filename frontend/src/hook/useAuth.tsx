@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useEffect } from 'react'
 
@@ -11,6 +11,8 @@ const fetchAuth = async () => {
 }
 
 export const useAuth = () => {
+  const queryClient = useQueryClient()
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['authUser'],
     queryFn: fetchAuth,
@@ -28,5 +30,22 @@ export const useAuth = () => {
     }
   }, [data])
 
-  return { data, isLoading, error }
+  const logout = async () => {
+    try {
+      await axios.post(
+        'https://backend-tests.conceptocar.xyz/auth/logout',
+        {},
+        { withCredentials: true }
+      )
+    } catch (err) {
+      console.error('Logout failed', err)
+    }
+
+    queryClient.removeQueries({ queryKey: ['authUser'] })
+    localStorage.removeItem('authUser')
+
+    window.location.href = '/sign-in'
+  }
+
+  return { data, isLoading, error, logout }
 }
