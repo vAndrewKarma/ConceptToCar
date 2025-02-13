@@ -220,6 +220,42 @@ const authcontroller = {
   },
   async logout(req, res) {
     try {
+      const redis = req.server.redis
+      const {
+        deviceId: deviceIdCookie,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      } = req.cookies
+      const [rawAccessToken, accessHmac] = accessToken.split('.')
+
+      if (!rawAccessToken || !accessHmac) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed access token')
+      }
+      const [userid, devicebound] = deviceIdCookie.split(':')
+
+      if (!userid || !devicebound) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed device ID')
+      }
+      const sessionKey = `access_token:${deviceIdCookie}-${rawAccessToken}`
+      const [rawRefreshToken, refreshHmac] = refreshToken.split('.')
+      if (!rawRefreshToken || !refreshHmac) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed refresh token')
+      }
+      const refreshKey = `refresh_token:${deviceIdCookie}-${rawRefreshToken}`
+      await redis
+        .pipeline()
+        .del(refreshKey)
+        .srem(`user_refresh_tokens:${userid}`, refreshKey)
+        .exec()
+      await redis
+        .pipeline()
+        .del(sessionKey)
+        .srem(`user_access_tokens:${userid}`, sessionKey)
+        .exec()
+
       clearCookie(req)
       res.send({ message: 'Logged out' })
     } catch (err) {
