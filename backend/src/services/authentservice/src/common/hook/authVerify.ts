@@ -21,6 +21,7 @@ export default async function verifyAuth(req, res) {
     const isPasgRoute = protected_routes.PASG.routes.includes(req.url)
     const isSCRoute = protected_routes.SC.routes.includes(req.url)
     if (isSCRoute) return
+
     console.log(`PASG ROUTE` + isPasgRoute)
     if (isPasgRoute) {
       if (accessToken || refreshToken) {
