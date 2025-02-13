@@ -256,7 +256,7 @@ const authcontroller = {
         .srem(`user_access_tokens:${userid}`, sessionKey)
         .exec()
 
-      clearCookie(req)
+      clearCookie(res)
       res.send({ message: 'Logged out' })
     } catch (err) {
       console.log(err)
