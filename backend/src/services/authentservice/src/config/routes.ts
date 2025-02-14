@@ -42,6 +42,11 @@ const routes: Record<string, RouteGroup> = {
       routeName: '/me',
       controller: authcontroller.me,
     },
+    logout: {
+      method: 'POST',
+      routeName: '/logout',
+      controller: authcontroller.logout,
+    },
   },
   healthRoutes: {
     healthCheck: {

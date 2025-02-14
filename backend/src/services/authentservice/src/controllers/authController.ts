@@ -11,6 +11,7 @@ import getDeviceId from '../common/helper/getDeviceId'
 import verifyPKCE from '../common/helper/verifyPKCE'
 import config from '../config'
 import removeOldTokensFromSet from '../common/helper/removeOldtokens'
+import clearCookie from '../common/helper/clearCookies'
 
 const HMAC_SECRET = config.app.SECRET
 const HMAC_ALGORITHM = 'sha256'
@@ -212,6 +213,57 @@ const authcontroller = {
     try {
       if (!req.sessionData) return res.send({ auth: false })
       res.send({ auth: true, session: req.sessionData })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
+  },
+  async logout(req, res) {
+    try {
+      const redis = req.server.redis
+      const {
+        deviceId: deviceIdCookie,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      } = req.cookies
+
+      if (!deviceIdCookie || !accessToken || !refreshToken) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed request')
+      }
+
+      const [rawAccessToken, accessHmac] = accessToken.split('.')
+
+      if (!rawAccessToken || !accessHmac) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed access token')
+      }
+      const [userid, devicebound] = deviceIdCookie.split(':')
+
+      if (!userid || !devicebound) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed device ID')
+      }
+      const sessionKey = `access_token:${deviceIdCookie}-${rawAccessToken}`
+      const [rawRefreshToken, refreshHmac] = refreshToken.split('.')
+      if (!rawRefreshToken || !refreshHmac) {
+        clearCookie(res)
+        throw new BadRequestError('Malformed refresh token')
+      }
+      const refreshKey = `refresh_token:${deviceIdCookie}-${rawRefreshToken}`
+      await redis
+        .pipeline()
+        .del(refreshKey)
+        .srem(`user_refresh_tokens:${userid}`, refreshKey)
+        .exec()
+      await redis
+        .pipeline()
+        .del(sessionKey)
+        .srem(`user_access_tokens:${userid}`, sessionKey)
+        .exec()
+
+      clearCookie(res)
+      res.send({ message: 'Logged out' })
     } catch (err) {
       console.log(err)
       throw err

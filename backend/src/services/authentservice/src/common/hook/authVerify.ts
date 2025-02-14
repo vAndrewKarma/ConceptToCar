@@ -1,6 +1,6 @@
 import config from '../../config'
 import { createHmac, createHash } from 'crypto'
-import { protected_routes } from '../../config/protected_routes'
+import { protected_routes } from '../config/protected_routes'
 import { BadRequestError } from '../errors/custom/errors'
 import clearCookie from '../helper/clearCookies'
 import generateToken from '../helper/generateToken'
@@ -19,6 +19,9 @@ export default async function verifyAuth(req, res) {
     } = req.cookies
     console.log(JSON.stringify(req.cookies))
     const isPasgRoute = protected_routes.PASG.routes.includes(req.url)
+    const isSCRoute = protected_routes.SC.routes.includes(req.url)
+    if (isSCRoute) return
+
     console.log(`PASG ROUTE` + isPasgRoute)
     if (isPasgRoute) {
       if (accessToken || refreshToken) {

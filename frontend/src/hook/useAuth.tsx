@@ -1,21 +1,51 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
 import { useEffect } from 'react'
-import useAxios from 'axios-hooks'
+
+const fetchAuth = async () => {
+  const { data } = await axios.get(
+    'https://backend-tests.conceptocar.xyz/auth/me',
+    { withCredentials: true }
+  )
+  return data
+}
 
 export const useAuth = () => {
-  const [{ data, loading, error }] = useAxios({
-    url: 'https://backend-tests.conceptocar.xyz/auth/me',
-    method: 'GET',
-    withCredentials: true,
+  const queryClient = useQueryClient()
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['authUser'],
+    queryFn: fetchAuth,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+    initialData: () => {
+      const cached = localStorage.getItem('authUser')
+      return cached ? JSON.parse(cached) : undefined
+    },
   })
 
   useEffect(() => {
-    if (!loading && data) {
-      console.log('Auth response:', data)
+    if (data) {
+      localStorage.setItem('authUser', JSON.stringify(data))
     }
-    if (!loading && error) {
-      console.error('Auth error:', error)
-    }
-  }, [loading, data, error])
+  }, [data])
 
-  return { data, loading, error }
+  const logout = async () => {
+    try {
+      await axios.post(
+        'https://backend-tests.conceptocar.xyz/auth/logout',
+        {},
+        { withCredentials: true }
+      )
+    } catch (err) {
+      console.error('Logout failed', err)
+    }
+
+    queryClient.removeQueries({ queryKey: ['authUser'] })
+    localStorage.removeItem('authUser')
+
+    window.location.href = '/sign-in'
+  }
+
+  return { data, isLoading, error, logout }
 }
