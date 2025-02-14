@@ -20,7 +20,7 @@
     "@fastify/mongodb": "^9.0.1",
     "@fastify/redis": "^7.0.1",
     "@fastify/websocket": "^11.0.2",
-    "@karma-packages/conceptocar-common": "^1.0.1",
+    "@karma-packages/conceptocar-common": "*",
     "ajv": "^8.17.1",
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^3.0.1",
