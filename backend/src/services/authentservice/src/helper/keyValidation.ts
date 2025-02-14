@@ -2,8 +2,7 @@ import { User } from '../db/m_m'
 import { createHash } from 'crypto'
 import { Roles } from './interfaces'
 import { FastifyRedis } from '@fastify/redis'
-import { BadRequestError } from '../common/errors/custom/errors'
-
+import { BadRequestError } from '@karma-packages/conceptocar-common'
 export default async function keyvalidation(user: User, redis: FastifyRedis) {
   try {
     const hashedRedisKey = createHash('sha256').update(user.key).digest('hex')
@@ -12,10 +11,12 @@ export default async function keyvalidation(user: User, redis: FastifyRedis) {
       await redis.get(keyRedisKey)
     )
     console.log(keyData)
-    const foundkey =await redis.get(`locked_key:${hashedRedisKey}`)
-    if(foundkey)
-      throw new BadRequestError('Account is being created... Please wait for the validation email')
-    
+    const foundkey = await redis.get(`locked_key:${hashedRedisKey}`)
+    if (foundkey)
+      throw new BadRequestError(
+        'Account is being created... Please wait for the validation email'
+      )
+
     if (!keyData) throw new BadRequestError('Invalid key')
 
     if (keyData.email !== user.email || keyData.role !== user.role)

@@ -1,14 +1,15 @@
-import config from '../../config'
+ 
 import { createHmac, createHash } from 'crypto'
 import { protected_routes } from '../config/protected_routes'
 import { BadRequestError } from '../errors/custom/errors'
 import clearCookie from '../helper/clearCookies'
 import generateToken from '../helper/generateToken'
 
-const HMAC_ALGORITHM = 'sha256'
-const HMAC_SECRET = config.app.SECRET
 
-export default async function verifyAuth(req, res) {
+
+export default async function verifyAuth(req, res,config) {
+  const HMAC_ALGORITHM = 'sha256'
+const HMAC_SECRET = config.app.SECRET
   try {
     const redis = req.server.redis
 

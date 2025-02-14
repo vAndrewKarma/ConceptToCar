@@ -1,17 +1,17 @@
 import fastify, { FastifyInstance } from 'fastify'
 import helmet from '@fastify/helmet'
 import cors from '@fastify/cors'
-import start from '../common/helper/start'
+import start from '@karma-packages/conceptocar-common/dist/helper/start'
 import ajvErrors from 'ajv-errors'
 import ajvKeywords from 'ajv-keywords'
 import InitRedis from './InitRedis'
 import { FastifySSEPlugin } from 'fastify-sse-v2'
 import InitRabbit from './InitRabbitMq'
 import RouteCore from '../plugins/route_core/core'
-import { ErrorHandler } from '../common/errors/handler'
+import { ErrorHandler } from '@karma-packages/conceptocar-common'
 import fastifyCookie from '@fastify/cookie'
 import config from '../config'
-import verifyAuth from '../common/hook/authVerify'
+import verifyAuth from '@karma-packages/conceptocar-common/dist/hook/authVerify'
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,
@@ -50,13 +50,15 @@ export default async function fastify_loader() {
   await server.register(cors, {
     origin: true,
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
-    allowedHeaders: ['content-type', 'accept', 'content-type'],
+    allowedHeaders: ['content-type', 'accept', 'content-type'], // todo change for prod
     credentials: true,
   })
-  // todo change for prod
-  server.addHook('preHandler', verifyAuth)
+
+  server.addHook('preHandler', async (request, reply) => {
+    await verifyAuth(request, reply, config)
+  })
   RouteCore(server)
 
-  await start(server)
+  await start(server, config)
   return server
 }

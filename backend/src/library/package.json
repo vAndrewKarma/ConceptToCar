@@ -1,0 +1,32 @@
+{
+  "name": "@karma-packages/conceptocar-common",
+  "version": "1.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "deploy": "npm run build &&  npm version patch && npm publish --access public"
+  },
+  "keywords": [],
+  "author": "Karma _Andrew_",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "A shared library for our project",
+  "dependencies": {
+    "@types/node": "^22.13.4",
+    "amqplib": "^0.10.5",
+    "crypto": "^1.0.1",
+    "fastify": "^5.2.1",
+    "os": "^0.1.2",
+    "user-agent": "^1.0.4"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}

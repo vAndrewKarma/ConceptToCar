@@ -12,7 +12,6 @@ async function startKeyConsumers(channel, server) {
     console.log(`Waiting for messages in ${queue}...`)
 
     channel.consume(queue, async (msg) => {
-      console.log('Sug pula romania sug pula')
       if (msg !== null) {
         const message = JSON.parse(msg.content.toString())
         console.log('Received message:', message)

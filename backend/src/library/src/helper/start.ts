@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify'
-import config from '../../config'
+ 
 import podIP from './getPodIps'
 
-const start = async (server: FastifyInstance) => {
+const start = async (server: FastifyInstance,config) => {
   try {
     console.log(config.app.ENV==='production' ? '0.0.0.0' : podIP)
     server.listen(
