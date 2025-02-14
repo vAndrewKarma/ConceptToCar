@@ -1,4 +1,4 @@
-import { rabbitConfig } from '../common/rabbitmq/queues'
+import { rabbitConfig } from '@karma-packages/conceptocar-common'
 import { createUserModel } from '../db/m_m'
 async function startKeyConsumers(channel, server) {
   try {

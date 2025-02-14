@@ -1,14 +1,15 @@
 import fastify, { FastifyInstance } from 'fastify'
 import helmet from '@fastify/helmet'
 import cors from '@fastify/cors'
-import start from '../common/helper/start'
+import start from '@karma-packages/conceptocar-common/dist/helper/start'
 import ajvErrors from 'ajv-errors'
 import ajvKeywords from 'ajv-keywords'
 import InitRedis from './InitRedis'
 import InitRabbit from './InitRabbitMq'
 import RouteCore from '../plugins/route_core/core'
-import { ErrorHandler } from '../common/errors/handler'
-import { FastifyRedis } from '@fastify/redis'
+import { ErrorHandler } from '@karma-packages/conceptocar-common'
+import config from '../config'
+
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,
@@ -33,6 +34,6 @@ export default async function fastify_loader() {
   await server.register(cors)
 
   RouteCore(server)
-  await start(server)
+  await start(server, config)
   return server
 }

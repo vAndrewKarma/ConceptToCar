@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'crypto'
-import { BadRequestError } from '../common/errors/custom/errors'
+import { BadRequestError } from '@karma-packages/conceptocar-common'
 import config from '../config'
 import { FastifyRequest, FastifyReply } from 'fastify'
 

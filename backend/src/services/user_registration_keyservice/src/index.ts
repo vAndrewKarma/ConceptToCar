@@ -11,7 +11,7 @@
 
 */
 import loader from './lib/loader'
-import shutdown from './common/helper/shutdown'
+import shutdown from '@karma-packages/conceptocar-common/dist/helper/shutdown'
 ;(async () => {
   const server = await loader()
 
