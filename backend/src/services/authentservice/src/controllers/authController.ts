@@ -117,6 +117,7 @@ const authcontroller = {
         role: userfound.role,
         ip: req.headers['x-forwarded-for'] || req.ip,
         deviceId: boundDevice,
+        createdAt: userfound.createdAt,
       }
 
       const deviceKeyPart = `${userId}:${boundDevice}`

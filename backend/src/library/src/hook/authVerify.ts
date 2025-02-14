@@ -1,15 +1,12 @@
- 
 import { createHmac, createHash } from 'crypto'
 import { protected_routes } from '../config/protected_routes'
-import { BadRequestError } from '../errors/custom/errors'
+import { Unauthorized } from '../errors/custom/errors'
 import clearCookie from '../helper/clearCookies'
 import generateToken from '../helper/generateToken'
 
-
-
-export default async function verifyAuth(req, res,config) {
+export default async function verifyAuth(req, res, config) {
   const HMAC_ALGORITHM = 'sha256'
-const HMAC_SECRET = config.app.SECRET
+  const HMAC_SECRET = config.app.SECRET
   try {
     const redis = req.server.redis
 
@@ -26,21 +23,21 @@ const HMAC_SECRET = config.app.SECRET
     console.log(`PASG ROUTE` + isPasgRoute)
     if (isPasgRoute) {
       if (accessToken || refreshToken) {
-        throw new BadRequestError('User already authenticated')
+        throw new Unauthorized('User already authenticated')
       }
       return
     }
 
     if (!accessToken || !refreshToken || !deviceIdCookie) {
       clearCookie(res)
-      throw new BadRequestError('Invalid authentication')
+      throw new Unauthorized('Invalid authentication')
     }
 
     const [userid, devicebound] = deviceIdCookie.split(':')
 
     if (!userid || !devicebound) {
       clearCookie(res)
-      throw new BadRequestError('Malformed device ID')
+      throw new Unauthorized('Malformed device ID')
     }
     const clientIp = (req.headers['x-forwarded-for'] || req.ip)
       .toString()
@@ -51,7 +48,7 @@ const HMAC_SECRET = config.app.SECRET
     const [rawAccessToken, accessHmac] = accessToken.split('.')
     if (!rawAccessToken || !accessHmac) {
       clearCookie(res)
-      throw new BadRequestError('Malformed access token')
+      throw new Unauthorized('Malformed access token')
     }
 
     const expectedAccessHmac = createHmac(HMAC_ALGORITHM, HMAC_SECRET)
@@ -60,7 +57,7 @@ const HMAC_SECRET = config.app.SECRET
 
     if (expectedAccessHmac !== accessHmac) {
       clearCookie(res)
-      throw new BadRequestError('Invalid access token signature')
+      throw new Unauthorized('Invalid access token signature')
     }
 
     const sessionKey = `access_token:${deviceIdCookie}-${rawAccessToken}`
@@ -70,7 +67,7 @@ const HMAC_SECRET = config.app.SECRET
       const [rawRefreshToken, refreshHmac] = refreshToken.split('.')
       if (!rawRefreshToken || !refreshHmac) {
         clearCookie(res)
-        throw new BadRequestError('Malformed refresh token')
+        throw new Unauthorized('Malformed refresh token')
       }
 
       const expectedRefreshHmac = createHmac(HMAC_ALGORITHM, HMAC_SECRET)
@@ -79,7 +76,7 @@ const HMAC_SECRET = config.app.SECRET
 
       if (expectedRefreshHmac !== refreshHmac) {
         clearCookie(res)
-        throw new BadRequestError('Invalid refresh token signature')
+        throw new Unauthorized('Invalid refresh token signature')
       }
 
       const refreshKey = `refresh_token:${deviceIdCookie}-${rawRefreshToken}`
@@ -87,7 +84,7 @@ const HMAC_SECRET = config.app.SECRET
 
       if (!sessionData) {
         clearCookie(res)
-        throw new BadRequestError('Invalid or expired session')
+        throw new Unauthorized('Invalid or expired session')
       }
       sessionData = JSON.parse(sessionData)
       console.log(
@@ -114,7 +111,7 @@ const HMAC_SECRET = config.app.SECRET
           .exec()
 
         clearCookie(res)
-        throw new BadRequestError('Device or IP mismatch')
+        throw new Unauthorized('Device or IP mismatch')
       }
       req.sessionData = sessionData
       req.auth = true
@@ -182,7 +179,7 @@ const HMAC_SECRET = config.app.SECRET
         .srem(`user_access_tokens:${userid}`, sessionKey)
         .exec()
       clearCookie(res)
-      throw new BadRequestError('Device or IP mismatch')
+      throw new Unauthorized('Device or IP mismatch')
     }
 
     await redis.expire(sessionKey, 900)
