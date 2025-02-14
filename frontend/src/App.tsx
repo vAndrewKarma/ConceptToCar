@@ -17,6 +17,7 @@ import PublicRoute from './pub_prot/public.tsx'
 import ProtectedRoute from './pub_prot/prot.tsx'
 import Dashboard from './pages/functionality/dashboard.tsx'
 import Products from './pages/functionality/products.tsx'
+import Profile from './pages/account/profile.tsx'
 
 function App() {
   const auth = useAuth()
@@ -61,6 +62,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
