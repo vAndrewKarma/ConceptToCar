@@ -5,6 +5,9 @@ metadata:
   namespace: deployments
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: '/metrics'
+    prometheus.io/port: '50051' # Port where Prometheus scrapes metrics
 spec:
   type: ClusterIP
   selector:

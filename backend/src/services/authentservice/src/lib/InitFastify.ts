@@ -1,4 +1,4 @@
-import fastify, { FastifyInstance } from 'fastify'
+import fastify, { FastifyInstance, FastifyRequest } from 'fastify'
 import helmet from '@fastify/helmet'
 import cors from '@fastify/cors'
 import start from '@karma-packages/conceptocar-common/dist/helper/start'
@@ -12,6 +12,13 @@ import { ErrorHandler } from '@karma-packages/conceptocar-common'
 import fastifyCookie from '@fastify/cookie'
 import config from '../config'
 import verifyAuth from '@karma-packages/conceptocar-common/dist/hook/authVerify'
+import Initprometheus from '../move_to_common/prometheus'
+declare module 'fastify' {
+  interface FastifyRequest {
+    startTime?: number
+  }
+}
+
 export default async function fastify_loader() {
   const server: FastifyInstance = fastify({
     logger: true,
@@ -57,7 +64,18 @@ export default async function fastify_loader() {
   server.addHook('preHandler', async (request, reply) => {
     await verifyAuth(request, reply, config)
   })
+  server.addHook('onRequest', (request, reply, done) => {
+    request.startTime = Date.now()
+    done()
+  })
+
   RouteCore(server)
+
+  // ------------------ METRICS ------------------
+
+  if (config.app.ENV === 'production') Initprometheus(server)
+
+  // ----------------------------------------------
 
   await start(server, config)
   return server

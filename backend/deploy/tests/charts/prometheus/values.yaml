@@ -1,0 +1,12 @@
+replicaCount: 1
+
+prometheus:
+  scrapeInterval: '30s'
+  scrapeTimeout: '10s'
+  evaluationInterval: '30s'
+
+serviceMonitor:
+  enabled: true
+  interval: '30s'
+  path: '/metrics'
+  port: '50051' # Port where Prometheus scrapes metrics (modify as needed)
