@@ -7,6 +7,7 @@ WORKDIR /home/node/app
 EXPOSE 3000
 ARG ENV=production
 COPY --chown=node:node package* ./
+RUN  npm update @karma-packages/conceptocar-common
 RUN npm install 
 COPY --chown=node:node . .
 ENV NODE_ENV $ENV
