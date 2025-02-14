@@ -94,14 +94,12 @@ const NavScroll: React.FC = () => {
                   Account
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item as={Link} to="/profile">
+                  <Dropdown.Item as={Link} to="/profile" onClick={closeNavbar}>
                     Profile
                   </Dropdown.Item>
-                  <Dropdown.Item as={Link} to="/settings">
-                    Settings
-                  </Dropdown.Item>
+
                   <Dropdown.Divider />
-                  <Dropdown.Item as={Link} to="/logout">
+                  <Dropdown.Item as={Link} to="/logout" onClick={closeNavbar}>
                     Logout
                   </Dropdown.Item>
                 </Dropdown.Menu>
