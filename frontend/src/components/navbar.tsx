@@ -41,6 +41,11 @@ const NavScroll: React.FC = () => {
     }
   }, [])
 
+  const handleLogout = () => {
+    closeNavbar()
+    auth.logout()
+  }
+
   return (
     <Navbar
       expand="lg"
@@ -99,9 +104,8 @@ const NavScroll: React.FC = () => {
                   </Dropdown.Item>
 
                   <Dropdown.Divider />
-                  <Dropdown.Item as={Link} to="/logout" onClick={closeNavbar}>
-                    Logout
-                  </Dropdown.Item>
+
+                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </Nav>

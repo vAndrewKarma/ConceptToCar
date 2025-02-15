@@ -44,7 +44,7 @@ export const useAuth = () => {
     queryClient.removeQueries({ queryKey: ['authUser'] })
     localStorage.removeItem('authUser')
 
-    window.location.href = '/sign-in'
+    window.location.replace('/sign-in')
   }
 
   return { data, isLoading, error, logout }
