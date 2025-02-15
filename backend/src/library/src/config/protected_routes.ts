@@ -8,6 +8,6 @@ export const protected_routes = {
     routes: ['/test'],
   },
   SC: {
-    routes: ['/health', '/', '/logout'], // sc = shouldn t care
+    routes: ['/health', '/', '/logout', '/metrics'], // sc = shouldn t care
   },
 }

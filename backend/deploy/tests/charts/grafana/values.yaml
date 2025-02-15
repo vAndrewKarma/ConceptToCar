@@ -1,0 +1,26 @@
+replicaCount: 1
+
+grafana:
+  adminUser: admin
+  adminPassword: karma
+
+service:
+  type: ClusterIP
+  port: 80
+
+persistence:
+  enabled: false
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-server-prometheus-server.monitoring.svc.cluster.local:9090
+        isDefault: true
+        editable: false
+
+ingress:
+  enabled: false

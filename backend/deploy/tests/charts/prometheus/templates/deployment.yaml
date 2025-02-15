@@ -1,47 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prometheus
+  name: {{ include "prometheus-server.fullname" . }}
   labels:
-    app: prometheus
+    app: {{ include "prometheus-server.name" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: prometheus
+      app: {{ include "prometheus-server.name" . }}
   template:
     metadata:
       labels:
-        app: prometheus
+        app: {{ include "prometheus-server.name" . }}
     spec:
       containers:
         - name: prometheus
-          image: prom/prometheus:v2.30.0
-          ports:
-            - containerPort: 9090
-          volumeMounts:
-            - mountPath: /etc/prometheus
-              name: prometheus-config
-              readOnly: true
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           args:
             - '--config.file=/etc/prometheus/prometheus.yml'
             - '--storage.tsdb.path=/prometheus'
-            - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-            - '--web.console.templates=/usr/share/prometheus/consoles'
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/prometheus
       volumes:
-        - name: prometheus-config
+        - name: config-volume
           configMap:
-            name: prometheus-config  
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: prometheus
-spec:
-  selector:
-    app: prometheus
-  ports:
-    - protocol: TCP
-      port: 9090
-      targetPort: 9090
+            name: {{ include "prometheus-server.fullname" . }}-config
