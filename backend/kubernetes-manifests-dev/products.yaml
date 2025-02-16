@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products
+spec:
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: server
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+          image: andrewkarma/products
+          resources:
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+          ports:
+            - containerPort: 50051
+          env:
+            - name: PORT
+              value: '50052'
+            - name: MONGO_DB
+              value: 'mongodb://product-mongo-srv:27017/products'
+            - name: RabbitMQ
+              value: 'amqp://guest:guest@auth-rabbitmq-srv:5672/'
+            - name: REDIS_HOST
+              value: 'redis://auth-redis-srv:6379'
+            - name: SECRET_KEY
+              value: 'teapa'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: products
+spec:
+  type: ClusterIP
+  selector:
+    app: products
+  ports:
+    - name: port
+      port: 82
+      targetPort: 50053
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: products-external
+spec:
+  type: LoadBalancer
+  selector:
+    app: products
+  ports:
+    - name: http
+      port: 82
+      targetPort: 50053
