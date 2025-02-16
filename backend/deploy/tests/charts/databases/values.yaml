@@ -1,21 +1,33 @@
 namespace: databases
 
-mongo:
-  name: auth-mongo
-  serviceName: auth-mongo-srv
-  image: mongo:latest
-  port: 27017
-  replicas: 1
-  storage:
-    size: 10Gi
-    storageClass: standard-storage
+services:
+  auth:
+    mongo:
+      name: auth-mongo
+      serviceName: auth-mongo-srv
+      image: mongo:latest
+      port: 27017
+      replicas: 1
+      storage:
+        size: 10Gi
+        storageClass: standard-storage
+  products:
+    mongo:
+      name: products-mongo
+      serviceName: products-mongo-srv
+      image: mongo:latest
+      port: 27018
+      replicas: 1
+      storage:
+        size: 20Gi
+        storageClass: standard-storage
 
 redis:
   name: redis
   serviceName: redis-service
-  image: redis:latest  # Specific stable version
+  image: redis:latest
   port: 6379
-  replicas: 1  # Start with 1 replica until stable
+  replicas: 1
   storage:
     size: 10Gi
     storageClass: standard-storage

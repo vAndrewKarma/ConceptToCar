@@ -40,7 +40,7 @@ spec:
           env:
             - name: PORT
               value: '50052'
-            - name: MONGO_DB
+            - name: MONGO_DB_Products
               value: 'mongodb://product-mongo-srv:27017/products'
             - name: RabbitMQ
               value: 'amqp://guest:guest@auth-rabbitmq-srv:5672/'

@@ -75,3 +75,10 @@ spec:
                 name: keyservice
                 port:
                   number: 80
+          - path: /products(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: productservice
+                port:
+                  number: 80

@@ -1,24 +1,28 @@
-# templates/mongo-statefulset.yaml
+{{- $namespace := .Release.Namespace | default .Values.namespace }}
+{{- range $key, $svc := .Values.services }}
+{{- $mongo := $svc.mongo }}
+{{- $name := $mongo.name | default (printf "%s-mongo" $key) }}
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.mongo.name }}-statefulset
-  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  name: {{ $name }}-statefulset
+  namespace: {{ $namespace }}
   labels:
-    app: {{ .Values.mongo.name }}
+    app: {{ $name }}
 spec:
-  serviceName: "{{ .Values.mongo.serviceName }}"
-  replicas: {{ .Values.mongo.replicas }}
+  serviceName: "{{ $mongo.serviceName }}"
+  replicas: {{ $mongo.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.mongo.name }}
+      app: {{ $name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.mongo.name }}
+        app: {{ $name }}
     spec:
       securityContext:
-        fsGroup: 999  # MongoDB container user's group
+        fsGroup: 999
       initContainers:
         - name: fix-data-permissions
           image: busybox:1.35
@@ -27,13 +31,13 @@ spec:
             - name: mongo-storage
               mountPath: /data/db
       containers:
-        - name: {{ .Values.mongo.name }}
+        - name: {{ $name }}
           securityContext:
             runAsUser: 999
             runAsGroup: 999
-          image: "{{ .Values.mongo.image }}"
+          image: "{{ $mongo.image }}"
           ports:
-            - containerPort: {{ .Values.mongo.port }}
+            - containerPort: {{ $mongo.port }}
           volumeMounts:
             - name: mongo-storage
               mountPath: /data/db
@@ -54,5 +58,6 @@ spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: {{ .Values.mongo.storage.size }}
-        storageClassName: {{ .Values.mongo.storage.storageClass }}
+            storage: {{ $mongo.storage.size }}
+        storageClassName: {{ $mongo.storage.storageClass }}
+{{- end }}
