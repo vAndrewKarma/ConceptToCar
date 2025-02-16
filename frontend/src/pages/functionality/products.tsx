@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-table'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button } from 'react-bootstrap'
-import { FaEdit, FaTrash, FaFilePdf, FaCircle } from 'react-icons/fa'
+import { FaEye, FaCircle } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import './products.css'
 
@@ -22,8 +22,21 @@ const ClickableName = ({ name, id }: { name: string; id: number }) => {
   )
 }
 
+const ViewProductIcon = ({ id }: { id: number }) => {
+  const navigate = useNavigate()
+  return (
+    <div className="d-flex justify-content-center" style={{ height: '100%' }}>
+      <FaEye
+        style={{ color: 'white', cursor: 'pointer' }}
+        title="View Product"
+        onClick={() => navigate(`/product/${id}`)}
+      />
+    </div>
+  )
+}
+
 const columns = [
-  { accessorKey: 'id', header: 'Number' },
+  { accessorKey: 'id', header: 'Index' },
   {
     accessorKey: 'name',
     header: 'Name',
@@ -44,24 +57,8 @@ const columns = [
   {
     accessorKey: 'actions',
     header: 'Actions',
-    cell: () => (
-      <div
-        className="d-flex justify-content-center gap-2"
-        style={{ height: '100%' }}
-      >
-        <FaEdit
-          style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
-          title="Edit"
-        />
-        <FaTrash
-          style={{ color: '#F64B4B', cursor: 'pointer' }}
-          title="Delete"
-        />
-        <FaFilePdf
-          style={{ color: 'white', cursor: 'pointer' }}
-          title="PDF Report"
-        />
-      </div>
+    cell: ({ row }: { row: { original: { id: number } } }) => (
+      <ViewProductIcon id={row.original.id} />
     ),
   },
 ]

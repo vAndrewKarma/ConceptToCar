@@ -1,0 +1,9 @@
+.border-bot {
+  border-bottom: 1px solid #000000;
+}
+
+@media (max-width: 576px) {
+  .profile * {
+    font-size: 16px;
+  }
+}
