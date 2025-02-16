@@ -6,3 +6,5 @@ resources:
   - rabbitmq.yaml
   - redis.yaml
   - keys.yaml
+  - productsmysql.yaml
+  - products.yaml

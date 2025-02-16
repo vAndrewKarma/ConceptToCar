@@ -2,16 +2,27 @@ import { Form, Image, Button } from 'react-bootstrap'
 import '../auth/login.css'
 import profile from '../../assets/profile.png'
 import './profile.css'
-
+import { useAuth } from '../../hook/useAuth'
 import { useState } from 'react'
 
 function Profile() {
-  const firstName = 'Stanciu'
-  const lastName = 'Iustin'
-  const email = 'stanciu_iustin@yahoo.com'
-  const role = 'Admin'
-  const date = '2025-01-30'
+  const auth = useAuth()
+  const firstName = auth.data?.session?.firstName
+  const lastName = auth.data?.session?.lastName
+  const email = auth.data?.session?.email
+  const role = auth.data?.session?.role
+  const sdate = new Date(auth.data?.session?.createdAt)
 
+  const date = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(sdate)
+
+  console.log(auth.data?.session)
   const [isVerifyDisabled, setIsVerifyDisabled] = useState(false)
   const [isResetDisabled, setIsResetDisabled] = useState(false)
 
@@ -66,29 +77,20 @@ function Profile() {
                     marginTop: '-10px',
                   }}
                 >
-                  <span className="border-bot">
+                  <span>
                     <strong>First Name:</strong> {firstName}
                   </span>
-                  <span className="border-bot">
+                  <span>
                     <strong>Last Name:</strong> {lastName}
                   </span>
                 </div>
-                <span
-                  className="border-bot"
-                  style={{ paddingTop: '10px', lineHeight: '1.5' }}
-                >
+                <span style={{ paddingTop: '10px', lineHeight: '1.5' }}>
                   <strong>Email:</strong> {email}
                 </span>
-                <span
-                  className="border-bot"
-                  style={{ paddingTop: '10px', lineHeight: '1.5' }}
-                >
+                <span style={{ paddingTop: '10px', lineHeight: '1.5' }}>
                   <strong>Role:</strong> {role}
                 </span>
-                <span
-                  className="border-bot"
-                  style={{ paddingTop: '10px', lineHeight: '1.5' }}
-                >
+                <span style={{ paddingTop: '10px', lineHeight: '1.5' }}>
                   <strong>Join Date:</strong> {date}
                 </span>
                 <div className="d-flex justify-content-between align-items-center w-100">

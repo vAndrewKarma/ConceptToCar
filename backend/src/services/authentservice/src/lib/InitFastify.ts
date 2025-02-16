@@ -44,7 +44,7 @@ export default async function fastify_loader() {
       secure: config.app.ENV === 'production',
       sameSite: 'none',
       path: '/',
-      maxAge: 30 * 24 * 60 * 60, // 7 days in seconds
+      maxAge: 30 * 24 * 60 * 60,
     },
   })
   const allowedOrigins = ['http://localhost:5173', 'https://conceptocar.xyz/']
