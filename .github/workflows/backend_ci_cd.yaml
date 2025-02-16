@@ -90,7 +90,7 @@ jobs:
         run: |
           sleep 30
           curl -f https://backend-tests.conceptocar.xyz/auth/health || exit 1
-          curl -f https://backend-tests.conceptocar.xyz/keys/healthz || exit 1
+          curl -f https://backend-tests.conceptocar.xyz/keys/keys/healthz || exit 1
           curl -f https://backend-tests.conceptocar.xyz/products/health || exit 1
   # DIN PACATE N AM BANI SA AVEM CLUSTER SI PT TESTE SI PT PRODUCTIE :(
   # cd:
