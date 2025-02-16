@@ -16,7 +16,7 @@ services:
       name: products-mongo
       serviceName: products-mongo-srv
       image: mongo:latest
-      port: 27018
+      port: 27017
       replicas: 1
       storage:
         size: 20Gi
