@@ -33,5 +33,3 @@ import shutdown from '@karma-packages/conceptocar-common/dist/helper/shutdown'
   process.once('SIGTERM', shutdownHandler)
   process.once('SIGINT', shutdownHandler)
 })()
-
-//TODO VERY IMPORTANT MAKE DEV AND PROD ENVIRONMENT FOR REDIS MONGO AND SESSIONS + RABBITMQ
