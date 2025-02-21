@@ -1,5 +1,19 @@
 import { FastifySchema } from 'fastify'
 import checksController from '../controllers/checkController'
+import productsController from '../controllers/productsController'
+import {
+  getproductbyname,
+  getproducts,
+  initiateProductChange,
+  productSchema,
+} from '../schema/products'
+import MaterialsController from '../controllers/MaterialController'
+import {
+  getmaterialspecific,
+  getmaterialsspecific,
+  materialschema,
+  materialupdateschema,
+} from '../schema/materials'
 
 interface ProductRoutes {
   method: string
@@ -13,7 +27,70 @@ interface RouteGroup {
 }
 
 const routes: Record<string, RouteGroup> = {
-  product_Routes: {},
+  product_Routes: {
+    InitiateProductModify: {
+      method: 'POST',
+      routeName: '/initiate_product',
+      controller: productsController.ProductModify,
+      schema: initiateProductChange,
+    },
+    productCreate: {
+      method: 'POST',
+      routeName: '/create-product',
+      controller: productsController.CreateProduct,
+      schema: productSchema,
+    },
+    getProduct: {
+      method: 'POST',
+      routeName: '/get-product',
+      controller: productsController.GetProduct,
+      schema: getproductbyname,
+    },
+    getProducts: {
+      method: 'POST',
+      routeName: '/get-products',
+      controller: productsController.GetProducts,
+      schema: getproducts,
+    },
+  },
+  material_routes: {
+    InitiateMatModify: {
+      method: 'POST',
+      routeName: '/initiate_material',
+      controller: MaterialsController.BomModify,
+      schema: initiateProductChange,
+    },
+    MatCreate: {
+      method: 'POST',
+      routeName: '/create-material',
+      controller: MaterialsController.CreateBom,
+      schema: materialschema,
+    },
+    UpdateMaterial: {
+      method: 'POST',
+      routeName: '/update-material',
+      controller: MaterialsController.UpdateBom,
+      schema: materialupdateschema,
+    },
+    GetMaterial: {
+      method: 'POST',
+      routeName: '/get-material',
+      controller: MaterialsController.GetMaterial,
+      schema: getmaterialspecific,
+    },
+    GetMaterials: {
+      method: 'POST',
+      routeName: '/get-materials',
+      controller: MaterialsController.GetMaterials,
+      schema: getmaterialsspecific,
+    },
+    DeleteMaterial: {
+      method: 'POST',
+      routeName: '/delete-material',
+      controller: MaterialsController.DeleteMaterial,
+      schema: getmaterialspecific,
+    },
+  },
   healthRoutes: {
     healthCheck: {
       method: 'GET',

@@ -1,26 +1,52 @@
 import { FastifyInstance } from 'fastify'
 import { ObjectId } from '@fastify/mongodb'
 import { Collection } from 'mongodb'
+export type Stage =
+  | 'concept'
+  | 'feasibility'
+  | 'design'
+  | 'production'
+  | 'withdrawal'
+  | 'standby'
+  | 'cancelled'
 
 export interface Product {
   _id?: ObjectId
   name: string
+  stage: Stage
   description: string
   estimated_height: number
   estimated_width: number
+  weight_unit: string
+  width_unit: string
+  height_unit: string
   estimated_weight: number
-  bom_id: ObjectId
+  material_number?: string[]
+  images?: string[]
+  createdBy: string
+  created_at: Date
+  updated_at: Date
 }
-
 export class ProductModel {
   private collection: Collection<Product>
+
   constructor(server: FastifyInstance) {
     this.collection = server.mongo.db.collection<Product>('products')
+    this.collection
+      .createIndex({ name: 1 }, { unique: true })
+      .catch(console.error)
   }
 
-  async createProduct(data: Omit<Product, '_id'>): Promise<ObjectId> {
+  async createProduct(
+    data: Omit<Product, '_id' | 'created_at' | 'updated_at' | 'material_number'>
+  ): Promise<ObjectId> {
     try {
-      const { insertedId } = await this.collection.insertOne({ ...data })
+      const now = new Date()
+      const { insertedId } = await this.collection.insertOne({
+        ...data,
+        created_at: now,
+        updated_at: now,
+      })
       return insertedId
     } catch (err) {
       console.error('Error when creating product', err)
@@ -28,17 +54,25 @@ export class ProductModel {
     }
   }
 
+  async findProductByName(name: string): Promise<Product | null> {
+    return await this.collection.findOne({ name: name })
+  }
+
   async findProductById(id: string): Promise<Product | null> {
     return await this.collection.findOne({ _id: new ObjectId(id) })
+  }
+  async findProducts(page: number = 1, limit: number = 10): Promise<Product[]> {
+    const skip = (page - 1) * limit
+    return await this.collection.find({}).skip(skip).limit(limit).toArray()
   }
 
   async updateProduct(
     id: string,
-    updateData: Partial<Product>
+    updateData: Partial<Omit<Product, '_id' | 'created_at'>>
   ): Promise<boolean> {
     const result = await this.collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: updateData }
+      { $set: { ...updateData, updated_at: new Date() } }
     )
     return result.modifiedCount > 0
   }
@@ -49,25 +83,17 @@ export class ProductModel {
   }
 }
 
-export type Stage =
-  | 'concept'
-  | 'fezabilitate'
-  | 'proiectare'
-  | 'productie'
-  | 'retragere'
-  | 'stand by'
-  | 'cancel'
-
 export interface ProductStageHistory {
   _id?: ObjectId
   stage: Stage
   product_id: ObjectId
   start_of_stage: Date
-  user_id: string
+  name: string
 }
 
 export class ProductStageHistoryModel {
   private collection: Collection<ProductStageHistory>
+
   constructor(server: FastifyInstance) {
     this.collection = server.mongo.db.collection<ProductStageHistory>(
       'product_stage_history'
@@ -94,142 +120,82 @@ export class ProductStageHistoryModel {
       .toArray()
   }
 }
-
-export interface BOMItem {
-  bom_id: ObjectId
-  material_number: string
-  qty: number
-  unit_measure_code: string
-}
-
-export class BOMModel {
-  private collection: Collection<BOMItem>
-  constructor(server: FastifyInstance) {
-    this.collection = server.mongo.db.collection<BOMItem>('boms')
-  }
-
-  async addBOMItem(item: BOMItem): Promise<boolean> {
-    try {
-      await this.collection.insertOne(item)
-      return true
-    } catch (err) {
-      console.error('Error when adding BOM item', err)
-      return false
-    }
-  }
-
-  async getBOMItemsByBomId(bomId: string): Promise<BOMItem[]> {
-    return await this.collection.find({ bom_id: new ObjectId(bomId) }).toArray()
-  }
-
-  async updateBOMItem(
-    bomId: string,
-    material_number: string,
-    updateData: Partial<BOMItem>
-  ): Promise<boolean> {
-    const result = await this.collection.updateOne(
-      { bom_id: new ObjectId(bomId), material_number },
-      { $set: updateData }
-    )
-    return result.modifiedCount > 0
-  }
-
-  async deleteBOMItem(
-    bomId: string,
-    material_number: string
-  ): Promise<boolean> {
-    const result = await this.collection.deleteOne({
-      bom_id: new ObjectId(bomId),
-      material_number,
-    })
-    return result.deletedCount > 0
-  }
-}
-
-export interface BOMMaterial {
-  material_number: string
+export interface Material {
+  product_id: string
+  name: string
   material_description: string
+  product_name: string
   weight: number
+  weight_unit: string
+  width_unit: string
+  height_unit: string
+  qty: number
   width: number
   height: number
-}
-
-export class BOMMaterialModel {
-  private collection: Collection<BOMMaterial>
-  constructor(server: FastifyInstance) {
-    this.collection = server.mongo.db.collection<BOMMaterial>('bom_materials')
-  }
-
-  async addBOMMaterial(material: BOMMaterial): Promise<boolean> {
-    try {
-      await this.collection.insertOne(material)
-      return true
-    } catch (err) {
-      console.error('Error when adding BOM material', err)
-      return false
-    }
-  }
-
-  async getBOMMaterial(material_number: string): Promise<BOMMaterial | null> {
-    return await this.collection.findOne({ material_number })
-  }
-
-  async updateBOMMaterial(
-    material_number: string,
-    updateData: Partial<BOMMaterial>
-  ): Promise<boolean> {
-    const result = await this.collection.updateOne(
-      { material_number },
-      { $set: updateData }
-    )
-    return result.modifiedCount > 0
-  }
-
-  async deleteBOMMaterial(material_number: string): Promise<boolean> {
-    const result = await this.collection.deleteOne({ material_number })
-    return result.deletedCount > 0
-  }
-}
-
-export interface Material {
-  _id?: ObjectId
-  email: string
-  name: string
+  created_at: Date
+  updated_at: Date
 }
 
 export class MaterialModel {
   private collection: Collection<Material>
+
   constructor(server: FastifyInstance) {
     this.collection = server.mongo.db.collection<Material>('materials')
+
+    this.collection
+      .createIndex({ product_id: 1, name: 1 }, { unique: true })
+      .catch(console.error)
   }
 
-  async createMaterial(data: Omit<Material, '_id'>): Promise<ObjectId> {
+  async addMaterial(
+    material: Omit<Material, 'created_at' | 'updated_at'>
+  ): Promise<boolean> {
     try {
-      const { insertedId } = await this.collection.insertOne({ ...data })
-      return insertedId
+      const now = new Date()
+      await this.collection.insertOne({
+        ...material,
+        created_at: now,
+        updated_at: now,
+      })
+      return true
     } catch (err) {
-      console.error('Error when creating material', err)
-      throw err
+      console.error('Error when adding material', err)
+      return false
     }
   }
 
-  async findMaterialById(id: string): Promise<Material | null> {
-    return await this.collection.findOne({ _id: new ObjectId(id) })
+  async getMaterialsByProduct(productId: string): Promise<Material[]> {
+    return await this.collection.find({ product_id: productId }).toArray()
   }
-
+  async getMaterialByProductAndName(
+    productId: string,
+    materialName: string
+  ): Promise<Material | null> {
+    return await this.collection.findOne({
+      product_id: productId,
+      name: materialName,
+    })
+  }
   async updateMaterial(
-    id: string,
+    productId: string,
+    materialName: string,
     updateData: Partial<Material>
   ): Promise<boolean> {
     const result = await this.collection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updateData }
+      { product_id: productId, name: materialName },
+      { $set: { ...updateData, updated_at: new Date() } }
     )
     return result.modifiedCount > 0
   }
 
-  async deleteMaterial(id: string): Promise<boolean> {
-    const result = await this.collection.deleteOne({ _id: new ObjectId(id) })
+  async deleteMaterial(
+    productId: string,
+    materialName: string
+  ): Promise<boolean> {
+    const result = await this.collection.deleteOne({
+      product_id: productId,
+      name: materialName,
+    })
     return result.deletedCount > 0
   }
 }
@@ -240,13 +206,6 @@ export const createProductModel = (server: FastifyInstance): ProductModel =>
 export const createProductStageHistoryModel = (
   server: FastifyInstance
 ): ProductStageHistoryModel => new ProductStageHistoryModel(server)
-
-export const createBOMModel = (server: FastifyInstance): BOMModel =>
-  new BOMModel(server)
-
-export const createBOMMaterialModel = (
-  server: FastifyInstance
-): BOMMaterialModel => new BOMMaterialModel(server)
 
 export const createMaterialModel = (server: FastifyInstance): MaterialModel =>
   new MaterialModel(server)

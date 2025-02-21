@@ -1,7 +1,13 @@
-import fastifyMongo from '@fastify/mongodb'
+import fastifyMongo, { ObjectId } from '@fastify/mongodb'
 import fastifyPlugin from 'fastify-plugin'
 import config from '../config'
 import { FastifyInstance } from 'fastify'
+import {
+  createMaterialModel,
+  createProductModel,
+  createProductStageHistoryModel,
+  Stage,
+} from '../db/m_m'
 
 async function InitMongo(server: FastifyInstance) {
   try {
@@ -16,6 +22,9 @@ async function InitMongo(server: FastifyInstance) {
     })
     server.log.info(`Succesfully connected to ${config.app.DB}`)
     //todo create models
+    server.decorate('productModel', createProductModel(server))
+    server.decorate('productStageModel', createProductStageHistoryModel(server))
+    server.decorate('materialModel', createMaterialModel(server))
   } catch (err) {
     console.log(err)
     process.exit(1)

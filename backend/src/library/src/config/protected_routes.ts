@@ -5,7 +5,19 @@ export const protected_routes = {
   },
   PAA: {
     // protected against users that are not authenticated
-    routes: ['/test'],
+    routes: [
+      '/initiate_product',
+      '/create-product',
+      '/get-product',
+      '/get-products',
+      '/initiate_material',
+      '/create-material',
+      '/update-material',
+      '/get-material',
+      '/get-materials',
+      '/delete-material',
+      '/test',
+    ],
   },
   SC: {
     routes: ['/health', '/', '/logout', '/metrics'], // sc = shouldn t care

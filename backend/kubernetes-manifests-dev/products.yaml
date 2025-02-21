@@ -36,10 +36,10 @@ spec:
               memory: '256Mi'
               cpu: '250m'
           ports:
-            - containerPort: 50051
+            - containerPort: 50053
           env:
             - name: PORT
-              value: '50052'
+              value: '50053'
             - name: MONGO_DB_Products
               value: 'mongodb://product-mongo-srv:27017/products'
             - name: RabbitMQ

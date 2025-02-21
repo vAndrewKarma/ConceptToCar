@@ -201,7 +201,7 @@ const authcontroller = {
         `login_request:${loginReqId}`,
         JSON.stringify({ challenge, fingerprint }),
         'EX',
-        300
+        config.app.ENV === 'production' ? 90 : 300
       )
       res.send({ id: loginReqId })
     } catch (err) {
