@@ -1,0 +1,43 @@
+.style {
+  color: white;
+  text-align: justify;
+}
+
+.pad {
+  padding-top: 10px;
+}
+
+@media (max-width: 1000px) {
+  .phone {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .phone button {
+    flex: 1 1 calc(50% - 10px);
+    max-width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 576px) {
+  .phone {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .phone button {
+    flex: 1 1 calc(50% - 10px);
+    max-width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 576px) {
+  .scrollable-container {
+    max-height: 76vh;
+    overflow-y: auto;
+  }
+}

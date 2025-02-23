@@ -18,6 +18,9 @@ import ProtectedRoute from './pub_prot/prot.tsx'
 import Dashboard from './pages/functionality/dashboard.tsx'
 import Products from './pages/functionality/products.tsx'
 import Profile from './pages/account/profile.tsx'
+import Product from './pages/functionality/product.tsx'
+import Materials from './pages/functionality/materials.tsx'
+import Gallery from './pages/functionality/gallery.tsx'
 
 function App() {
   const auth = useAuth()
@@ -62,6 +65,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <ProtectedRoute>
+                <Product />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/materials"
+            element={
+              <ProtectedRoute>
+                <Materials />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gallery"
+            element={
+              <ProtectedRoute>
+                <Gallery />
               </ProtectedRoute>
             }
           />

@@ -54,7 +54,7 @@ const NavScroll: React.FC = () => {
     >
       <Container fluid>
         <Navbar.Brand as={Link} to="/">
-          ConceptToCarz
+          ConceptToCar
         </Navbar.Brand>
         <Navbar.Toggle ref={toggleRef} aria-controls="navbarScroll" />
         <Navbar.Collapse ref={navbarRef} id="navbarScroll">
@@ -64,11 +64,11 @@ const NavScroll: React.FC = () => {
             </Nav.Link>
             {auth?.data?.auth ? (
               <>
-                <Nav.Link as={Link} to="/dashboard" onClick={closeNavbar}>
-                  Dashboard
-                </Nav.Link>
                 <Nav.Link as={Link} to="/products" onClick={closeNavbar}>
                   Products
+                </Nav.Link>
+                <Nav.Link as={Link} to="/dashboard" onClick={closeNavbar}>
+                  Dashboard
                 </Nav.Link>
                 <Nav.Link as={Link} to="/contact" onClick={closeNavbar}>
                   Contact
