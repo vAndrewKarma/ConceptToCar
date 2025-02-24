@@ -72,7 +72,7 @@ jobs:
         run: docker push gcr.io/spheric-temple-451313-b7/products:latest
 
       - name: Get GKE credentials
-        run: gcloud container clusters get-credentials backend --region us-central1
+        run: gcloud container clusters get-credentials backend --region us-central1-a
 
       - name: Restart Kubernetes deployments
         run: |

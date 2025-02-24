@@ -45,7 +45,7 @@ const productsController = {
         if (!verifyPKCE(code_verifier, proreq.challenge))
           throw new BadRequestError('Invalid or expired request')
       }
-
+      console.log('exc232')
       const pname = sanitizeHTML(name)
       if (await redis.get(`product: ${pname}`))
         throw new BadRequestError('Product already exists')
