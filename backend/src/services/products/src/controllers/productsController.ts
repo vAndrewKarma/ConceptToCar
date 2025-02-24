@@ -13,6 +13,7 @@ import sanitizeHTML from '../helper/sanitizeHtml'
 const productsController = {
   async CreateProduct(req, res) {
     try {
+      console.log('execcuted3')
       if (req.sessionData.role !== 'Admin')
         throw new Unauthorized('Not authorized')
       const {
