@@ -127,7 +127,7 @@ const productsController = {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
       const { page = 1 } = req.body
-      const limit = 2
+      const limit = 16
       const redis = req.server.redis
       const productModel = req.server.productModel
 
@@ -135,7 +135,10 @@ const productsController = {
       const cachedProducts = await redis.get(cacheKey)
 
       if (cachedProducts) {
-        return res.send(JSON.parse(cachedProducts))
+        return res.send(
+          JSON.parse(cachedProducts),
+          JSON.parse(cachedProducts).length
+        )
       }
 
       const products = await productModel.findProducts(
@@ -149,7 +152,7 @@ const productsController = {
 
       await redis.set(cacheKey, JSON.stringify(products), 'EX', 3600)
 
-      res.send(products)
+      res.send({ length: products.length, products })
     } catch (err) {
       throw err
     }
