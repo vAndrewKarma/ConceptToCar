@@ -1,0 +1,17 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: kubernetes.io/gce-pd  
+parameters:
+  type: pd-ssd 
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: standard-storage
+provisioner: kubernetes.io/gce-pd # Adjust based on your environment
+parameters:
+  type: pd-standard
+reclaimPolicy: Retain
+volumeBindingMode: Immediate

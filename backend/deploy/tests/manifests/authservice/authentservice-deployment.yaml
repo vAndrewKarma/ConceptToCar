@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: gcr.io/focus-vim-448513-a1/authentservice:latest
+          image: gcr.io/spheric-temple-451313-b7/authentservice:latest
           ports:
             - containerPort: 50051
           envFrom:
