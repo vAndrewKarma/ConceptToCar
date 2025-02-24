@@ -30,7 +30,7 @@ const productsController = {
       const redis = req.server.redis
       const productModel = req.server.productModel
       const productStageModel = req.server.productStageModel
-
+      console.log('execcuted')
       if (config.app.ENV === 'production') {
         const productraw = await redis.get(`product_modify:${modifyID}`)
 
