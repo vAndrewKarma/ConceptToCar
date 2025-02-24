@@ -8,7 +8,7 @@ export default async function verifyAuth(req, res, config) {
   const HMAC_ALGORITHM = 'sha256'
   const HMAC_SECRET = config.app.SECRET
   try {
-    console.log('sal')
+    console.log('s al')
     const redis = req.server.redis
 
     const {
