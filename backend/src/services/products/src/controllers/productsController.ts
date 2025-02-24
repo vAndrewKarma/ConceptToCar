@@ -135,10 +135,10 @@ const productsController = {
       const cachedProducts = await redis.get(cacheKey)
 
       if (cachedProducts) {
-        return res.send(
-          JSON.parse(cachedProducts),
-          JSON.parse(cachedProducts).length
-        )
+        return res.send({
+          length: JSON.parse(cachedProducts).length,
+          products: JSON.parse(cachedProducts),
+        })
       }
 
       const products = await productModel.findProducts(
