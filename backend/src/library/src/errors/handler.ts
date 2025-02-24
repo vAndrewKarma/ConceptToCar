@@ -29,6 +29,7 @@ function ErrorHandler(server: FastifyInstance) {
 
   server.setErrorHandler((error: FastifyError, req, res) => {
     console.error(JSON.stringify(error, null, 2))
+    console.log(JSON.stringify(error))
     if (error.validation) {
       const context = req.url
 
