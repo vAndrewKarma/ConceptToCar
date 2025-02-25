@@ -12,7 +12,9 @@ import sanitizeHTML from '../helper/sanitizeHtml'
 
 const productsController = {
   async CreateProduct(req, res) {
+    console.log('execcuted3')
     try {
+      console.log('execcuted3')
       if (req.sessionData.role !== 'Admin')
         throw new Unauthorized('Not authorized')
       const {
@@ -30,7 +32,7 @@ const productsController = {
       const redis = req.server.redis
       const productModel = req.server.productModel
       const productStageModel = req.server.productStageModel
-
+      console.log('execcuted')
       if (config.app.ENV === 'production') {
         const productraw = await redis.get(`product_modify:${modifyID}`)
 
@@ -45,15 +47,13 @@ const productsController = {
         if (!verifyPKCE(code_verifier, proreq.challenge))
           throw new BadRequestError('Invalid or expired request')
       }
-
+      console.log('exc232')
       const pname = sanitizeHTML(name)
       if (await redis.get(`product: ${pname}`))
         throw new BadRequestError('Product already exists')
 
       if (await productModel.findProductByName(pname))
         throw new BadRequestError('Product already exists')
-
-      // todo check if materials exists
 
       const product = {
         name: pname,
@@ -127,7 +127,7 @@ const productsController = {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
       const { page = 1 } = req.body
-      const limit = 2
+      const limit = 16
       const redis = req.server.redis
       const productModel = req.server.productModel
 
@@ -135,7 +135,10 @@ const productsController = {
       const cachedProducts = await redis.get(cacheKey)
 
       if (cachedProducts) {
-        return res.send(JSON.parse(cachedProducts))
+        return res.send({
+          length: JSON.parse(cachedProducts).length,
+          products: JSON.parse(cachedProducts),
+        })
       }
 
       const products = await productModel.findProducts(
@@ -149,7 +152,7 @@ const productsController = {
 
       await redis.set(cacheKey, JSON.stringify(products), 'EX', 3600)
 
-      res.send(products)
+      res.send({ length: products.length, products })
     } catch (err) {
       throw err
     }
@@ -171,6 +174,84 @@ const productsController = {
       res.send({ id: modifyID })
     } catch (err) {
       console.log(err)
+      throw err
+    }
+  },
+  async UpdateProduct(req, res) {
+    try {
+      if (!req.sessionData) throw new Unauthorized('Not authorized')
+      if (req.sessionData.role !== 'Admin')
+        throw new Unauthorized('Not authorized')
+
+      const {
+        productId,
+        name,
+        description,
+        estimated_height,
+        estimated_width,
+        estimated_weight,
+        weight_unit,
+        width_unit,
+        height_unit,
+      } = req.body
+
+      const redis = req.server.redis
+      const productModel = req.server.productModel
+
+      const currentProduct = await productModel.findProductById(productId)
+      if (!currentProduct) throw new BadRequestError('Product not found')
+
+      const updateData: {
+        name?: string
+        description?: string
+        estimated_height?: number
+        estimated_width?: number
+        estimated_weight?: number
+        weight_unit?: string
+        width_unit?: string
+        height_unit?: string
+      } = {}
+
+      if (name) {
+        const sanitizedName = sanitizeHTML(name)
+        if (sanitizedName !== currentProduct.name) {
+          if (
+            (await redis.get(`product: ${sanitizedName}`)) ||
+            (await productModel.findProductByName(sanitizedName))
+          ) {
+            throw new BadRequestError('Product already exists with this name')
+          }
+          updateData.name = sanitizedName
+        }
+      }
+
+      if (description) updateData.description = sanitizeHTML(description)
+      if (estimated_height !== undefined)
+        updateData.estimated_height = estimated_height
+      if (estimated_width !== undefined)
+        updateData.estimated_width = estimated_width
+      if (estimated_weight !== undefined)
+        updateData.estimated_weight = estimated_weight
+      if (weight_unit !== undefined) updateData.weight_unit = weight_unit
+      if (width_unit !== undefined) updateData.width_unit = width_unit
+      if (height_unit !== undefined) updateData.height_unit = height_unit
+
+      const updated = await productModel.updateProduct(productId, updateData)
+      if (!updated) throw new BadRequestError('Product update failed')
+
+      await redis.del(`product: ${currentProduct.name}`)
+
+      if (updateData.name) {
+        await redis.del(`product: ${updateData.name}`)
+      }
+
+      const keys = await redis.keys('products:all:*')
+      if (keys.length) {
+        await redis.del(...keys)
+      }
+
+      res.send({ ok: true })
+    } catch (err) {
       throw err
     }
   },

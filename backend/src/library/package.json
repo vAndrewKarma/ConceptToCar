@@ -1,6 +1,6 @@
 {
   "name": "@karma-packages/conceptocar-common",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

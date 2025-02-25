@@ -43,7 +43,7 @@ function Products() {
     Array.from({ length: 45 }, (_, i) => ({
       id: i + 1,
       name: 'Door',
-      status: 'Released',
+      status: 'Released ',
       active: 'true',
     }))
   )

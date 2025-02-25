@@ -36,8 +36,7 @@ metadata:
     nginx.ingress.kubernetes.io/limit-rps: '100' # Limit 100 requests per second per IP
     nginx.ingress.kubernetes.io/limit-burst: '200' # Allow burst up to 200 requests per IP
     nginx.ingress.kubernetes.io/limit-rate: '50' # Limit total requests rate to 50 requests per second per IP
-    nginx.ingress.kubernetes.io/limit-requests: '100' # Allow 100 requests per IP in the configured window (e.g., per second)
-
+    nginx.ingress.kubernetes.io/limit-requests: '100' # Allow 100 requests per IP in the configured window (e.g., per second)"
     # Rate limit behavior
     nginx.ingress.kubernetes.io/limit-req-status: '429' # Return 429 Too Many Requests for IPs that exceed the limit
     nginx.ingress.kubernetes.io/limit-req-zone: 'req_limit_per_ip' # Apply rate limit per IP

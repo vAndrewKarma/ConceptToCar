@@ -19,7 +19,7 @@ Testers: (karma_andrew_) TODO: create tests, had only one on the testing cluster
            
 For any questions regarding de project you can message one of the Project Managers or the DevOps directly.
 Contributions are closed for now, but we will open them in the future.
-Don't forget to star the repoooooo :D
+Don't forget to star the repoooooo :D 
 */
 
 import loader from './lib/loader'

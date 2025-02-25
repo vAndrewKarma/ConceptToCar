@@ -21,8 +21,7 @@ export interface Product {
   width_unit: string
   height_unit: string
   estimated_weight: number
-  material_number?: string[]
-  images?: string[]
+  image?: string
   createdBy: string
   created_at: Date
   updated_at: Date

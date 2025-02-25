@@ -14,6 +14,7 @@ function ErrorHandler(server: FastifyInstance) {
   function formatValidationErrors(
     error: FastifyError
   ): { field: string; message: string }[] {
+    console.log(JSON.stringify(error))
     return (
       error.validation?.flatMap((err) =>
         (err.params.errors as any[]).map((validationErr) => ({
@@ -28,6 +29,7 @@ function ErrorHandler(server: FastifyInstance) {
 
   server.setErrorHandler((error: FastifyError, req, res) => {
     console.error(JSON.stringify(error, null, 2))
+    console.log(JSON.stringify(error))
     if (error.validation) {
       const context = req.url
 
@@ -47,6 +49,7 @@ function ErrorHandler(server: FastifyInstance) {
   })
 }
 const schemaErrorFormatter = (errors) => {
+  console.log(JSON.stringify(errors))
   return new Error(
     errors
       .map(

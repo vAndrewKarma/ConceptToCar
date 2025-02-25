@@ -51,28 +51,28 @@ jobs:
         run: gcloud auth configure-docker --quiet
 
       - name: Build Docker image
-        run: docker build -t gcr.io/focus-vim-448513-a1/authentservice:latest .
+        run: docker build -t gcr.io/spheric-temple-451313-b7/authentservice:latest .
         working-directory: backend/src/services/authentservice
 
       - name: Build Docker image
-        run: docker build -t gcr.io/focus-vim-448513-a1/keys:latest .
+        run: docker build -t gcr.io/spheric-temple-451313-b7/keys:latest .
         working-directory: backend/src/services/user_registration_keyservice
 
       - name: Build Docker image
-        run: docker build -t gcr.io/focus-vim-448513-a1/products:latest .
+        run: docker build -t gcr.io/spheric-temple-451313-b7/products:latest .
         working-directory: backend/src/services/products
 
       - name: Push Docker image to GCR
-        run: docker push gcr.io/focus-vim-448513-a1/authentservice:latest
+        run: docker push gcr.io/spheric-temple-451313-b7/authentservice:latest
 
       - name: Push Docker image to GCR
-        run: docker push gcr.io/focus-vim-448513-a1/keys:latest
+        run: docker push gcr.io/spheric-temple-451313-b7/keys:latest
 
       - name: Push Docker image to GCR
-        run: docker push gcr.io/focus-vim-448513-a1/products:latest
+        run: docker push gcr.io/spheric-temple-451313-b7/products:latest
 
       - name: Get GKE credentials
-        run: gcloud container clusters get-credentials doarptteste --region europe-west1
+        run: gcloud container clusters get-credentials backend --region us-central1-a
 
       - name: Restart Kubernetes deployments
         run: |
