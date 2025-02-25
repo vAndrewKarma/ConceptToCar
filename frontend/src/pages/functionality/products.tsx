@@ -202,7 +202,6 @@ function Products() {
         </div>
       </div>
 
-      {/* ✅ Modal pentru confirmare ștergere */}
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header className="bg-danger text-white">
           <Modal.Title>Confirm Deletion</Modal.Title>
