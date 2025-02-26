@@ -60,9 +60,10 @@ export class ProductModel {
   async findProductById(id: string): Promise<Product | null> {
     return await this.collection.findOne({ _id: new ObjectId(id) })
   }
-  async findProducts(page: number = 1, limit: number = 10): Promise<Product[]> {
-    const skip = (page - 1) * limit
-    return await this.collection.find({}).skip(skip).limit(limit).toArray()
+  async findProducts(page = 1, displayLimit = 15): Promise<Product[]> {
+    const queryLimit = displayLimit + 1
+    const skip = (page - 1) * displayLimit
+    return await this.collection.find({}).skip(skip).limit(queryLimit).toArray()
   }
 
   async updateProduct(

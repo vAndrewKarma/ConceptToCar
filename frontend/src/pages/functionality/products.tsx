@@ -2,16 +2,27 @@ import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-  getPaginationRowModel,
 } from '@tanstack/react-table'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Button, Modal } from 'react-bootstrap'
-import { FaEdit, FaCircle, FaTrash } from 'react-icons/fa'
+import { Button, Modal, Spinner } from 'react-bootstrap'
+import { FaEdit, FaTrash } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import useAxios from 'axios-hooks'
 import './products.css'
 
-const ClickableName = ({ name, id }: { name: string; id: number }) => {
+interface Product {
+  _id: string
+  name: string
+  description: string
+  stage: string
+  created_at: string
+}
+
+const PAGE_SIZE = 15
+const CACHE_EXPIRY_MS = 30 * 1000
+
+const ClickableName = ({ name, id }: { name: string; id: string }) => {
   const navigate = useNavigate()
   return (
     <span
@@ -23,7 +34,7 @@ const ClickableName = ({ name, id }: { name: string; id: number }) => {
   )
 }
 
-const Edit = ({ id }: { id: number }) => {
+const Edit = ({ id }: { id: string }) => {
   const navigate = useNavigate()
   return (
     <div className="d-flex justify-content-center" style={{ height: '100%' }}>
@@ -37,18 +48,62 @@ const Edit = ({ id }: { id: number }) => {
 }
 
 function Products() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasNextPage, setHasNextPage] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [tableData, setTableData] = useState(
-    Array.from({ length: 45 }, (_, i) => ({
-      id: i + 1,
-      name: 'Door',
-      status: 'Released ',
-      active: 'true',
-    }))
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [products, setProducts] = useState<Product[]>([])
+
+  const cacheRef = useRef<{
+    [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
+  }>({})
+
+  const [{ loading, error }, execute] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/get-products',
+      method: 'POST',
+      withCredentials: true,
+      data: { page: currentPage },
+    },
+    { manual: true }
   )
 
-  const handleShow = (id: number) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      const now = Date.now()
+      const cached = cacheRef.current[currentPage]
+      if (cached && now - cached.timestamp < CACHE_EXPIRY_MS) {
+        setProducts(cached.products)
+        setHasNextPage(cached.hasNext)
+        return
+      }
+
+      try {
+        const response = await execute({ data: { page: currentPage } })
+        if (response.data) {
+          const receivedProducts = response.data.products || []
+          const hasNext = receivedProducts.length === PAGE_SIZE + 1
+          const productsToShow = hasNext
+            ? receivedProducts.slice(0, PAGE_SIZE)
+            : receivedProducts
+
+          cacheRef.current[currentPage] = {
+            products: productsToShow,
+            hasNext,
+            timestamp: Date.now(),
+          }
+
+          setProducts(productsToShow)
+          setHasNextPage(hasNext)
+        }
+      } catch (err) {
+        console.error('Fetch error:', err)
+      }
+    }
+    fetchData()
+  }, [currentPage, execute])
+
+  const handleShow = (id: string) => {
     setSelectedId(id)
     setShowModal(true)
   }
@@ -60,47 +115,57 @@ function Products() {
 
   const handleDelete = () => {
     if (selectedId !== null) {
-      setTableData((prevData) =>
-        prevData.filter((item) => item.id !== selectedId)
+      setProducts((prev) =>
+        prev.filter((product) => product._id !== selectedId)
       )
+      delete cacheRef.current[currentPage]
       console.log(`Deleted product with ID: ${selectedId}`)
     }
     handleClose()
   }
 
   const columns = [
-    { accessorKey: 'id', header: 'Index' },
+    {
+      accessorKey: 'index',
+      header: 'ID',
+      cell: ({ row }: { row: { index: number } }) =>
+        (currentPage - 1) * PAGE_SIZE + row.index + 1,
+    },
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: ({ row }: { row: { original: { name: string; id: number } } }) => (
-        <ClickableName name={row.original.name} id={row.original.id} />
+      cell: ({ row }: { row: { original: Product } }) => (
+        <ClickableName name={row.original.name} id={row.original._id} />
       ),
     },
-    { accessorKey: 'status', header: 'Status' },
     {
-      accessorKey: 'active',
-      header: 'Active',
-      cell: () => (
-        <div className="d-flex justify-content-center align-items-center">
-          <FaCircle style={{ color: 'green' }} />
-        </div>
+      accessorKey: 'stage',
+      header: 'Status',
+      cell: ({ row }: { row: { original: Product } }) => (
+        <span style={{ textTransform: 'capitalize' }}>
+          {row.original.stage}
+        </span>
       ),
+    },
+    {
+      accessorKey: 'created_at',
+      header: 'Created At',
+      cell: ({ row }: { row: { original: Product } }) =>
+        new Date(row.original.created_at).toLocaleDateString(),
     },
     {
       accessorKey: 'actions',
       header: 'Actions',
-      cell: ({ row }: { row: { original: { id: number } } }) => (
+      cell: ({ row }: { row: { original: Product } }) => (
         <div
           className="d-flex justify-content-center gap-2"
           style={{ height: '100%' }}
         >
-          <Edit id={row.original.id} />
-
+          <Edit id={row.original._id} />
           <FaTrash
             style={{ color: '#F64B4B', cursor: 'pointer' }}
             title="Delete"
-            onClick={() => handleShow(row.original.id)}
+            onClick={() => handleShow(row.original._id)}
           />
         </div>
       ),
@@ -109,11 +174,16 @@ function Products() {
 
   const table = useReactTable({
     columns,
-    data: tableData,
+    data: products,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 15 } },
   })
+
+  if (error)
+    return (
+      <div className="text-light text-center mt-5">
+        Error loading products: {error.message}
+      </div>
+    )
 
   return (
     <>
@@ -122,7 +192,7 @@ function Products() {
         style={{ paddingTop: '150px', padding: '80px' }}
       >
         <div
-          className="table-responsive"
+          className="table-responsive position-relative"
           style={{
             borderRadius: '20px',
             margin: '0 auto',
@@ -133,6 +203,14 @@ function Products() {
             boxShadow: '0 4px 8px rgba(0,0,0,0.5)',
           }}
         >
+          {loading && (
+            <div className="loading-overlay">
+              <div className="d-flex justify-content-center align-items-center h-100">
+                <Spinner animation="border" variant="light" />
+              </div>
+            </div>
+          )}
+
           <table
             className="table table-dark table-striped table-hover text-center"
             style={{
@@ -141,6 +219,8 @@ function Products() {
               borderSpacing: '0',
               borderRadius: '15px',
               overflow: 'hidden',
+              opacity: loading ? 0.5 : 1,
+              transition: 'opacity 0.3s ease',
             }}
           >
             <thead>
@@ -174,25 +254,18 @@ function Products() {
           </table>
           <div className="d-flex justify-content-end mt-3">
             <Button
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
               className="btn btn-dark"
               style={{ fontSize: '12px', height: '30px' }}
               size="sm"
             >
               Previous
             </Button>
-            <span
-              className="mx-2 text-light"
-              style={{ fontSize: '12px', paddingTop: '6px' }}
-            >
-              Page {table.getState().pagination.pageIndex + 1} of{' '}
-              {table.getPageCount()}
-            </span>
             <Button
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="btn btn-dark"
+              onClick={() => setCurrentPage((p) => p + 1)}
+              disabled={!hasNextPage}
+              className="btn btn-dark ms-2"
               style={{ fontSize: '12px', height: '30px' }}
               size="sm"
             >

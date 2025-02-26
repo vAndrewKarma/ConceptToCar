@@ -1,3 +1,17 @@
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(52, 58, 64, 0.8);
+  z-index: 100;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
   .color-overlay {
     padding-top: 80px !important;
@@ -8,4 +22,8 @@
     overflow-y: auto;
     max-height: 70vh;
   }
+}
+
+.table-responsive {
+  transition: opacity 0.3s ease;
 }
