@@ -161,7 +161,7 @@ function Products() {
     },
     {
       accessorKey: 'created_at',
-      header: 'Created At',
+      header: 'Created',
       cell: ({ row }: { row: { original: Product } }) =>
         new Date(row.original.created_at).toLocaleDateString(),
     },
