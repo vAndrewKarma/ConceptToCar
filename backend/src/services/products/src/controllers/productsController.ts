@@ -65,7 +65,7 @@ const productsController = {
         width_unit,
         height_unit,
         stage: 'concept',
-        createdBy: `dddsa dsadsa`,
+        createdBy: req.sessionData.firstName + ' ' + req.sessionData.lastName,
       }
 
       const session = req.server.mongo.client.startSession()
