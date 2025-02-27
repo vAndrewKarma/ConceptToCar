@@ -22,16 +22,15 @@ interface Product {
 const PAGE_SIZE = 15
 const CACHE_EXPIRY_MS = 30 * 1000
 
-// A simple slugify function that replaces spaces and removes unwanted characters.
 function slugify(text: string): string {
   return text
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/&/g, '-and-') // Replace & with 'and'
-    .replace(/[^\w-]+/g, '') // Remove all non-word chars
-    .replace(/--+/g, '-') // Replace multiple - with single -
+    .replace(/\s+/g, '-')
+    .replace(/&/g, '-and-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
 }
 
 const ClickableName = ({ name, id }: { name: string; id: string }) => {
@@ -68,7 +67,6 @@ function Products() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [products, setProducts] = useState<Product[]>([])
 
-  // Cache stored in a ref (won't trigger re-renders on update)
   const cacheRef = useRef<{
     [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
   }>({})
@@ -97,7 +95,7 @@ function Products() {
         const response = await execute({ data: { page: currentPage } })
         if (response.data) {
           const { products, hasNext } = response.data
-          // Cache the API response for this page
+
           cacheRef.current[currentPage] = {
             products,
             hasNext,
@@ -128,7 +126,6 @@ function Products() {
       setProducts((prev) =>
         prev.filter((product) => product._id !== selectedId)
       )
-      // Optionally clear the cache for the current page
       delete cacheRef.current[currentPage]
       console.log(`Deleted product with ID: ${selectedId}`)
     }
@@ -139,7 +136,6 @@ function Products() {
     {
       accessorKey: 'index',
       header: 'ID',
-      // Compute an overall index based on currentPage and PAGE_SIZE
       cell: ({ row }: { row: { index: number } }) =>
         (currentPage - 1) * PAGE_SIZE + row.index + 1,
     },

@@ -4,7 +4,12 @@ import { useState, useEffect } from 'react'
 import useAxios from 'axios-hooks'
 import './product.css'
 import '../auth/login.css'
-
+function unslugify(slug: string): string {
+  return slug
+    .split('-')
+    .map((word) => word.charAt(0) + word.slice(1))
+    .join(' ')
+}
 function Product() {
   const { name: productName } = useParams()
   const navigate = useNavigate()
@@ -12,7 +17,7 @@ function Product() {
   const handleClose = () => setShowModal(false)
   const handleShow = () => setShowModal(true)
 
-  const [{ loading, error, data: product }, execute] = useAxios(
+  const [{ loading, error }, execute] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-product',
       method: 'POST',
@@ -21,18 +26,20 @@ function Product() {
     { manual: true }
   )
 
+  const [product, setProduct] = useState(null)
+
   useEffect(() => {
-    if (productName) {
-      execute({
-        data: { name: productName },
-      })
+    const pname = productName ? unslugify(productName) : ''
+    if (pname) {
+      execute({ data: { name: pname } })
+        .then((response) => {
+          if (response.data) {
+            setProduct(response.data)
+          }
+        })
+        .catch(() => {})
     }
   }, [productName, execute])
-
-  const formatDate = (dateString: string | number | Date) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-GB')
-  }
 
   if (loading)
     return (
@@ -47,11 +54,30 @@ function Product() {
       </div>
     )
 
+  const defaultProduct = {
+    id: '1',
+    name: 'Wheel',
+    description:
+      "A wheel is a crucial component of a vehicle's mobility and steering system. It provides the necessary contact with the road, ensuring traction, stability, and smooth movement. In the steering mechanism, the front wheels pivot to change the vehicle’s direction, guided by the steering system.",
+    stage: 'Concept',
+    estimated_weight: '5',
+    weight_unit: 'kg',
+    estimated_height: '60',
+    height_unit: 'cm',
+    estimated_width: '32',
+    width_unit: 'cm',
+    createdBy: 'Stanciu Iustin',
+    created_at: '18.02.2025',
+    updated_at: '20.02.2025',
+  }
+
+  const displayProduct = product || defaultProduct
+
   return (
     <>
       <div className="color-overlay d-flex justify-content-center align-items-center scroll">
         <div className="scrollable-container">
-          <div className="container ">
+          <div className="container">
             <div className="row justify-content-center">
               <div className="col-12 col-md-6 col-lg-7">
                 <Form className="rounded p-4 p-sm-3 bg-dark">
@@ -63,41 +89,48 @@ function Product() {
                         fontWeight: '600',
                       }}
                     >
-                      Product Page
+                      Product {displayProduct.id}
                     </Form.Label>
                   </div>
                   <div className="d-flex flex-column justify-content-start style">
                     <span>
-                      <strong>Name:</strong> {product?.name}
+                      <strong>Name:</strong> {displayProduct.name}
                     </span>
                     <span className="pad">
-                      <strong>Description:</strong> {product?.description}
+                      <strong>Description:</strong> {displayProduct.description}
                     </span>
                     <span className="pad">
-                      <strong>Stage:</strong> {product?.stage}
+                      <strong>Stage:</strong> {displayProduct.stage}
                     </span>
                     <span className="pad">
                       <strong>Estimated weight:</strong>{' '}
-                      {product?.estimated_weight} {product?.weight_unit}
+                      {displayProduct.estimated_weight}{' '}
+                      {displayProduct.weight_unit}
                     </span>
                     <span className="pad">
                       <strong>Estimated height:</strong>{' '}
-                      {product?.estimated_height} {product?.height_unit}
+                      {displayProduct.estimated_height}{' '}
+                      {displayProduct.height_unit}
                     </span>
                     <span className="pad">
                       <strong>Estimated width:</strong>{' '}
-                      {product?.estimated_width} {product?.width_unit}
+                      {displayProduct.estimated_width}{' '}
+                      {displayProduct.width_unit}
                     </span>
                     <span className="pad">
-                      <strong>Created By:</strong> {product?.createdBy}
+                      <strong>Created By:</strong> {displayProduct.createdBy}
                     </span>
                     <span className="pad">
                       <strong>Created at:</strong>{' '}
-                      {product ? formatDate(product.created_at) : ''}
+                      {new Date(displayProduct.created_at).toLocaleDateString()}{' '}
+                      at{' '}
+                      {new Date(displayProduct.created_at).toLocaleTimeString()}
                     </span>
                     <span className="pad">
                       <strong>Updated at:</strong>{' '}
-                      {product ? formatDate(product.updated_at) : ''}
+                      {new Date(displayProduct.updated_at).toLocaleDateString()}{' '}
+                      at{' '}
+                      {new Date(displayProduct.updated_at).toLocaleTimeString()}
                     </span>
                   </div>
                   <div
