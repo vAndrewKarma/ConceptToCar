@@ -39,7 +39,7 @@ export default async function fastify_loader() {
     hook: 'onRequest',
     parseOptions: {
       httpOnly: true,
-      secure: config.app.ENV === 'production',
+      secure: false,
       sameSite: config.app.ENV === 'production' ? 'none' : 'lax',
       path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
