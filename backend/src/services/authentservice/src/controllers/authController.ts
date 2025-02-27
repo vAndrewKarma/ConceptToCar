@@ -170,6 +170,7 @@ const authcontroller = {
         httpOnly: true,
         sameSite: 'none',
         path: '/',
+        maxAge: 30 * 24 * 60 * 60,
       }
 
       res

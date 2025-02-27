@@ -137,6 +137,7 @@ export default async function verifyAuth(req, res, config) {
         httpOnly: true,
         sameSite: 'none',
         path: '/',
+        maxAge: 30 * 24 * 60 * 60,
       })
       return
     }
