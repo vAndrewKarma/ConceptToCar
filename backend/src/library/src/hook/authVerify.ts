@@ -132,13 +132,7 @@ export default async function verifyAuth(req, res, config) {
         .expire(refreshKey, refreshTokenTTL)
         .exec()
 
-      res.setCookie('access_token', `${newAccessToken}.${newAccessTokenHmac}`, {
-        secure: config.app.ENV === 'production',
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        maxAge: 30 * 24 * 60 * 60,
-      })
+      res.setCookie('access_token', `${newAccessToken}.${newAccessTokenHmac}`)
       return
     }
 

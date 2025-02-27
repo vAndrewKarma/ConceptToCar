@@ -165,26 +165,10 @@ const authcontroller = {
         .expire(userAccessTokenKey, accessTokenTTL)
         .exec()
 
-      const cookieOptions = {
-        secure: config.app.ENV === 'production',
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        maxAge: 30 * 24 * 60 * 60,
-      }
-
       res
-        .setCookie(
-          'access_token',
-          `${accessToken}.${accessTokenHmac}`,
-          cookieOptions
-        )
-        .setCookie(
-          'refresh_token',
-          `${refreshToken}.${refreshTokenHmac}`,
-          cookieOptions
-        )
-        .setCookie('deviceId', deviceKeyPart, cookieOptions)
+        .setCookie('access_token', `${accessToken}.${accessTokenHmac}`)
+        .setCookie('refresh_token', `${refreshToken}.${refreshTokenHmac}`)
+        .setCookie('deviceId', deviceKeyPart)
         .send({ message: 'Login Successful' })
     } catch (err) {
       console.log(err)
