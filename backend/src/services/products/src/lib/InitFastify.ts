@@ -42,7 +42,7 @@ export default async function fastify_loader() {
       secure: config.app.ENV === 'production',
       sameSite: config.app.ENV === 'production' ? 'none' : 'lax',
       path: '/',
-      maxAge: 30 * 24 * 60 * 60,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
       domain: '.conceptocar.xyz',
     },
   })

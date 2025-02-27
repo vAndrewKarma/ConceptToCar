@@ -1,29 +1,51 @@
 import { Form, Button, Modal } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import useAxios from 'axios-hooks'
 import './product.css'
 import '../auth/login.css'
 
 function Product() {
+  const { name: productName } = useParams()
   const navigate = useNavigate()
   const [showModal, setShowModal] = useState(false)
   const handleClose = () => setShowModal(false)
   const handleShow = () => setShowModal(true)
 
-  const id = '1'
-  const name = 'Wheel'
-  const description =
-    "A wheel is a crucial component of a vehicle's mobility and steering system. It provides the necessary contact with the road, ensuring traction, stability, and smooth movement. In the steering mechanism, the front wheels pivot to change the vehicle’s direction, guided by the steering system."
-  const stage = 'Concept'
-  const estimated_height = '60'
-  const estimated_width = '32'
-  const estimated_weight = '5'
-  const weight_unit = 'kg'
-  const width_unit = 'cm'
-  const height_unit = 'cm'
-  const createdBy = 'Stanciu Iustin'
-  const created_at = '18.02.2025'
-  const update_at = '20.02.2025'
+  const [{ loading, error, data: product }, execute] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/get-product',
+      method: 'POST',
+      withCredentials: true,
+    },
+    { manual: true }
+  )
+
+  useEffect(() => {
+    if (productName) {
+      execute({
+        data: { name: productName },
+      })
+    }
+  }, [productName, execute])
+
+  const formatDate = (dateString: string | number | Date) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-GB')
+  }
+
+  if (loading)
+    return (
+      <div className="color-overlay d-flex justify-content-center align-items-center">
+        Loading...
+      </div>
+    )
+  if (error)
+    return (
+      <div className="color-overlay d-flex justify-content-center align-items-center">
+        Error: {error.response?.data?.message || error.message}
+      </div>
+    )
 
   return (
     <>
@@ -41,39 +63,41 @@ function Product() {
                         fontWeight: '600',
                       }}
                     >
-                      Product {id}
+                      Product Page
                     </Form.Label>
                   </div>
                   <div className="d-flex flex-column justify-content-start style">
                     <span>
-                      <strong>Name:</strong> {name}
+                      <strong>Name:</strong> {product?.name}
                     </span>
                     <span className="pad">
-                      <strong>Description:</strong> {description}
+                      <strong>Description:</strong> {product?.description}
                     </span>
                     <span className="pad">
-                      <strong>Stage:</strong> {stage}
+                      <strong>Stage:</strong> {product?.stage}
                     </span>
                     <span className="pad">
-                      <strong>Estimated weight:</strong> {estimated_weight}{' '}
-                      {weight_unit}
+                      <strong>Estimated weight:</strong>{' '}
+                      {product?.estimated_weight} {product?.weight_unit}
                     </span>
                     <span className="pad">
-                      <strong>Estimated height:</strong> {estimated_height}{' '}
-                      {height_unit}
+                      <strong>Estimated height:</strong>{' '}
+                      {product?.estimated_height} {product?.height_unit}
                     </span>
                     <span className="pad">
-                      <strong>Estimdated width:</strong> {estimated_width}{' '}
-                      {width_unit}
+                      <strong>Estimated width:</strong>{' '}
+                      {product?.estimated_width} {product?.width_unit}
                     </span>
                     <span className="pad">
-                      <strong>Created By:</strong> {createdBy}
+                      <strong>Created By:</strong> {product?.createdBy}
                     </span>
                     <span className="pad">
-                      <strong>Created at:</strong> {created_at}
+                      <strong>Created at:</strong>{' '}
+                      {product ? formatDate(product.created_at) : ''}
                     </span>
                     <span className="pad">
-                      <strong>Update at:</strong> {update_at}
+                      <strong>Updated at:</strong>{' '}
+                      {product ? formatDate(product.updated_at) : ''}
                     </span>
                   </div>
                   <div
