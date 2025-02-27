@@ -45,6 +45,7 @@ export default async function fastify_loader() {
       sameSite: 'none',
       path: '/',
       maxAge: 30 * 24 * 60 * 60,
+      domain: '.conceptocar.xyz',
     },
   })
   const allowedOrigins = ['http://localhost:5173', 'https://conceptocar.xyz/']
