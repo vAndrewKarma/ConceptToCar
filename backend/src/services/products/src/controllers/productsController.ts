@@ -261,6 +261,48 @@ const productsController = {
       throw err
     }
   },
+  async DeleteProduct(req, res) {
+    try {
+      if (!req.sessionData) throw new Unauthorized('Not authorized')
+      if (req.sessionData.role !== 'Admin')
+        throw new Unauthorized('Not authorized')
+
+      const { productId, modifyID, code_verifier } = req.body
+      const redis = req.server.redis
+      const productModel = req.server.productModel
+
+      if (config.app.ENV === 'production') {
+        const productraw = await redis.get(`product_modify:${modifyID}`)
+        if (!productraw) throw new BadRequestError('Invalid or expired request')
+
+        const proreq = JSON.parse(productraw)
+        const boundDevice = getDeviceId(req)
+
+        if (proreq.fingerprint !== boundDevice)
+          throw new BadRequestError('Invalid or expired request')
+
+        if (!verifyPKCE(code_verifier, proreq.challenge))
+          throw new BadRequestError('Invalid or expired request')
+      }
+
+      const currentProduct = await productModel.findProductById(productId)
+      if (!currentProduct) throw new BadRequestError('Product not found')
+
+      const deleted = await productModel.deleteProduct(productId)
+      if (!deleted) throw new BadRequestError('Product deletion failed')
+
+      await redis.del(`product: ${currentProduct.name}`)
+      const keys = await redis.keys('products:all:*')
+      if (keys.length) {
+        await redis.del(...keys)
+      }
+
+      res.send({ ok: true })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
+  },
 }
 
 export default productsController

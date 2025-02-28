@@ -239,3 +239,48 @@ export const getproducts = {
     additionalProperties: 'No additional properties are allowed.',
   },
 }
+
+export const deleteProductSchema = {
+  type: 'object',
+  required: ['productId', 'modifyID', 'code_verifier'],
+  properties: {
+    productId: {
+      type: 'string',
+      pattern: '^[a-fA-F0-9]{24}$',
+      errorMessage: {
+        pattern: 'Invalid product ID.',
+      },
+    },
+    modifyID: {
+      type: 'string',
+      minLength: 32,
+      maxLength: 32,
+      pattern: '^[a-zA-Z0-9]+$',
+      errorMessage: {
+        minLength: 'Invalid or expired request.',
+        maxLength: 'Invalid or expired request.',
+        pattern: 'Invalid or expired request.',
+      },
+    },
+    code_verifier: {
+      type: 'string',
+      minLength: 43,
+      maxLength: 128,
+      pattern: '^[a-zA-Z0-9-._~]+$',
+      errorMessage: {
+        minLength: 'Invalid or expired request.',
+        maxLength: 'Invalid or expired request.',
+        pattern: 'Invalid or expired request.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      productId: 'Product ID is required.',
+      modifyID: 'Invalid request.',
+      code_verifier: 'Invalid request.',
+    },
+    additionalProperties: 'No additional properties are allowed.',
+  },
+}
