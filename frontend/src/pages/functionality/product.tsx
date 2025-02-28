@@ -10,6 +10,24 @@ function unslugify(slug: string): string {
     .map((word) => word.charAt(0) + word.slice(1))
     .join(' ')
 }
+const generateCodeVerifier = (length: number): string => {
+  const allowedChars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
+  const randomArray = new Uint8Array(length)
+  crypto.getRandomValues(randomArray)
+  return Array.from(
+    randomArray,
+    (byte) => allowedChars[byte % allowedChars.length]
+  ).join('')
+}
+
+const generateCodeChallenge = async (verifier: string): Promise<string> => {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(verifier)
+  const digest = await crypto.subtle.digest('SHA-256', data)
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
 function Product() {
   const { name: productName } = useParams()
   const navigate = useNavigate()
@@ -26,8 +44,38 @@ function Product() {
     { manual: true }
   )
 
-  const [product, setProduct] = useState(null)
+  const [product, setProduct] = useState<{
+    _id: string
+    name: string
+    description?: string
+    stage?: string
+    estimated_weight?: string
+    weight_unit?: string
+    estimated_height?: string
+    height_unit?: string
+    estimated_width?: string
+    width_unit?: string
+    createdBy?: string
+    created_at?: string
+    updated_at?: string
+  } | null>(null)
 
+  // Add delete hooks
+  const [, executeInit] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/initiate_product',
+      method: 'POST',
+    },
+    { manual: true }
+  )
+
+  const [, executedelete] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/delete-product',
+      method: 'POST',
+    },
+    { manual: true }
+  )
   useEffect(() => {
     const pname = productName ? unslugify(productName) : ''
     if (pname) {
@@ -70,7 +118,34 @@ function Product() {
     created_at: '18.02.2025',
     updated_at: '20.02.2025',
   }
+  const handleDelete = async () => {
+    if (!product) return
 
+    try {
+      const code_verifier = generateCodeVerifier(43)
+      const challenge = await generateCodeChallenge(code_verifier)
+      const res = await executeInit({
+        data: { challenge },
+        withCredentials: true,
+      })
+      const modifyID = res.data.id
+
+      await executedelete({
+        data: {
+          productId: product._id,
+          modifyID: modifyID,
+          code_verifier: code_verifier,
+          name: product.name,
+        },
+        withCredentials: true,
+      })
+
+      navigate('/products')
+    } catch (error) {
+      console.error('Error deleting product:', error)
+    }
+    handleClose()
+  }
   const displayProduct = product || defaultProduct
 
   return (
@@ -89,7 +164,7 @@ function Product() {
                         fontWeight: '600',
                       }}
                     >
-                      Product {displayProduct.id}
+                      Product
                     </Form.Label>
                   </div>
                   <div className="d-flex flex-column justify-content-start style">
@@ -122,15 +197,31 @@ function Product() {
                     </span>
                     <span className="pad">
                       <strong>Created at:</strong>{' '}
-                      {new Date(displayProduct.created_at).toLocaleDateString()}{' '}
+                      {displayProduct.created_at
+                        ? new Date(
+                            displayProduct.created_at
+                          ).toLocaleDateString()
+                        : 'N/A'}{' '}
                       at{' '}
-                      {new Date(displayProduct.created_at).toLocaleTimeString()}
+                      {displayProduct.created_at
+                        ? new Date(
+                            displayProduct.created_at
+                          ).toLocaleTimeString()
+                        : 'N/A'}
                     </span>
                     <span className="pad">
                       <strong>Updated at:</strong>{' '}
-                      {new Date(displayProduct.updated_at).toLocaleDateString()}{' '}
+                      {displayProduct.updated_at
+                        ? new Date(
+                            displayProduct.updated_at
+                          ).toLocaleDateString()
+                        : 'N/A'}{' '}
                       at{' '}
-                      {new Date(displayProduct.updated_at).toLocaleTimeString()}
+                      {displayProduct.updated_at
+                        ? new Date(
+                            displayProduct.updated_at
+                          ).toLocaleTimeString()
+                        : 'N/A'}
                     </span>
                   </div>
                   <div
@@ -180,7 +271,7 @@ function Product() {
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="danger" id="confirmDelete">
+          <Button variant="danger" onClick={handleDelete}>
             Delete
           </Button>
         </Modal.Footer>

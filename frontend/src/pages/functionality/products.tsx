@@ -21,7 +21,24 @@ interface Product {
 
 const PAGE_SIZE = 15
 const CACHE_EXPIRY_MS = 30 * 1000
+const generateCodeVerifier = (length: number): string => {
+  const allowedChars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
+  const randomArray = new Uint8Array(length)
+  crypto.getRandomValues(randomArray)
+  return Array.from(
+    randomArray,
+    (byte) => allowedChars[byte % allowedChars.length]
+  ).join('')
+}
 
+const generateCodeChallenge = async (verifier: string): Promise<string> => {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(verifier)
+  const digest = await crypto.subtle.digest('SHA-256', data)
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
 function slugify(text: string): string {
   return text
     .toString()
@@ -81,6 +98,22 @@ function Products() {
     { manual: true }
   )
 
+  const [, executeInit] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/initiate_product',
+      method: 'POST',
+    },
+    { manual: true }
+  )
+
+  const [, executedelete] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/delete-product',
+      method: 'POST',
+    },
+    { manual: true }
+  )
+
   useEffect(() => {
     const fetchData = async () => {
       const now = Date.now()
@@ -121,13 +154,44 @@ function Products() {
     setSelectedId(null)
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedId !== null) {
-      setProducts((prev) =>
-        prev.filter((product) => product._id !== selectedId)
-      )
-      delete cacheRef.current[currentPage]
-      console.log(`Deleted product with ID: ${selectedId}`)
+      try {
+        // Find the product in state
+        const productToDelete = products.find((p) => p._id === selectedId)
+        if (!productToDelete) {
+          console.error('Product not found')
+          return
+        }
+
+        const code_verifier = generateCodeVerifier(43)
+        const challenge = await generateCodeChallenge(code_verifier)
+        const res = await executeInit({
+          data: { challenge },
+          withCredentials: true,
+        })
+        const modifyID = res.data.id
+
+        await executedelete({
+          data: {
+            productId: selectedId,
+            modifyID: modifyID,
+            code_verifier: code_verifier,
+            name: productToDelete.name,
+          },
+          withCredentials: true,
+        })
+
+        setProducts((prev) =>
+          prev.filter((product) => product._id !== selectedId)
+        )
+
+        delete cacheRef.current[currentPage]
+
+        console.log(`Deleted product with ID: ${selectedId}`)
+      } catch (error) {
+        console.error('Error deleting product:', error)
+      }
     }
     handleClose()
   }
