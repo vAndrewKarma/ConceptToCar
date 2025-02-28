@@ -166,9 +166,30 @@ const authcontroller = {
         .exec()
 
       res
-        .setCookie('access_token', `${accessToken}.${accessTokenHmac}`)
-        .setCookie('refresh_token', `${refreshToken}.${refreshTokenHmac}`)
-        .setCookie('deviceId', deviceKeyPart)
+        .setCookie('access_token', `${accessToken}.${accessTokenHmac}`, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/',
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          domain: '.conceptocar.xyz',
+        })
+        .setCookie('refresh_token', `${refreshToken}.${refreshTokenHmac}`, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/',
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          domain: '.conceptocar.xyz',
+        })
+        .setCookie('deviceId', deviceKeyPart, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/',
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          domain: '.conceptocar.xyz',
+        })
         .send({ message: 'Login Successful' })
     } catch (err) {
       console.log(err)

@@ -132,7 +132,14 @@ export default async function verifyAuth(req, res, config) {
         .expire(refreshKey, refreshTokenTTL)
         .exec()
 
-      res.setCookie('access_token', `${newAccessToken}.${newAccessTokenHmac}`)
+      res.setCookie('access_token', `${newAccessToken}.${newAccessTokenHmac}`, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        domain: '.conceptocar.xyz',
+      })
       return
     }
 
