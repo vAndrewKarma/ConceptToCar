@@ -100,7 +100,7 @@ function Materials() {
             timestamp: Date.now(),
           }
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         /* empty */
       }
