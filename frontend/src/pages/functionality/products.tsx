@@ -4,7 +4,7 @@ import {
   flexRender,
 } from '@tanstack/react-table'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Button, Modal, Spinner } from 'react-bootstrap'
+import { Button, Modal, Spinner, Form } from 'react-bootstrap'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
@@ -17,6 +17,9 @@ interface Product {
   description: string
   stage: string
   created_at: string
+  width?: number
+  height?: number
+  weight?: number
 }
 
 const PAGE_SIZE = 15
@@ -63,26 +66,14 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
   )
 }
 
-const Edit = ({ name, id }: { name: string; id: string }) => {
-  const navigate = useNavigate()
-  const slug = slugify(name)
-  return (
-    <div className="d-flex justify-content-center" style={{ height: '100%' }}>
-      <FaEdit
-        style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
-        title="Edit"
-        onClick={() => navigate(`/product/${slug}/${id}`)}
-      />
-    </div>
-  )
-}
-
 function Products() {
   const [currentPage, setCurrentPage] = useState(1)
   const [hasNextPage, setHasNextPage] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [products, setProducts] = useState<Product[]>([])
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   const cacheRef = useRef<{
     [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
@@ -152,6 +143,15 @@ function Products() {
   const handleClose = () => {
     setShowModal(false)
     setSelectedId(null)
+  }
+  const handleEditShow = (product: Product) => {
+    setSelectedProduct(product)
+    setShowEditModal(true)
+  }
+
+  const handleEditClose = () => {
+    setShowEditModal(false)
+    setSelectedProduct(null)
   }
 
   const handleDelete = async () => {
@@ -233,7 +233,11 @@ function Products() {
           className="d-flex justify-content-center gap-2"
           style={{ height: '100%' }}
         >
-          <Edit name={row.original.name} id={row.original._id} />
+          <FaEdit
+            style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
+            title="Edit"
+            onClick={() => handleEditShow(row.original)}
+          />
           <FaTrash
             style={{ color: '#F64B4B', cursor: 'pointer' }}
             title="Delete"
@@ -328,6 +332,7 @@ function Products() {
             <Button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
+              onMouseDown={(e) => e.preventDefault()}
               className="btn btn-dark"
               style={{ fontSize: '12px', height: '30px' }}
               size="sm"
@@ -337,6 +342,7 @@ function Products() {
             <Button
               onClick={() => setCurrentPage((p) => p + 1)}
               disabled={!hasNextPage}
+              onMouseDown={(e) => e.preventDefault()}
               className="btn btn-dark ms-2"
               style={{ fontSize: '12px', height: '30px' }}
               size="sm"
@@ -347,6 +353,7 @@ function Products() {
         </div>
       </div>
 
+      {/* Delete Modal */}
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header className="bg-danger text-white">
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -369,6 +376,65 @@ function Products() {
           <Button variant="danger" onClick={handleDelete}>
             Delete
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modify Modal */}
+      <Modal show={showEditModal} onHide={handleEditClose} centered>
+        <Modal.Header closeButton className="bg-dark text-white">
+          <Modal.Title>Edit Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="bg-dark text-white">
+          <Form>
+            <Form.Group>
+              <Form.Label>Name:</Form.Label>
+              <Form.Control type="text" defaultValue={selectedProduct?.name} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Description:</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                defaultValue={selectedProduct?.description}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Stage:</Form.Label>
+              <Form.Control type="text" defaultValue={selectedProduct?.stage} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Estimated weight (kg):</Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedProduct?.weight}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Estimated height (cm):</Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedProduct?.height}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Estimated width (cm):</Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedProduct?.width}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer className="bg-dark">
+          <Button variant="secondary" onClick={handleEditClose}>
+            Cancel
+          </Button>
+          <Button variant="warning">Save Changes</Button>
         </Modal.Footer>
       </Modal>
     </>
