@@ -270,15 +270,20 @@ const MaterialsController = {
       const { productId, name, modifyID, code_verifier } = req.body
       const redis = req.server.redis
       const materialModel = req.server.materialModel
+      console.log('exec1')
       if (config.app.ENV === 'production') {
         const bomraw = await redis.get(`bom_modify:${modifyID}`)
+        console.log('exec2')
         if (!bomraw) throw new BadRequestError('Invalid or expired request')
         const proreq = JSON.parse(bomraw)
+        console.log('exec3')
         const boundDevice = getDeviceId(req)
         if (proreq.fingerprint !== boundDevice)
           throw new BadRequestError('Invalid or expired request')
+        console.log('exec4')
         if (!verifyPKCE(code_verifier, proreq.challenge))
           throw new BadRequestError('Invalid or expired request')
+        console.log('exec5')
       }
       const sanitizedProductId = sanitizeHTML(productId)
       const sanitizedName = sanitizeHTML(name)

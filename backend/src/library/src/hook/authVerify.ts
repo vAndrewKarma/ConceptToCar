@@ -92,15 +92,9 @@ export default async function verifyAuth(req, res, config) {
         '-------------------------------- REFRESH TOKEN --------------------------------'
       )
       console.log(
-        sessionData.deviceId !== devicebound ||
-          sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
-          userid !== sessionData.id
+        sessionData.deviceId !== devicebound || userid !== sessionData.id
       )
-      if (
-        sessionData.deviceId !== devicebound ||
-        sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
-        userid !== sessionData.id
-      ) {
+      if (sessionData.deviceId !== devicebound || userid !== sessionData.id) {
         console.log('entered here')
         await redis
           .pipeline()
@@ -165,11 +159,7 @@ export default async function verifyAuth(req, res, config) {
     console.log(sessionData.deviceId, devicebound)
     console.log(sessionData.ip, req.headers['x-forwarded-for'] || req.ip)
     console.log(userid, sessionData.id)
-    if (
-      sessionData.deviceId !== devicebound ||
-      sessionData.ip !== (req.headers['x-forwarded-for'] || req.ip) ||
-      userid !== sessionData.id
-    ) {
+    if (sessionData.deviceId !== devicebound || userid !== sessionData.id) {
       console.log('entered here23')
       await redis
         .pipeline()
