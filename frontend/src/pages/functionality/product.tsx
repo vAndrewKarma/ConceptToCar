@@ -113,7 +113,7 @@ function Product() {
     )
 
   const defaultProduct = {
-    id: '1',
+    _id: '1',
     name: 'Wheel',
     description:
       "A wheel is a crucial component of a vehicle's mobility and steering system. It provides the necessary contact with the road, ensuring traction, stability, and smooth movement. In the steering mechanism, the front wheels pivot to change the vehicle’s direction, guided by the steering system.",
@@ -245,9 +245,14 @@ function Product() {
                       Modify
                     </Button>
                     <Button
-                      onClick={() => navigate('/materials')}
+                      onClick={() =>
+                        navigate(
+                          `/product/${productName}/${displayProduct._id}/materials`
+                        )
+                      }
                       className="btn btn-warning"
                     >
+                      {' '}
                       Materials
                     </Button>
                     <Button
