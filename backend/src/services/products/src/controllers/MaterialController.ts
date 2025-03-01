@@ -271,6 +271,8 @@ const MaterialsController = {
       const redis = req.server.redis
       const materialModel = req.server.materialModel
       console.log('exec1')
+      console.log(req.body)
+      console.log(JSON.stringify(req.body))
       console.log(modifyID)
       if (config.app.ENV === 'production') {
         const bomraw = await redis.get(`bom_modify:${modifyID}`)
