@@ -194,7 +194,7 @@ export const materialschema = {
       weight: 'Weight is required.',
       qty: 'Quantity is required',
       name: 'Name is required',
-      length: 'Length is required',
+      length_unit: 'Length is required',
       weight_unit: 'Weight unit is required.',
       width: 'Width is required.',
       width_unit: 'Width unit is required.',

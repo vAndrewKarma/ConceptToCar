@@ -20,6 +20,7 @@ interface Material {
   qty: number
   weight_unit: string
   height_unit: string
+  length_unit: string
   width_unit: string
   product_id: string
   product_name: string
@@ -146,7 +147,7 @@ function Materials() {
       header: 'Dimensions (cm)',
       cell: ({ row }: { row: { original: Material } }) => {
         const m = row.original
-        return `${m.estimated_height}  x ${m.estimated_width} `
+        return `${m.estimated_height} x ${m.estimated_width} x ${m.length_unit} `
       },
     },
     {
