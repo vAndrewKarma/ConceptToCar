@@ -6,7 +6,7 @@ import {
   flexRender,
 } from '@tanstack/react-table'
 import { Button, Modal, Spinner, Form } from 'react-bootstrap'
-import { FaEdit, FaTrash } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
 import useAxios from 'axios-hooks'
 import './materials.css'
@@ -141,7 +141,10 @@ function Materials() {
       accessorKey: 'name',
       header: 'Name',
     },
-
+    {
+      accessorKey: 'qty',
+      header: 'Quantity',
+    },
     {
       accessorKey: 'dimensions',
       header: 'Dimensions (cm)',
@@ -152,15 +155,11 @@ function Materials() {
     },
     {
       accessorKey: 'weight',
-      header: 'Weight',
+      header: 'Weight (kg)',
       cell: ({ row }: { row: { original: Material } }) => {
         const m = row.original
-        return `${m.estimated_weight} ${m.weight_unit}`
+        return `${m.estimated_weight}`
       },
-    },
-    {
-      accessorKey: 'qty',
-      header: 'Quantity',
     },
     {
       accessorKey: 'created_at',
@@ -224,14 +223,23 @@ function Materials() {
           {error && (
             <div className="alert alert-danger text-center">{error}</div>
           )}
-          <Form.Control
-            type="text"
-            placeholder="Search by name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-25"
-            style={{ fontSize: '14px', marginBottom: '10px' }}
-          />
+          <div className="d-flex align-items-center justify-content-between mb-3">
+            <Form.Control
+              type="text"
+              placeholder="Search by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-25"
+              style={{ fontSize: '14px', marginBottom: '10px' }}
+            />
+            <div style={{ paddingRight: '15px' }}>
+              <FaPlusCircle
+                size={24}
+                style={{ color: 'green', cursor: 'pointer' }}
+                title="Add Material"
+              />
+            </div>
+          </div>
           <table
             className="table table-dark table-striped table-hover text-center"
             style={{

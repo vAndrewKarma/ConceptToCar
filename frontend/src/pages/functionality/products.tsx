@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-table'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Modal, Spinner, Form } from 'react-bootstrap'
-import { FaEdit, FaTrash } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import useAxios from 'axios-hooks'
@@ -22,6 +22,7 @@ interface Product {
   estimated_weight?: number
   estimated_height?: string
   estimated_width?: string
+  length_unit: string
 }
 
 const PAGE_SIZE = 15
@@ -296,7 +297,23 @@ function Products() {
               </div>
             </div>
           )}
-
+          <div className="d-flex align-items-center justify-content-between mb-3">
+            <Form.Control
+              type="text"
+              placeholder="Search by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-25"
+              style={{ fontSize: '14px', marginBottom: '10px' }}
+            />
+            <div style={{ paddingRight: '15px' }}>
+              <FaPlusCircle
+                size={24}
+                style={{ color: 'green', cursor: 'pointer' }}
+                title="Add Material"
+              />
+            </div>
+          </div>
           <table
             className="table table-dark table-striped table-hover text-center"
             style={{
@@ -339,47 +356,37 @@ function Products() {
             </tbody>
           </table>
 
-          <div className="d-flex justify-content-between mt-3">
-            <Form.Control
-              type="text"
-              placeholder="Search by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-25"
-              style={{ fontSize: '14px' }}
-            />
-            <div className="justify-content-end">
-              <Button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                onMouseDown={(e) => e.preventDefault()}
-                className="btn btn-dark"
-                style={{ fontSize: '12px', height: '30px' }}
-                size="sm"
-              >
-                Previous
-              </Button>
-              <span
-                className="text-light"
-                style={{
-                  fontSize: '12px',
-                  paddingTop: '6px',
-                  paddingLeft: '10px',
-                }}
-              >
-                Page {currentPage}
-              </span>
-              <Button
-                onClick={() => setCurrentPage((p) => p + 1)}
-                disabled={!hasNextPage}
-                onMouseDown={(e) => e.preventDefault()}
-                className="btn btn-dark ms-2"
-                style={{ fontSize: '12px', height: '30px' }}
-                size="sm"
-              >
-                Next
-              </Button>
-            </div>
+          <div className="d-flex justify-content-end mt-3">
+            <Button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              onMouseDown={(e) => e.preventDefault()}
+              className="btn btn-dark"
+              style={{ fontSize: '12px', height: '30px' }}
+              size="sm"
+            >
+              Previous
+            </Button>
+            <span
+              className="text-light"
+              style={{
+                fontSize: '12px',
+                paddingTop: '6px',
+                paddingLeft: '10px',
+              }}
+            >
+              Page {currentPage}
+            </span>
+            <Button
+              onClick={() => setCurrentPage((p) => p + 1)}
+              disabled={!hasNextPage}
+              onMouseDown={(e) => e.preventDefault()}
+              className="btn btn-dark ms-2"
+              style={{ fontSize: '12px', height: '30px' }}
+              size="sm"
+            >
+              Next
+            </Button>
           </div>
         </div>
       </div>
@@ -438,11 +445,21 @@ function Products() {
 
             <Form.Group>
               <Form.Label className="modal-style">
-                Estimated weight (kg):
+                Estimated length (cm):
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.estimated_weight}
+                defaultValue={selectedProduct?.length_unit}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated width (cm):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedProduct?.estimated_width}
               />
             </Form.Group>
 
@@ -458,11 +475,11 @@ function Products() {
 
             <Form.Group>
               <Form.Label className="modal-style">
-                Estimated width (cm):
+                Estimated weight (kg):
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.estimated_width}
+                defaultValue={selectedProduct?.estimated_weight}
               />
             </Form.Group>
           </Form>
