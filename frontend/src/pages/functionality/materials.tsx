@@ -7,7 +7,6 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Modal } from 'react-bootstrap'
 import { FaEdit, FaTrash } from 'react-icons/fa'
-
 import { useState } from 'react'
 import '../auth/login.css'
 
@@ -59,7 +58,7 @@ function Materials() {
       header: 'Dimensions (cm)',
     },
     { accessorKey: 'price', header: ' Production Price' },
-    { accessorKey: 'createdAt', header: 'Created At' },
+    { accessorKey: 'createdAt', header: 'Created' },
 
     {
       accessorKey: 'actions',

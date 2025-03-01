@@ -9,6 +9,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import useAxios from 'axios-hooks'
+import { useMemo } from 'react'
 import './products.css'
 import './product.tsx'
 
@@ -75,6 +76,14 @@ function Products() {
   const [products, setProducts] = useState<Product[]>([])
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm) return products
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [searchTerm, products])
 
   const cacheRef = useRef<{
     [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
@@ -251,7 +260,7 @@ function Products() {
 
   const table = useReactTable({
     columns,
-    data: products,
+    data: filteredProducts,
     getCoreRowModel: getCoreRowModel(),
   })
 
@@ -329,27 +338,38 @@ function Products() {
               ))}
             </tbody>
           </table>
-          <div className="d-flex justify-content-end mt-3">
-            <Button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              onMouseDown={(e) => e.preventDefault()}
-              className="btn btn-dark"
-              style={{ fontSize: '12px', height: '30px' }}
-              size="sm"
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={() => setCurrentPage((p) => p + 1)}
-              disabled={!hasNextPage}
-              onMouseDown={(e) => e.preventDefault()}
-              className="btn btn-dark ms-2"
-              style={{ fontSize: '12px', height: '30px' }}
-              size="sm"
-            >
-              Next
-            </Button>
+
+          <div className="d-flex justify-content-between mt-3">
+            <Form.Control
+              type="text"
+              placeholder="Search by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-25"
+              style={{ fontSize: '14px' }}
+            />
+            <div className="justify-content-end">
+              <Button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                onMouseDown={(e) => e.preventDefault()}
+                className="btn btn-dark"
+                style={{ fontSize: '12px', height: '30px' }}
+                size="sm"
+              >
+                Previous
+              </Button>
+              <Button
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={!hasNextPage}
+                onMouseDown={(e) => e.preventDefault()}
+                className="btn btn-dark ms-2"
+                style={{ fontSize: '12px', height: '30px' }}
+                size="sm"
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
