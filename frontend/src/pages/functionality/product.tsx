@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import useAxios from 'axios-hooks'
 import './product.css'
 import '../auth/login.css'
+import './products.css'
+
 function unslugify(slug: string): string {
   return slug
     .split('-')
@@ -34,6 +36,14 @@ function Product() {
   const [showModal, setShowModal] = useState(false)
   const handleClose = () => setShowModal(false)
   const handleShow = () => setShowModal(true)
+  const [showEditModal, setShowEditModal] = useState(false)
+
+  const handleEditShow = () => {
+    setProduct(product)
+    setShowEditModal(true)
+  }
+
+  const handleEditClose = () => setShowEditModal(false)
 
   const [{ loading, error }, execute] = useAxios(
     {
@@ -228,7 +238,12 @@ function Product() {
                     className="d-flex justify-content-between align-items-center phone"
                     style={{ paddingTop: '15px' }}
                   >
-                    <Button className="btn btn-warning">Modify</Button>
+                    <Button
+                      className="btn btn-warning"
+                      onClick={handleEditShow}
+                    >
+                      Modify
+                    </Button>
                     <Button
                       onClick={() => navigate('/materials')}
                       className="btn btn-warning"
@@ -252,6 +267,7 @@ function Product() {
         </div>
       </div>
 
+      {/* Delete Modal */}
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header className="bg-danger text-white">
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -274,6 +290,71 @@ function Product() {
           <Button variant="danger" onClick={handleDelete}>
             Delete
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modify Modal */}
+      <Modal show={showEditModal} onHide={handleEditClose} centered>
+        <Modal.Header closeButton className="bg-dark text-white">
+          <Modal.Title>Edit Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="bg-dark shadow-lg">
+          <Form className="text-light modal-form rounded">
+            <Form.Group>
+              <Form.Label className="modal-style">Name:</Form.Label>
+              <Form.Control type="text" defaultValue={product?.name} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Description:</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                defaultValue={product?.description}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Stage:</Form.Label>
+              <Form.Control type="text" defaultValue={product?.stage} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated weight (kg):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={product?.estimated_weight}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated height (cm):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={product?.estimated_height}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated width (cm):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={product?.estimated_width}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer className="bg-dark">
+          <Button variant="secondary" onClick={handleEditClose}>
+            Cancel
+          </Button>
+          <Button variant="warning">Save Changes</Button>
         </Modal.Footer>
       </Modal>
     </>

@@ -27,3 +27,15 @@
 .table-responsive {
   transition: opacity 0.3s ease;
 }
+
+.modal-style {
+  font-style: italic;
+  font-weight: 600;
+  padding-top: 10px;
+}
+
+.modal-form {
+  background-color: rgba(71, 82, 83, 0.322);
+  padding: 10px;
+  padding-bottom: 20px;
+}

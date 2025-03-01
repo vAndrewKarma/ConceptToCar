@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import useAxios from 'axios-hooks'
 import './products.css'
+import './product.tsx'
 
 interface Product {
   _id: string
@@ -17,9 +18,9 @@ interface Product {
   description: string
   stage: string
   created_at: string
-  width?: number
-  height?: number
-  weight?: number
+  estimated_weight?: number
+  estimated_height?: string
+  estimated_width?: string
 }
 
 const PAGE_SIZE = 15
@@ -384,15 +385,15 @@ function Products() {
         <Modal.Header closeButton className="bg-dark text-white">
           <Modal.Title>Edit Product</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="bg-dark text-white">
-          <Form>
+        <Modal.Body className="bg-dark shadow-lg">
+          <Form className="text-light modal-form rounded">
             <Form.Group>
-              <Form.Label>Name:</Form.Label>
+              <Form.Label className="modal-style">Name:</Form.Label>
               <Form.Control type="text" defaultValue={selectedProduct?.name} />
             </Form.Group>
 
             <Form.Group>
-              <Form.Label>Description:</Form.Label>
+              <Form.Label className="modal-style">Description:</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -401,31 +402,37 @@ function Products() {
             </Form.Group>
 
             <Form.Group>
-              <Form.Label>Stage:</Form.Label>
+              <Form.Label className="modal-style">Stage:</Form.Label>
               <Form.Control type="text" defaultValue={selectedProduct?.stage} />
             </Form.Group>
 
             <Form.Group>
-              <Form.Label>Estimated weight (kg):</Form.Label>
+              <Form.Label className="modal-style">
+                Estimated weight (kg):
+              </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.weight}
+                defaultValue={selectedProduct?.estimated_weight}
               />
             </Form.Group>
 
             <Form.Group>
-              <Form.Label>Estimated height (cm):</Form.Label>
+              <Form.Label className="modal-style">
+                Estimated height (cm):
+              </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.height}
+                defaultValue={selectedProduct?.estimated_height}
               />
             </Form.Group>
 
             <Form.Group>
-              <Form.Label>Estimated width (cm):</Form.Label>
+              <Form.Label className="modal-style">
+                Estimated width (cm):
+              </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.width}
+                defaultValue={selectedProduct?.estimated_width}
               />
             </Form.Group>
           </Form>
