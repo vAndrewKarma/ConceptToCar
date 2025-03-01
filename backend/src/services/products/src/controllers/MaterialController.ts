@@ -271,8 +271,10 @@ const MaterialsController = {
       const redis = req.server.redis
       const materialModel = req.server.materialModel
       console.log('exec1')
+      console.log(modifyID)
       if (config.app.ENV === 'production') {
         const bomraw = await redis.get(`bom_modify:${modifyID}`)
+        console.log(bomraw)
         console.log('exec2')
         if (!bomraw) throw new BadRequestError('Invalid or expired request')
         const proreq = JSON.parse(bomraw)
