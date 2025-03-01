@@ -185,14 +185,18 @@ const productsController = {
   },
   async UpdateProduct(req, res) {
     try {
+      // Ensure the request is authenticated.
       if (!req.sessionData) throw new Unauthorized('Not authorized')
-      if (req.sessionData.role !== 'Admin')
+      const allowedRoles = ['Admin', 'Designer', 'Seller', 'Portfolio Manager']
+      const userRole = req.sessionData.role
+      if (!allowedRoles.includes(userRole))
         throw new Unauthorized('Not authorized')
 
       const {
         productId,
         name,
         description,
+        stage,
         estimated_height,
         estimated_width,
         estimated_weight,
@@ -207,9 +211,20 @@ const productsController = {
       const currentProduct = await productModel.findProductById(productId)
       if (!currentProduct) throw new BadRequestError('Product not found')
 
+      // Define the new stages.
+      const allStages = [
+        'concept',
+        'feasibility',
+        'design',
+        'production',
+        'withdrawal',
+        'standby',
+        'cancelled',
+      ]
       const updateData: {
         name?: string
         description?: string
+        stage?: string
         estimated_height?: number
         estimated_width?: number
         estimated_weight?: number
@@ -218,7 +233,14 @@ const productsController = {
         height_unit?: string
       } = {}
 
+      // --- Name & Description ---
+      // Admin, Seller, and Portfolio Manager can update these.
       if (name) {
+        if (userRole === 'Designer') {
+          throw new Unauthorized(
+            'Designers are not allowed to update the product name'
+          )
+        }
         const sanitizedName = sanitizeHTML(name)
         if (sanitizedName !== currentProduct.name) {
           if (
@@ -230,8 +252,42 @@ const productsController = {
           updateData.name = sanitizedName
         }
       }
+      if (description) {
+        if (userRole === 'Designer') {
+          throw new Unauthorized(
+            'Designers are not allowed to update the product description'
+          )
+        }
+        updateData.description = sanitizeHTML(description)
+      }
 
-      if (description) updateData.description = sanitizeHTML(description)
+      // --- Stage Update ---
+      if (stage) {
+        if (!allStages.includes(stage)) {
+          throw new BadRequestError('Invalid stage value')
+        }
+        if (userRole === 'Designer') {
+          const currentStage = currentProduct.stage
+          const idx = allStages.indexOf(currentStage)
+          if (idx === -1) {
+            throw new BadRequestError('Current stage is invalid')
+          }
+          // Designer can only set stage to the current or immediate next stage.
+          const allowedStages =
+            idx < allStages.length - 1
+              ? [allStages[idx], allStages[idx + 1]]
+              : [allStages[idx]]
+          if (!allowedStages.includes(stage)) {
+            throw new Unauthorized(
+              'Designer not allowed to update stage to the given value'
+            )
+          }
+        }
+        // Admin, Seller, and Portfolio Manager have no restriction.
+        updateData.stage = stage
+      }
+
+      // --- Dimensions & Weight ---
       if (estimated_height !== undefined)
         updateData.estimated_height = estimated_height
       if (estimated_width !== undefined)
@@ -246,11 +302,9 @@ const productsController = {
       if (!updated) throw new BadRequestError('Product update failed')
 
       await redis.del(`product: ${currentProduct.name}`)
-
       if (updateData.name) {
         await redis.del(`product: ${updateData.name}`)
       }
-
       const keys = await redis.keys('products:all:*')
       if (keys.length) {
         await redis.del(...keys)

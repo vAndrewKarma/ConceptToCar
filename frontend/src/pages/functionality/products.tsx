@@ -13,11 +13,44 @@ import { useMemo } from 'react'
 import './products.css'
 import './product.tsx'
 
+export type Stage =
+  | 'concept'
+  | 'feasibility'
+  | 'design'
+  | 'production'
+  | 'withdrawal'
+  | 'standby'
+  | 'cancelled'
+
+// Update the full stages list
+const allStages: Stage[] = [
+  'concept',
+  'feasibility',
+  'design',
+  'production',
+  'withdrawal',
+  'standby',
+  'cancelled',
+]
+
+// Helper function: for Designers, allow only the current stage or the next stage.
+function getAllowedStages(currentStage: Stage, role: string): Stage[] {
+  if (role === 'Designer') {
+    const idx = allStages.indexOf(currentStage)
+    if (idx === -1) return []
+    return idx < allStages.length - 1
+      ? [allStages[idx], allStages[idx + 1]]
+      : [allStages[idx]]
+  }
+  // Other roles get all options.
+  return allStages
+}
+
 interface Product {
   _id: string
   name: string
   description: string
-  stage: string
+  stage: Stage
   created_at: string
   estimated_weight?: number
   estimated_height?: string
@@ -25,8 +58,10 @@ interface Product {
   length_unit: string
 }
 
+// Assume PAGE_SIZE and CACHE_EXPIRY_MS remain the same.
 const PAGE_SIZE = 15
 const CACHE_EXPIRY_MS = 30 * 1000
+
 const generateCodeVerifier = (length: number): string => {
   const allowedChars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
@@ -45,6 +80,7 @@ const generateCodeChallenge = async (verifier: string): Promise<string> => {
   const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
+
 function slugify(text: string): string {
   return text
     .toString()
@@ -70,6 +106,10 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
 }
 
 function Products() {
+  // Assume currentUserRole comes from auth/session.
+  // For demo purposes, you can change it to "Admin", "Designer", "Seller", or "Portfolio Manager".
+  const currentUserRole = 'Designer'
+
   const [currentPage, setCurrentPage] = useState(1)
   const [hasNextPage, setHasNextPage] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -78,15 +118,22 @@ function Products() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Controlled fields for editing
   const [editName, setEditName] = useState('')
   const [editDescription, setEditDescription] = useState('')
-  const [editStage, setEditStage] = useState('')
+  const [editStage, setEditStage] = useState<Stage>('concept')
   const [editEstimatedHeight, setEditEstimatedHeight] = useState('')
   const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
   const [editWeightUnit, setEditWeightUnit] = useState('')
   const [editWidthUnit, setEditWidthUnit] = useState('')
   const [editHeightUnit, setEditHeightUnit] = useState('')
+
+  // Compute allowed stage options based on the product's current stage and the user role.
+  const allowedStages: Stage[] = selectedProduct
+    ? getAllowedStages(selectedProduct.stage, currentUserRole)
+    : allStages
 
   const filteredProducts = useMemo(() => {
     if (!searchTerm) return products
@@ -99,27 +146,6 @@ function Products() {
     [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
   }>({})
 
-  const [, executeUpdate] = useAxios(
-    {
-      url: 'https://backend-tests.conceptocar.xyz/products/update-product',
-      method: 'POST',
-      withCredentials: true,
-    },
-    { manual: true }
-  )
-  useEffect(() => {
-    if (selectedProduct) {
-      setEditName(selectedProduct.name || '')
-      setEditDescription(selectedProduct.description || '')
-      setEditStage(selectedProduct.stage || '')
-      setEditEstimatedHeight(selectedProduct.estimated_height?.toString() || '')
-      setEditEstimatedWidth(selectedProduct.estimated_width?.toString() || '')
-      setEditEstimatedWeight(selectedProduct.estimated_weight?.toString() || '')
-      //setEditWeightUnit(selectedProduct.weight_unit || '')
-      // setEditWidthUnit(selectedProduct.width_unit || '')
-      // setEditHeightUnit(selectedProduct.height_unit || '')
-    }
-  }, [selectedProduct])
   const [{ loading, error }, execute] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-products',
@@ -134,6 +160,15 @@ function Products() {
     {
       url: 'https://backend-tests.conceptocar.xyz/products/initiate_product',
       method: 'POST',
+    },
+    { manual: true }
+  )
+
+  const [, executeUpdate] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/update-product',
+      method: 'POST',
+      withCredentials: true,
     },
     { manual: true }
   )
@@ -155,12 +190,10 @@ function Products() {
         setHasNextPage(cached.hasNext)
         return
       }
-
       try {
         const response = await execute({ data: { page: currentPage } })
         if (response.data) {
           const { products, hasNext } = response.data
-
           cacheRef.current[currentPage] = {
             products,
             hasNext,
@@ -169,11 +202,24 @@ function Products() {
           setProducts(products)
           setHasNextPage(hasNext)
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
-      } catch (err) {}
+      } catch (err) {
+        console.error(err)
+      }
     }
     fetchData()
   }, [currentPage, execute])
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setEditName(selectedProduct.name || '')
+      setEditDescription(selectedProduct.description || '')
+      setEditStage(selectedProduct.stage || 'concept')
+      setEditEstimatedHeight(selectedProduct.estimated_height?.toString() || '')
+      setEditEstimatedWidth(selectedProduct.estimated_width?.toString() || '')
+      setEditEstimatedWeight(selectedProduct.estimated_weight?.toString() || '')
+      // Set unit fields if available.
+    }
+  }, [selectedProduct])
 
   const handleShow = (id: string) => {
     setSelectedId(id)
@@ -188,41 +234,38 @@ function Products() {
     setSelectedProduct(product)
     setShowEditModal(true)
   }
-
   const handleEditClose = () => {
     setShowEditModal(false)
     setSelectedProduct(null)
   }
+
   const handleSaveChanges = async () => {
     if (!selectedProduct) return
     try {
       const code_verifier = generateCodeVerifier(43)
       const challenge = await generateCodeChallenge(code_verifier)
-
       const initRes = await executeInit({
         data: { challenge },
         withCredentials: true,
       })
       const modifyID = initRes.data.id
-
       await executeUpdate({
         data: {
           productId: selectedProduct._id,
           name: editName,
           description: editDescription,
+          stage: editStage, // stage updated from dropdown
           estimated_height: parseFloat(editEstimatedHeight),
           estimated_width: parseFloat(editEstimatedWidth),
           estimated_weight: parseFloat(editEstimatedWeight),
           weight_unit: editWeightUnit,
           width_unit: editWidthUnit,
           height_unit: editHeightUnit,
-
           modifyID: modifyID,
           code_verifier: code_verifier,
         },
         withCredentials: true,
       })
-
       handleEditClose()
     } catch (error) {
       console.error('Error updating product:', error)
@@ -237,7 +280,6 @@ function Products() {
           console.error('Product not found')
           return
         }
-
         const code_verifier = generateCodeVerifier(43)
         const challenge = await generateCodeChallenge(code_verifier)
         const res = await executeInit({
@@ -245,7 +287,6 @@ function Products() {
           withCredentials: true,
         })
         const modifyID = res.data.id
-
         await executedelete({
           data: {
             productId: selectedId,
@@ -255,15 +296,12 @@ function Products() {
           },
           withCredentials: true,
         })
-
         setProducts((prev) =>
           prev.filter((product) => product._id !== selectedId)
         )
-
         delete cacheRef.current[currentPage]
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        /* empty */
+        console.error('Error deleting product:', error)
       }
     }
     handleClose()
@@ -285,7 +323,7 @@ function Products() {
     },
     {
       accessorKey: 'stage',
-      header: 'Status',
+      header: 'Stage',
       cell: ({ row }: { row: { original: Product } }) => (
         <span style={{ textTransform: 'capitalize' }}>
           {row.original.stage}
@@ -479,7 +517,7 @@ function Products() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modify Modal */}
+      {/* Edit Modal */}
       <Modal show={showEditModal} onHide={handleEditClose} centered>
         <Modal.Header closeButton className="bg-dark text-white">
           <Modal.Title>Edit Product</Modal.Title>
@@ -508,10 +546,16 @@ function Products() {
             <Form.Group>
               <Form.Label className="modal-style">Stage:</Form.Label>
               <Form.Control
-                type="text"
+                as="select"
                 value={editStage}
-                onChange={(e) => setEditStage(e.target.value)}
-              />
+                onChange={(e) => setEditStage(e.target.value as Stage)}
+              >
+                {allowedStages.map((stageOption, idx) => (
+                  <option key={idx} value={stageOption}>
+                    {stageOption}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
 
             <Form.Group>
