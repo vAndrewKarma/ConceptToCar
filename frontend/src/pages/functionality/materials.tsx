@@ -10,6 +10,7 @@ import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
 import useAxios from 'axios-hooks'
 import './materials.css'
+
 interface Material {
   _id: string
   name: string
@@ -31,12 +32,27 @@ interface Material {
 const PAGE_SIZE = 15
 const CACHE_EXPIRY_MS = 30 * 1000
 
-function Materials() {
-  const { productId } = useParams<{
-    productId: string
-    productName: string
-  }>()
+const generateCodeVerifier = (length: number): string => {
+  const allowedChars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
+  const randomArray = new Uint8Array(length)
+  crypto.getRandomValues(randomArray)
+  return Array.from(
+    randomArray,
+    (byte) => allowedChars[byte % allowedChars.length]
+  ).join('')
+}
 
+const generateCodeChallenge = async (verifier: string): Promise<string> => {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(verifier)
+  const digest = await crypto.subtle.digest('SHA-256', data)
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+function Materials() {
+  const { productId } = useParams<{ productId: string }>()
   const [currentPage, setCurrentPage] = useState(1)
   const [materials, setMaterials] = useState<Material[]>([])
   const [hasNextPage, setHasNextPage] = useState(false)
@@ -45,13 +61,6 @@ function Materials() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [loadingState, setLoadingState] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const filteredMaterials = useMemo(() => {
-    if (!searchTerm) return materials
-    return materials.filter((m) =>
-      m.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [searchTerm, materials])
 
   const cacheRef = useRef<{
     [key: number]: {
@@ -66,6 +75,22 @@ function Materials() {
       url: 'https://backend-tests.conceptocar.xyz/products/get-materials',
       method: 'POST',
       withCredentials: true,
+    },
+    { manual: true }
+  )
+
+  const [, executeInit] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/initiate_material',
+      method: 'POST',
+    },
+    { manual: true }
+  )
+
+  const [, executeDelete] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/delete-material',
+      method: 'POST',
     },
     { manual: true }
   )
@@ -102,7 +127,7 @@ function Materials() {
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        /* empty */
+        console.error(err)
       }
       setLoadingState(false)
     }
@@ -122,13 +147,48 @@ function Materials() {
     setShowModal(false)
     setSelectedId(null)
   }
-  const handleDelete = () => {
+
+  const handleDelete = async () => {
     if (selectedId) {
-      setMaterials((prev) => prev.filter((m) => m._id !== selectedId))
-      console.log(`Deleted material with ID: ${selectedId}`)
+      try {
+        const materialToDelete = materials.find((m) => m._id === selectedId)
+        if (!materialToDelete) {
+          console.error('Material not found')
+          return
+        }
+        const code_verifier = generateCodeVerifier(43)
+        const challenge = await generateCodeChallenge(code_verifier)
+        const initRes = await executeInit({
+          data: { challenge },
+          withCredentials: true,
+        })
+        const modifyID = initRes.data.id
+
+        await executeDelete({
+          data: {
+            productId: materialToDelete.product_id,
+            name: materialToDelete.name,
+            modifyID: modifyID,
+            code_verifier: code_verifier,
+          },
+          withCredentials: true,
+        })
+
+        setMaterials((prev) => prev.filter((m) => m._id !== selectedId))
+        delete cacheRef.current[currentPage]
+      } catch (error) {
+        /* empty */
+      }
     }
     handleClose()
   }
+
+  const filteredMaterials = useMemo(() => {
+    if (!searchTerm) return materials
+    return materials.filter((m) =>
+      m.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [searchTerm, materials])
 
   const columns = [
     {
@@ -150,7 +210,7 @@ function Materials() {
       header: 'Dimensions (cm)',
       cell: ({ row }: { row: { original: Material } }) => {
         const m = row.original
-        return `${m.estimated_height} x ${m.estimated_width} x ${m.length_unit} `
+        return `${m.estimated_height} x ${m.estimated_width} x ${m.length_unit}`
       },
     },
     {

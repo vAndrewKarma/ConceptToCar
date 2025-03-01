@@ -78,6 +78,15 @@ function Products() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [editName, setEditName] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editStage, setEditStage] = useState('')
+  const [editEstimatedHeight, setEditEstimatedHeight] = useState('')
+  const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
+  const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
+  const [editWeightUnit, setEditWeightUnit] = useState('')
+  const [editWidthUnit, setEditWidthUnit] = useState('')
+  const [editHeightUnit, setEditHeightUnit] = useState('')
 
   const filteredProducts = useMemo(() => {
     if (!searchTerm) return products
@@ -90,6 +99,27 @@ function Products() {
     [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
   }>({})
 
+  const [, executeUpdate] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/update-product',
+      method: 'POST',
+      withCredentials: true,
+    },
+    { manual: true }
+  )
+  useEffect(() => {
+    if (selectedProduct) {
+      setEditName(selectedProduct.name || '')
+      setEditDescription(selectedProduct.description || '')
+      setEditStage(selectedProduct.stage || '')
+      setEditEstimatedHeight(selectedProduct.estimated_height?.toString() || '')
+      setEditEstimatedWidth(selectedProduct.estimated_width?.toString() || '')
+      setEditEstimatedWeight(selectedProduct.estimated_weight?.toString() || '')
+      //setEditWeightUnit(selectedProduct.weight_unit || '')
+      // setEditWidthUnit(selectedProduct.width_unit || '')
+      // setEditHeightUnit(selectedProduct.height_unit || '')
+    }
+  }, [selectedProduct])
   const [{ loading, error }, execute] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-products',
@@ -139,9 +169,8 @@ function Products() {
           setProducts(products)
           setHasNextPage(hasNext)
         }
-      } catch (err) {
-        console.error('Fetch error:', err)
-      }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+      } catch (err) {}
     }
     fetchData()
   }, [currentPage, execute])
@@ -164,11 +193,45 @@ function Products() {
     setShowEditModal(false)
     setSelectedProduct(null)
   }
+  const handleSaveChanges = async () => {
+    if (!selectedProduct) return
+    try {
+      const code_verifier = generateCodeVerifier(43)
+      const challenge = await generateCodeChallenge(code_verifier)
+
+      const initRes = await executeInit({
+        data: { challenge },
+        withCredentials: true,
+      })
+      const modifyID = initRes.data.id
+
+      await executeUpdate({
+        data: {
+          productId: selectedProduct._id,
+          name: editName,
+          description: editDescription,
+          estimated_height: parseFloat(editEstimatedHeight),
+          estimated_width: parseFloat(editEstimatedWidth),
+          estimated_weight: parseFloat(editEstimatedWeight),
+          weight_unit: editWeightUnit,
+          width_unit: editWidthUnit,
+          height_unit: editHeightUnit,
+
+          modifyID: modifyID,
+          code_verifier: code_verifier,
+        },
+        withCredentials: true,
+      })
+
+      handleEditClose()
+    } catch (error) {
+      console.error('Error updating product:', error)
+    }
+  }
 
   const handleDelete = async () => {
     if (selectedId !== null) {
       try {
-        // Find the product in state
         const productToDelete = products.find((p) => p._id === selectedId)
         if (!productToDelete) {
           console.error('Product not found')
@@ -198,10 +261,9 @@ function Products() {
         )
 
         delete cacheRef.current[currentPage]
-
-        console.log(`Deleted product with ID: ${selectedId}`)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error('Error deleting product:', error)
+        /* empty */
       }
     }
     handleClose()
@@ -426,7 +488,11 @@ function Products() {
           <Form className="text-light modal-form rounded">
             <Form.Group>
               <Form.Label className="modal-style">Name:</Form.Label>
-              <Form.Control type="text" defaultValue={selectedProduct?.name} />
+              <Form.Control
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
             </Form.Group>
 
             <Form.Group>
@@ -434,13 +500,18 @@ function Products() {
               <Form.Control
                 as="textarea"
                 rows={3}
-                defaultValue={selectedProduct?.description}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
               />
             </Form.Group>
 
             <Form.Group>
               <Form.Label className="modal-style">Stage:</Form.Label>
-              <Form.Control type="text" defaultValue={selectedProduct?.stage} />
+              <Form.Control
+                type="text"
+                value={editStage}
+                onChange={(e) => setEditStage(e.target.value)}
+              />
             </Form.Group>
 
             <Form.Group>
@@ -449,7 +520,8 @@ function Products() {
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.length_unit}
+                value={editEstimatedHeight}
+                onChange={(e) => setEditEstimatedHeight(e.target.value)}
               />
             </Form.Group>
 
@@ -459,17 +531,8 @@ function Products() {
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.estimated_width}
-              />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
-                Estimated height (cm):
-              </Form.Label>
-              <Form.Control
-                type="number"
-                defaultValue={selectedProduct?.estimated_height}
+                value={editEstimatedWidth}
+                onChange={(e) => setEditEstimatedWidth(e.target.value)}
               />
             </Form.Group>
 
@@ -479,7 +542,35 @@ function Products() {
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={selectedProduct?.estimated_weight}
+                value={editEstimatedWeight}
+                onChange={(e) => setEditEstimatedWeight(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Weight Unit:</Form.Label>
+              <Form.Control
+                type="text"
+                value={editWeightUnit}
+                onChange={(e) => setEditWeightUnit(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Width Unit:</Form.Label>
+              <Form.Control
+                type="text"
+                value={editWidthUnit}
+                onChange={(e) => setEditWidthUnit(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Height Unit:</Form.Label>
+              <Form.Control
+                type="text"
+                value={editHeightUnit}
+                onChange={(e) => setEditHeightUnit(e.target.value)}
               />
             </Form.Group>
           </Form>
@@ -488,7 +579,9 @@ function Products() {
           <Button variant="secondary" onClick={handleEditClose}>
             Cancel
           </Button>
-          <Button variant="warning">Save Changes</Button>
+          <Button variant="warning" onClick={handleSaveChanges}>
+            Save Changes
+          </Button>
         </Modal.Footer>
       </Modal>
     </>

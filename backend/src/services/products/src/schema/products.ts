@@ -239,6 +239,110 @@ export const getproducts = {
     additionalProperties: 'No additional properties are allowed.',
   },
 }
+export const updateProductSchema = {
+  type: 'object',
+  required: ['productId', 'modifyID', 'code_verifier'],
+  properties: {
+    productId: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      pattern: '^(?!\\s*$)[A-Za-z0-9 ]+$',
+      errorMessage: {
+        type: 'productId must be a string.',
+        minLength: 'productId cannot be empty.',
+        maxLength: 'productId cannot exceed 50 characters.',
+        pattern: 'productId can only contain letters, numbers, and spaces.',
+      },
+    },
+    modifyID: {
+      type: 'string',
+      minLength: 16,
+      maxLength: 16,
+      pattern: '^[a-zA-Z0-9]+$',
+      errorMessage: {
+        minLength: 'Invalid request',
+        maxLength: 'Invalid request',
+        pattern: 'Invalid request',
+      },
+    },
+    code_verifier: {
+      type: 'string',
+      minLength: 43,
+      maxLength: 128,
+      pattern: '^[a-zA-Z0-9-._~]+$',
+      errorMessage: {
+        minLength: 'Invalid request',
+        maxLength: 'Invalid request',
+        pattern: 'Invalid request',
+      },
+    },
+
+    name: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      pattern: '^(?!\\s*$)[A-Za-z0-9 ]+$',
+      errorMessage: {
+        type: 'Name must be a string.',
+        minLength: 'Name cannot be empty.',
+        maxLength: 'Name cannot exceed 50 characters.',
+        pattern: 'Name can only contain letters, numbers, and spaces.',
+      },
+    },
+    description: {
+      type: 'string',
+      errorMessage: {
+        type: 'Description must be a string.',
+      },
+    },
+    estimated_height: {
+      type: 'number',
+      errorMessage: {
+        type: 'Estimated height must be a number.',
+      },
+    },
+    estimated_width: {
+      type: 'number',
+      errorMessage: {
+        type: 'Estimated width must be a number.',
+      },
+    },
+    estimated_weight: {
+      type: 'number',
+      errorMessage: {
+        type: 'Estimated weight must be a number.',
+      },
+    },
+    weight_unit: {
+      type: 'string',
+      errorMessage: {
+        type: 'Weight unit must be a string.',
+      },
+    },
+    width_unit: {
+      type: 'string',
+      errorMessage: {
+        type: 'Width unit must be a string.',
+      },
+    },
+    height_unit: {
+      type: 'string',
+      errorMessage: {
+        type: 'Height unit must be a string.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      productId: 'productId is required',
+      modifyID: 'Invalid request',
+      code_verifier: 'Invalid request',
+    },
+    additionalProperties: 'No additional properties are allowed.',
+  },
+}
 
 export const deleteProductSchema = {
   type: 'object',
