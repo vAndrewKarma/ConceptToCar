@@ -359,6 +359,16 @@ function Products() {
               >
                 Previous
               </Button>
+              <span
+                className="text-light"
+                style={{
+                  fontSize: '12px',
+                  paddingTop: '6px',
+                  paddingLeft: '10px',
+                }}
+              >
+                Page {currentPage}
+              </span>
               <Button
                 onClick={() => setCurrentPage((p) => p + 1)}
                 disabled={!hasNextPage}

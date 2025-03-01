@@ -272,7 +272,7 @@ function Materials() {
               ))}
             </tbody>
           </table>
-          <div className="d-flex justify-content-between mt-3">
+          <div className="d-flex justify-content-end mt-3">
             <Button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
@@ -284,7 +284,11 @@ function Materials() {
             </Button>
             <span
               className="mx-2 text-light"
-              style={{ fontSize: '12px', paddingTop: '6px' }}
+              style={{
+                fontSize: '12px',
+                paddingTop: '6px',
+                paddingLeft: '10px',
+              }}
             >
               Page {currentPage}
             </span>
