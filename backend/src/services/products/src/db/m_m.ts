@@ -127,6 +127,7 @@ export interface Material {
   product_name: string
   weight: number
   weight_unit: string
+  length_unit: number
   width_unit: string
   height_unit: string
   qty: number

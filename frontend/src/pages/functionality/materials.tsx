@@ -1,87 +1,188 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-  getPaginationRowModel,
 } from '@tanstack/react-table'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import { Button, Modal } from 'react-bootstrap'
+import { Button, Modal, Spinner, Form } from 'react-bootstrap'
 import { FaEdit, FaTrash } from 'react-icons/fa'
-import { useState } from 'react'
-import '../auth/login.css'
+import { useParams } from 'react-router-dom'
+import useAxios from 'axios-hooks'
+import './materials.css'
+interface Material {
+  _id: string
+  name: string
+  description: string
+  estimated_height: number
+  estimated_width: number
+  estimated_weight: number
+  qty: number
+  weight_unit: string
+  height_unit: string
+  width_unit: string
+  product_id: string
+  product_name: string
+  created_at: string
+  updated_at: string
+}
+
+const PAGE_SIZE = 15
+const CACHE_EXPIRY_MS = 30 * 1000
 
 function Materials() {
+  const { productId } = useParams<{
+    productId: string
+    productName: string
+  }>()
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [materials, setMaterials] = useState<Material[]>([])
+  const [hasNextPage, setHasNextPage] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
-  const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [tableData, setTableData] = useState(
-    Array.from({ length: 45 }, (_, i) => ({
-      id: i + 1,
-      name: i % 2 === 0 ? 'Copper' : 'Steel',
-      weight: i % 2 === 0 ? '1.25' : '2.75',
-      dimensions: i % 2 === 0 ? '10x10x10' : '20x20x20',
-      price: i % 2 === 0 ? '$5.00' : '$10.00',
-      quantity: i % 2 === 0 ? '5' : '10',
-      createdAt: i % 2 === 0 ? '3/01/2025' : '2/28/2025',
-    }))
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [loadingState, setLoadingState] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const filteredMaterials = useMemo(() => {
+    if (!searchTerm) return materials
+    return materials.filter((m) =>
+      m.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [searchTerm, materials])
+
+  const cacheRef = useRef<{
+    [key: number]: {
+      materials: Material[]
+      hasNext: boolean
+      timestamp: number
+    }
+  }>({})
+
+  const [, execute] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/get-materials',
+      method: 'POST',
+      withCredentials: true,
+    },
+    { manual: true }
   )
 
-  const handleShow = (id: number) => {
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      setError(null)
+      setLoadingState(true)
+      const now = Date.now()
+      const cached = cacheRef.current[currentPage]
+      if (cached && now - cached.timestamp < CACHE_EXPIRY_MS) {
+        setMaterials(cached.materials)
+        setHasNextPage(cached.hasNext)
+        setLoadingState(false)
+        return
+      }
+      try {
+        const response = await execute({
+          data: { productId: productId, page: currentPage },
+        })
+        const data = response.data
+        if (!data || data.length === 0) {
+          setError('No materials found')
+          setMaterials([])
+          setHasNextPage(false)
+        } else {
+          setMaterials(data)
+          setHasNextPage(data.length === PAGE_SIZE)
+          cacheRef.current[currentPage] = {
+            materials: data,
+            hasNext: data.length === PAGE_SIZE,
+            timestamp: Date.now(),
+          }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        /* empty */
+      }
+      setLoadingState(false)
+    }
+
+    if (productId) {
+      fetchMaterials()
+    } else {
+      setError('Product ID is missing')
+    }
+  }, [currentPage, productId, execute])
+
+  const handleShow = (id: string) => {
     setSelectedId(id)
     setShowModal(true)
   }
-
   const handleClose = () => {
     setShowModal(false)
     setSelectedId(null)
   }
-
   const handleDelete = () => {
-    if (selectedId !== null) {
-      setTableData((prevData) =>
-        prevData.filter((item) => item.id !== selectedId)
-      )
-      console.log(`Deleted product with ID: ${selectedId}`)
+    if (selectedId) {
+      setMaterials((prev) => prev.filter((m) => m._id !== selectedId))
+      console.log(`Deleted material with ID: ${selectedId}`)
     }
     handleClose()
   }
 
   const columns = [
-    { accessorKey: 'id', header: 'Index' },
+    {
+      accessorKey: 'index',
+      header: 'ID',
+      cell: ({ row }: { row: { index: number } }) =>
+        (currentPage - 1) * PAGE_SIZE + row.index + 1,
+    },
     {
       accessorKey: 'name',
       header: 'Name',
     },
-    { accessorKey: 'quantity', header: 'Quantity' },
-    { accessorKey: 'weight', header: 'Weight (kg)' },
+
     {
       accessorKey: 'dimensions',
       header: 'Dimensions (cm)',
+      cell: ({ row }: { row: { original: Material } }) => {
+        const m = row.original
+        return `${m.estimated_height}  x ${m.estimated_width} `
+      },
     },
-    { accessorKey: 'price', header: ' Production Price' },
-    { accessorKey: 'createdAt', header: 'Created' },
-
+    {
+      accessorKey: 'weight',
+      header: 'Weight',
+      cell: ({ row }: { row: { original: Material } }) => {
+        const m = row.original
+        return `${m.estimated_weight} ${m.weight_unit}`
+      },
+    },
+    {
+      accessorKey: 'qty',
+      header: 'Quantity',
+    },
+    {
+      accessorKey: 'created_at',
+      header: 'Created',
+      cell: ({ row }: { row: { original: Material } }) =>
+        new Date(row.original.created_at).toLocaleDateString(),
+    },
     {
       accessorKey: 'actions',
       header: 'Actions',
-      cell: ({ row }: { row: { original: { id: number } } }) => (
+      cell: ({ row }: { row: { original: Material } }) => (
         <div
           className="d-flex justify-content-center gap-2"
           style={{ height: '100%' }}
         >
-          <div
-            className="d-flex justify-content-center"
-            style={{ height: '100%' }}
-          >
-            <FaEdit
-              style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
-              title="Edit"
-            />
-          </div>
-
+          <FaEdit
+            style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
+            title="Edit"
+          />
           <FaTrash
             style={{ color: '#F64B4B', cursor: 'pointer' }}
             title="Delete"
-            onClick={() => handleShow(row.original.id)}
+            onClick={() => handleShow(row.original._id)}
           />
         </div>
       ),
@@ -90,10 +191,8 @@ function Materials() {
 
   const table = useReactTable({
     columns,
-    data: tableData,
+    data: filteredMaterials,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 15 } },
   })
 
   return (
@@ -103,7 +202,7 @@ function Materials() {
         style={{ paddingTop: '150px', padding: '80px' }}
       >
         <div
-          className="table-responsive"
+          className="table-responsive position-relative"
           style={{
             borderRadius: '20px',
             margin: '0 auto',
@@ -114,6 +213,24 @@ function Materials() {
             boxShadow: '0 4px 8px rgba(0,0,0,0.5)',
           }}
         >
+          {loadingState && (
+            <div className="loading-overlay">
+              <div className="d-flex justify-content-center align-items-center h-100">
+                <Spinner animation="border" variant="light" />
+              </div>
+            </div>
+          )}
+          {error && (
+            <div className="alert alert-danger text-center">{error}</div>
+          )}
+          <Form.Control
+            type="text"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-25"
+            style={{ fontSize: '14px', marginBottom: '10px' }}
+          />
           <table
             className="table table-dark table-striped table-hover text-center"
             style={{
@@ -122,6 +239,8 @@ function Materials() {
               borderSpacing: '0',
               borderRadius: '15px',
               overflow: 'hidden',
+              opacity: loadingState ? 0.5 : 1,
+              transition: 'opacity 0.3s ease',
             }}
           >
             <thead>
@@ -153,11 +272,10 @@ function Materials() {
               ))}
             </tbody>
           </table>
-          <div className="d-flex justify-content-end mt-3">
+          <div className="d-flex justify-content-between mt-3">
             <Button
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
               className="btn btn-dark"
               style={{ fontSize: '12px', height: '30px' }}
               size="sm"
@@ -168,14 +286,12 @@ function Materials() {
               className="mx-2 text-light"
               style={{ fontSize: '12px', paddingTop: '6px' }}
             >
-              Page {table.getState().pagination.pageIndex + 1} of{' '}
-              {table.getPageCount()}
+              Page {currentPage}
             </span>
             <Button
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              onMouseDown={(e) => e.preventDefault()}
-              className="btn btn-dark"
+              onClick={() => setCurrentPage((p) => p + 1)}
+              disabled={!hasNextPage}
+              className="btn btn-dark ms-2"
               style={{ fontSize: '12px', height: '30px' }}
               size="sm"
             >
@@ -196,7 +312,7 @@ function Materials() {
         </Modal.Header>
         <Modal.Body>
           <p>
-            Are you sure you want to delete this product? This action cannot be
+            Are you sure you want to delete this material? This action cannot be
             undone.
           </p>
         </Modal.Body>

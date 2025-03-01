@@ -77,7 +77,7 @@ function App() {
             }
           />
           <Route
-            path="/materials"
+            path="/product/:productName/:productId/materials"
             element={
               <ProtectedRoute>
                 <Materials />
