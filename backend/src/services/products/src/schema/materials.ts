@@ -577,3 +577,65 @@ export const deleteproductschema = {
     additionalProperties: 'No additional properties are allowed.',
   },
 }
+export const deleteMaterialSp = {
+  type: 'object',
+  required: ['name', 'productId', 'code_verifier', 'modifyID'],
+  properties: {
+    name: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      pattern: '^(?!\\s*$)[A-Za-z0-9 ]+$',
+      errorMessage: {
+        type: 'Name must be a string.',
+        minLength: 'Name cannot be empty.',
+        maxLength: 'Name cannot exceed 50 characters.',
+        pattern: 'Name can only contain letters, numbers, and spaces.',
+      },
+    },
+    productId: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      pattern: '^(?!\\s*$)[A-Za-z0-9 ]+$',
+      errorMessage: {
+        type: 'productId must be a string.',
+        minLength: 'productId cannot be empty.',
+        maxLength: 'productId cannot exceed 50 characters.',
+        pattern: 'productId can only contain letters, numbers, and spaces.',
+      },
+    },
+    code_verifier: {
+      type: 'string',
+      minLength: 43,
+      maxLength: 128,
+      pattern: '^[a-zA-Z0-9-._~]+$',
+      errorMessage: {
+        minLength: 'Invalid or expired request.',
+        maxLength: 'Invalid or expired request.',
+        pattern: 'Invalid or expired request.',
+      },
+    },
+    modifyID: {
+      type: 'string',
+      minLength: 32,
+      maxLength: 32,
+      pattern: '^[a-zA-Z0-9]+$',
+      errorMessage: {
+        minLength: 'Invalid or expired request.',
+        maxLength: 'Invalid or expired request.',
+        pattern: 'Invalid or expired request.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      name: 'Name is required',
+      productId: 'productId is required',
+      code_verifier: 'Invalid request',
+      modifyID: 'Invalid request',
+    },
+    additionalProperties: 'No additional properties are allowed.',
+  },
+}

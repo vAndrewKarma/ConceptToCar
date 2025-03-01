@@ -9,6 +9,7 @@ import {
 } from '../schema/products'
 import MaterialsController from '../controllers/MaterialController'
 import {
+  deleteMaterialSp,
   deleteproductschema,
   getmaterialspecific,
   getmaterialsspecific,
@@ -95,7 +96,7 @@ const routes: Record<string, RouteGroup> = {
       method: 'POST',
       routeName: '/delete-material',
       controller: MaterialsController.DeleteMaterial,
-      schema: getmaterialspecific,
+      schema: deleteMaterialSp,
     },
   },
   healthRoutes: {
