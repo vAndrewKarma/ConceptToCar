@@ -188,7 +188,6 @@ const productsController = {
   },
   async updateProduct(req, res): Promise<void> {
     try {
-      // Ensure the request is authenticated.
       if (!req.sessionData) {
         throw new Unauthorized('Not authorized')
       }
@@ -283,7 +282,6 @@ const productsController = {
         }
         const sanitizedName = sanitizeHTML(name)
         if (sanitizedName !== currentProduct.name) {
-          // Check for duplicate names via cache and DB.
           if (
             (await redis.get(`product:${sanitizedName}`)) ||
             (await productModel.findProductByName(sanitizedName))
