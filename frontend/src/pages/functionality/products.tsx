@@ -118,6 +118,7 @@ function Products() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [showAddModal, setShowAddModal] = useState(false)
 
   // Controlled fields for editing
   const [editName, setEditName] = useState('')
@@ -236,6 +237,15 @@ function Products() {
     setSelectedProduct(null)
   }
 
+  const handleAddShow = (product: Product) => {
+    setSelectedProduct(product)
+    setShowAddModal(true)
+  }
+  const handleAddClose = () => {
+    setShowAddModal(false)
+    setSelectedProduct(null)
+  }
+
   const handleSaveChanges = async () => {
     if (!selectedProduct) return
     try {
@@ -255,7 +265,9 @@ function Products() {
           estimated_height: parseFloat(editEstimatedHeight),
           estimated_width: parseFloat(editEstimatedWidth),
           estimated_weight: parseFloat(editEstimatedWeight),
-
+          weight_unit: editWeightUnit,
+          width_unit: editWidthUnit,
+          height_unit: editHeightUnit,
           modifyID: modifyID,
           code_verifier: code_verifier,
         },
@@ -406,6 +418,7 @@ function Products() {
                 size={24}
                 style={{ color: 'green', cursor: 'pointer' }}
                 title="Add Material"
+                onClick={() => handleAddShow({} as Product)}
               />
             </div>
           </div>
@@ -545,11 +558,22 @@ function Products() {
                 value={editStage}
                 onChange={(e) => setEditStage(e.target.value as Stage)}
               >
-                {allowedStages.map((stageOption, idx) => (
-                  <option key={idx} value={stageOption}>
-                    {stageOption}
-                  </option>
-                ))}
+                {[
+                  'Concept',
+                  'Feasibility',
+                  'Design',
+                  'Production',
+                  'Withdrawal',
+                  'Stand-by',
+                  'Canceled',
+                  ...allowedStages,
+                ]
+                  .filter((stageOption) => stageOption !== editStage)
+                  .map((stageOption, idx) => (
+                    <option key={idx} value={stageOption}>
+                      {stageOption}
+                    </option>
+                  ))}
               </Form.Control>
             </Form.Group>
 
@@ -583,6 +607,33 @@ function Products() {
                 type="number"
                 value={editEstimatedWeight}
                 onChange={(e) => setEditEstimatedWeight(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Weight Unit:</Form.Label>
+              <Form.Control
+                type="text"
+                value={editWeightUnit}
+                onChange={(e) => setEditWeightUnit(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Width Unit:</Form.Label>
+              <Form.Control
+                type="text"
+                value={editWidthUnit}
+                onChange={(e) => setEditWidthUnit(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Height Unit:</Form.Label>
+              <Form.Control
+                type="text"
+                value={editHeightUnit}
+                onChange={(e) => setEditHeightUnit(e.target.value)}
               />
             </Form.Group>
           </Form>
