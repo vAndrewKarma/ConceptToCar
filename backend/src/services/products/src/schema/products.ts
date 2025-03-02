@@ -239,7 +239,7 @@ export const getproducts = {
     additionalProperties: 'No additional properties are allowed.',
   },
 }
-export const updateProductSchema = {
+export const upschema = {
   type: 'object',
   required: ['productId', 'modifyID', 'code_verifier'],
   properties: {

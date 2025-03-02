@@ -7,6 +7,7 @@ import {
   initiateProductChange,
   productSchema,
   updateProductSchema,
+  upschema,
 } from '../schema/products'
 import MaterialsController from '../controllers/MaterialController'
 import {
@@ -64,8 +65,8 @@ const routes: Record<string, RouteGroup> = {
     updateProduct: {
       method: 'POST',
       routeName: '/update-product',
-      controller: productsController.UpdateProduct,
-      schema: updateProductSchema,
+      controller: productsController.updateProduct,
+      schema: upschema,
     },
   },
   material_routes: {
