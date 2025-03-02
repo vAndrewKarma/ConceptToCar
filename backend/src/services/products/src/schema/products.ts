@@ -257,8 +257,8 @@ export const updateProductSchema = {
     },
     modifyID: {
       type: 'string',
-      minLength: 32,
-      maxLength: 32,
+      minLength: 1,
+      maxLength: 143,
       pattern: '^[a-zA-Z0-9]+$',
       errorMessage: {
         minLength: 'Invalid or expired request.',
