@@ -552,9 +552,12 @@ function Products() {
               <Form.Label className="modal-style">Stage:</Form.Label>
               <Form.Control
                 as="select"
-                value={editStage}
+                value={editStage || ''}
                 onChange={(e) => setEditStage(e.target.value as Stage)}
               >
+                <option value="" disabled style={{ fontWeight: 'bold' }}>
+                  Stage
+                </option>
                 {[
                   'Concept',
                   'Feasibility',
@@ -564,13 +567,11 @@ function Products() {
                   'Stand-by',
                   'Canceled',
                   ...allowedStages,
-                ]
-                  .filter((stageOption) => stageOption !== editStage)
-                  .map((stageOption, idx) => (
-                    <option key={idx} value={stageOption}>
-                      {stageOption}
-                    </option>
-                  ))}
+                ].map((stageOption, idx) => (
+                  <option key={idx} value={stageOption}>
+                    {stageOption}
+                  </option>
+                ))}
               </Form.Control>
             </Form.Group>
 
@@ -648,9 +649,12 @@ function Products() {
               <Form.Label className="modal-style">Stage:</Form.Label>
               <Form.Control
                 as="select"
-                value={editStage}
+                value={editStage || ''}
                 onChange={(e) => setEditStage(e.target.value as Stage)}
               >
+                <option value="" disabled style={{ fontWeight: 'bold' }}>
+                  Stage
+                </option>
                 {[
                   'Concept',
                   'Feasibility',
@@ -660,13 +664,11 @@ function Products() {
                   'Stand-by',
                   'Canceled',
                   ...allowedStages,
-                ]
-                  .filter((stageOption) => stageOption !== editStage)
-                  .map((stageOption, idx) => (
-                    <option key={idx} value={stageOption}>
-                      {stageOption}
-                    </option>
-                  ))}
+                ].map((stageOption, idx) => (
+                  <option key={idx} value={stageOption}>
+                    {stageOption}
+                  </option>
+                ))}
               </Form.Control>
             </Form.Group>
 

@@ -62,6 +62,12 @@ function Materials() {
   const [loadingState, setLoadingState] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [showAddModal, setShowAddModal] = useState(false)
+
+  const handleAddShow = () => setShowAddModal(true)
+
+  const handleAddClose = () => setShowAddModal(false)
+
   const cacheRef = useRef<{
     [key: number]: {
       materials: Material[]
@@ -297,6 +303,7 @@ function Materials() {
                 size={24}
                 style={{ color: 'green', cursor: 'pointer' }}
                 title="Add Material"
+                onClick={handleAddShow}
               />
             </div>
           </div>
@@ -374,6 +381,7 @@ function Materials() {
         </div>
       </div>
 
+      {/* Delete Material Modal */}
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header className="bg-danger text-white">
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -396,6 +404,53 @@ function Materials() {
           <Button variant="danger" onClick={handleDelete}>
             Delete
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Add Material Modal*/}
+      <Modal show={showAddModal} onHide={handleAddClose} centered>
+        <Modal.Header closeButton className="bg-dark text-white">
+          <Modal.Title>Add Material</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="bg-dark shadow-lg">
+          <Form className="text-light modal-form rounded">
+            <Form.Group>
+              <Form.Label className="modal-style">Name:</Form.Label>
+              <Form.Control type="text" value="" onChange={() => {}} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Quantity:</Form.Label>
+              <Form.Control type="number" value="" onChange={() => {}} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated length (cm):
+              </Form.Label>
+              <Form.Control type="number" value="" onChange={() => {}} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated width (cm):
+              </Form.Label>
+              <Form.Control type="number" value="" onChange={() => {}} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated weight (kg):
+              </Form.Label>
+              <Form.Control type="number" value="" onChange={() => {}} />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer className="bg-dark">
+          <Button variant="secondary" onClick={handleAddClose}>
+            Cancel
+          </Button>
+          <Button variant="warning">Add</Button>
         </Modal.Footer>
       </Modal>
     </>
