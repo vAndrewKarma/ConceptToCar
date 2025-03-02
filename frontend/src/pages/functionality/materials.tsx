@@ -61,12 +61,20 @@ function Materials() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [loadingState, setLoadingState] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(
+    null
+  )
 
   const handleAddShow = () => setShowAddModal(true)
-
   const handleAddClose = () => setShowAddModal(false)
+
+  const handleEditShow = (material: Material) => {
+    setSelectedMaterial(material)
+    setShowEditModal(true)
+  }
+  const handleEditClose = () => setShowEditModal(false)
 
   const cacheRef = useRef<{
     [key: number]: {
@@ -244,6 +252,7 @@ function Materials() {
           <FaEdit
             style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
             title="Edit"
+            onClick={() => handleEditShow(row.original)}
           />
           <FaTrash
             style={{ color: '#F64B4B', cursor: 'pointer' }}
@@ -451,6 +460,63 @@ function Materials() {
             Cancel
           </Button>
           <Button variant="warning">Add</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Edit Material Modal */}
+      <Modal show={showEditModal} onHide={handleEditClose} centered>
+        <Modal.Header closeButton className="bg-dark text-white">
+          <Modal.Title>Edit Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="bg-dark shadow-lg">
+          <Form className="text-light modal-form rounded">
+            <Form.Group>
+              <Form.Label className="modal-style">Name:</Form.Label>
+              <Form.Control type="text" defaultValue={selectedMaterial?.name} />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Quantity:</Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedMaterial?.qty}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">Length (cm):</Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedMaterial?.length_unit}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated width (cm):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedMaterial?.estimated_width}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated weight (kg):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={selectedMaterial?.estimated_weight}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer className="bg-dark">
+          <Button variant="secondary" onClick={handleEditClose}>
+            Cancel
+          </Button>
+          <Button variant="warning">Save Changes</Button>
         </Modal.Footer>
       </Modal>
     </>
