@@ -235,20 +235,25 @@ const productsController = {
       const redis = req.server.redis
       const productModel: ProductModel = req.server.productModel
 
-      // In production, verify the modifyID, device fingerprint, and PKCE challenge.
+      console.log(modifyID)
       if (config.app.ENV === 'production') {
         const productRaw = await redis.get(`product_modify:${modifyID}`)
         if (!productRaw) {
           throw new BadRequestError('Invalid or expired request')
         }
+        console.log('1')
         const prodReq = JSON.parse(productRaw)
         const boundDevice = getDeviceId(req)
         if (prodReq.fingerprint !== boundDevice) {
           throw new BadRequestError('Invalid or expired request')
         }
+
+        console.log('2')
         if (!verifyPKCE(code_verifier, prodReq.challenge)) {
           throw new BadRequestError('Invalid or expired request')
         }
+
+        console.log('3')
       }
 
       // Fetch the current product.

@@ -257,13 +257,13 @@ export const updateProductSchema = {
     },
     modifyID: {
       type: 'string',
-      minLength: 16,
-      maxLength: 16,
+      minLength: 32,
+      maxLength: 32,
       pattern: '^[a-zA-Z0-9]+$',
       errorMessage: {
-        minLength: 'Invalid request',
-        maxLength: 'Invalid request',
-        pattern: 'Invalid request',
+        minLength: 'Invalid or expired request.',
+        maxLength: 'Invalid or expired request.',
+        pattern: 'Invalid or expired request.',
       },
     },
     code_verifier: {
