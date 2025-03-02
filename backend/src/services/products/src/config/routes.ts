@@ -6,7 +6,6 @@ import {
   getproducts,
   initiateProductChange,
   productSchema,
-  updateProductSchema,
   upschema,
 } from '../schema/products'
 import MaterialsController from '../controllers/MaterialController'
