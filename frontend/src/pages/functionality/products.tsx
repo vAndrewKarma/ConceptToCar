@@ -127,6 +127,7 @@ function Products() {
   const [editEstimatedHeight, setEditEstimatedHeight] = useState('')
   const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
+  const [editEstimatedLength, setEditEstimatedLength] = useState('')
 
   // Compute allowed stage options based on the product's current stage and the user role.
   const allowedStages: Stage[] = selectedProduct
@@ -599,6 +600,17 @@ function Products() {
 
             <Form.Group>
               <Form.Label className="modal-style">
+                Estimated height (cm):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                value={editEstimatedLength}
+                onChange={(e) => setEditEstimatedLength(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
                 Estimated weight (kg):
               </Form.Label>
               <Form.Control
@@ -628,11 +640,7 @@ function Products() {
           <Form className="text-light modal-form rounded">
             <Form.Group>
               <Form.Label className="modal-style">Name:</Form.Label>
-              <Form.Control
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-              />
+              <Form.Control type="text" value="" onChange={() => {}} />
             </Form.Group>
 
             <Form.Group>
@@ -640,8 +648,8 @@ function Products() {
               <Form.Control
                 as="textarea"
                 rows={3}
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
+                value=""
+                onChange={() => {}}
               />
             </Form.Group>
 
@@ -676,33 +684,21 @@ function Products() {
               <Form.Label className="modal-style">
                 Estimated length (cm):
               </Form.Label>
-              <Form.Control
-                type="number"
-                value={editEstimatedHeight}
-                onChange={(e) => setEditEstimatedHeight(e.target.value)}
-              />
+              <Form.Control type="number" value="" onChange={() => {}} />
             </Form.Group>
 
             <Form.Group>
               <Form.Label className="modal-style">
                 Estimated width (cm):
               </Form.Label>
-              <Form.Control
-                type="number"
-                value={editEstimatedWidth}
-                onChange={(e) => setEditEstimatedWidth(e.target.value)}
-              />
+              <Form.Control type="number" value="" onChange={() => {}} />
             </Form.Group>
 
             <Form.Group>
               <Form.Label className="modal-style">
                 Estimated weight (kg):
               </Form.Label>
-              <Form.Control
-                type="number"
-                value={editEstimatedWeight}
-                onChange={(e) => setEditEstimatedWeight(e.target.value)}
-              />
+              <Form.Control type="number" value="" onChange={() => {}} />
             </Form.Group>
           </Form>
         </Modal.Body>

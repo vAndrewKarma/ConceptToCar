@@ -164,8 +164,14 @@ function Product() {
         <div className="scrollable-container">
           <div className="container">
             <div className="row justify-content-center">
-              <div className="col-12 col-md-6 col-lg-7">
-                <Form className="rounded p-4 p-sm-3 bg-dark">
+              <div className="col-12 d-flex justify-content-center">
+                <Form
+                  className="rounded p-4 p-sm-3 bg-dark"
+                  style={{
+                    width: '800px',
+                    maxWidth: '90%',
+                  }}
+                >
                   <div className="d-flex justify-content-center">
                     <Form.Label
                       style={{
@@ -259,7 +265,7 @@ function Product() {
                       onClick={() => navigate('/gallery')}
                       className="btn btn-warning"
                     >
-                      Go to gallery
+                      Export PDF
                     </Button>
                     <Button className="btn btn-danger" onClick={handleShow}>
                       Delete
