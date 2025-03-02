@@ -126,9 +126,6 @@ function Products() {
   const [editEstimatedHeight, setEditEstimatedHeight] = useState('')
   const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
-  const [editWeightUnit, setEditWeightUnit] = useState('')
-  const [editWidthUnit, setEditWidthUnit] = useState('')
-  const [editHeightUnit, setEditHeightUnit] = useState('')
 
   // Compute allowed stage options based on the product's current stage and the user role.
   const allowedStages: Stage[] = selectedProduct
@@ -258,9 +255,7 @@ function Products() {
           estimated_height: parseFloat(editEstimatedHeight),
           estimated_width: parseFloat(editEstimatedWidth),
           estimated_weight: parseFloat(editEstimatedWeight),
-          weight_unit: editWeightUnit,
-          width_unit: editWidthUnit,
-          height_unit: editHeightUnit,
+
           modifyID: modifyID,
           code_verifier: code_verifier,
         },
@@ -588,33 +583,6 @@ function Products() {
                 type="number"
                 value={editEstimatedWeight}
                 onChange={(e) => setEditEstimatedWeight(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">Weight Unit:</Form.Label>
-              <Form.Control
-                type="text"
-                value={editWeightUnit}
-                onChange={(e) => setEditWeightUnit(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">Width Unit:</Form.Label>
-              <Form.Control
-                type="text"
-                value={editWidthUnit}
-                onChange={(e) => setEditWidthUnit(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">Height Unit:</Form.Label>
-              <Form.Control
-                type="text"
-                value={editHeightUnit}
-                onChange={(e) => setEditHeightUnit(e.target.value)}
               />
             </Form.Group>
           </Form>

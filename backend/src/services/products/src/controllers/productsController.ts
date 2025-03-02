@@ -5,10 +5,13 @@ import {
   BadRequestError,
   Unauthorized,
 } from '@karma-packages/conceptocar-common'
+
+type Roles = 'Admin' | 'Designer' | 'Seller' | 'Portfolio Manager'
 import verifyPKCE from '@karma-packages/conceptocar-common/dist/helper/verifyPKCE'
 
 import { ObjectId } from '@fastify/mongodb'
 import sanitizeHTML from '../helper/sanitizeHtml'
+import { Product, ProductModel, Stage } from '../db/m_m'
 
 const productsController = {
   async CreateProduct(req, res) {
@@ -183,36 +186,79 @@ const productsController = {
       throw err
     }
   },
-  async UpdateProduct(req, res) {
+  async updateProduct(req, res): Promise<void> {
     try {
       // Ensure the request is authenticated.
-      if (!req.sessionData) throw new Unauthorized('Not authorized')
-      const allowedRoles = ['Admin', 'Designer', 'Seller', 'Portfolio Manager']
-      const userRole = req.sessionData.role
-      if (!allowedRoles.includes(userRole))
+      if (!req.sessionData) {
         throw new Unauthorized('Not authorized')
+      }
+      const allowedRoles: Roles[] = [
+        'Admin',
+        'Designer',
+        'Seller',
+        'Portfolio Manager',
+      ]
+      const userRole: Roles = req.sessionData.role
+      if (!allowedRoles.includes(userRole)) {
+        throw new Unauthorized('Not authorized')
+      }
 
+      // Destructure and type the request body.
       const {
         productId,
         name,
         description,
         stage,
+        modifyID,
+        code_verifier,
         estimated_height,
         estimated_width,
         estimated_weight,
         weight_unit,
         width_unit,
         height_unit,
-      } = req.body
+      } = req.body as {
+        productId: string
+        name?: string
+        description?: string
+        stage?: Stage
+        modifyID: string
+        code_verifier: string
+        estimated_height?: number
+        estimated_width?: number
+        estimated_weight?: number
+        weight_unit?: string
+        width_unit?: string
+        height_unit?: string
+      }
 
       const redis = req.server.redis
-      const productModel = req.server.productModel
+      const productModel: ProductModel = req.server.productModel
 
+      // In production, verify the modifyID, device fingerprint, and PKCE challenge.
+      if (config.app.ENV === 'production') {
+        const productRaw = await redis.get(`product_modify:${modifyID}`)
+        if (!productRaw) {
+          throw new BadRequestError('Invalid or expired request')
+        }
+        const prodReq = JSON.parse(productRaw)
+        const boundDevice = getDeviceId(req)
+        if (prodReq.fingerprint !== boundDevice) {
+          throw new BadRequestError('Invalid or expired request')
+        }
+        if (!verifyPKCE(code_verifier, prodReq.challenge)) {
+          throw new BadRequestError('Invalid or expired request')
+        }
+      }
+
+      // Fetch the current product.
       const currentProduct = await productModel.findProductById(productId)
-      if (!currentProduct) throw new BadRequestError('Product not found')
+      if (!currentProduct) {
+        throw new BadRequestError('Product not found')
+      }
 
-      // Define the new stages.
-      const allStages = [
+      // Define allowed stages.
+      const allStages: Stage[] = [
         'concept',
         'feasibility',
         'design',
@@ -221,21 +267,10 @@ const productsController = {
         'standby',
         'cancelled',
       ]
-      const updateData: {
-        name?: string
-        description?: string
-        stage?: string
-        estimated_height?: number
-        estimated_width?: number
-        estimated_weight?: number
-        weight_unit?: string
-        width_unit?: string
-        height_unit?: string
-      } = {}
 
-      // --- Name & Description ---
-      // Admin, Seller, and Portfolio Manager can update these.
-      if (name) {
+      const updateData: Partial<Product> = {}
+
+      if (name !== undefined) {
         if (userRole === 'Designer') {
           throw new Unauthorized(
             'Designers are not allowed to update the product name'
@@ -243,8 +278,9 @@ const productsController = {
         }
         const sanitizedName = sanitizeHTML(name)
         if (sanitizedName !== currentProduct.name) {
+          // Check for duplicate names via cache and DB.
           if (
-            (await redis.get(`product: ${sanitizedName}`)) ||
+            (await redis.get(`product:${sanitizedName}`)) ||
             (await productModel.findProductByName(sanitizedName))
           ) {
             throw new BadRequestError('Product already exists with this name')
@@ -252,7 +288,7 @@ const productsController = {
           updateData.name = sanitizedName
         }
       }
-      if (description) {
+      if (description !== undefined) {
         if (userRole === 'Designer') {
           throw new Unauthorized(
             'Designers are not allowed to update the product description'
@@ -261,33 +297,32 @@ const productsController = {
         updateData.description = sanitizeHTML(description)
       }
 
-      // --- Stage Update ---
-      if (stage) {
+      // ----- Stage Update (RBAC) -----
+      if (stage !== undefined) {
         if (!allStages.includes(stage)) {
           throw new BadRequestError('Invalid stage value')
         }
         if (userRole === 'Designer') {
           const currentStage = currentProduct.stage
-          const idx = allStages.indexOf(currentStage)
-          if (idx === -1) {
+          const currentIndex = allStages.indexOf(currentStage)
+          if (currentIndex === -1) {
             throw new BadRequestError('Current stage is invalid')
           }
-          // Designer can only set stage to the current or immediate next stage.
+          // Designers can only set stage to the current or immediate next stage.
           const allowedStages =
-            idx < allStages.length - 1
-              ? [allStages[idx], allStages[idx + 1]]
-              : [allStages[idx]]
+            currentIndex < allStages.length - 1
+              ? [allStages[currentIndex], allStages[currentIndex + 1]]
+              : [allStages[currentIndex]]
           if (!allowedStages.includes(stage)) {
             throw new Unauthorized(
               'Designer not allowed to update stage to the given value'
             )
           }
         }
-        // Admin, Seller, and Portfolio Manager have no restriction.
         updateData.stage = stage
       }
 
-      // --- Dimensions & Weight ---
+      // ----- Dimensions & Weight (All roles can update these) -----
       if (estimated_height !== undefined)
         updateData.estimated_height = estimated_height
       if (estimated_width !== undefined)
@@ -298,12 +333,16 @@ const productsController = {
       if (width_unit !== undefined) updateData.width_unit = width_unit
       if (height_unit !== undefined) updateData.height_unit = height_unit
 
+      // Update the product and set updated_at timestamp.
       const updated = await productModel.updateProduct(productId, updateData)
-      if (!updated) throw new BadRequestError('Product update failed')
+      if (!updated) {
+        throw new BadRequestError('Product update failed')
+      }
 
-      await redis.del(`product: ${currentProduct.name}`)
+      // Clear cache entries for the updated product.
+      await redis.del(`product:${currentProduct.name}`)
       if (updateData.name) {
-        await redis.del(`product: ${updateData.name}`)
+        await redis.del(`product:${updateData.name}`)
       }
       const keys = await redis.keys('products:all:*')
       if (keys.length) {
@@ -312,6 +351,7 @@ const productsController = {
 
       res.send({ ok: true })
     } catch (err) {
+      // In production, you may log this error and forward it to a centralized error handler.
       throw err
     }
   },
