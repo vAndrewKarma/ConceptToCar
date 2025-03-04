@@ -299,8 +299,9 @@ const productsController = {
         }
         updateData.description = sanitizeHTML(description)
       }
-
+      console.log('STAGE BODY' + stage)
       if (stage !== undefined) {
+        console.log('sccriudelafac')
         if (!allStages.includes(stage)) {
           throw new BadRequestError('Invalid stage value')
         }
