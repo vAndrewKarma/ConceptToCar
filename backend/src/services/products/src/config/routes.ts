@@ -81,12 +81,12 @@ const routes: Record<string, RouteGroup> = {
       controller: MaterialsController.CreateBom,
       schema: materialschema,
     },
-    // UpdateMaterial: {
-    //   method: 'POST',
-    //   routeName: '/update-material',
-    //   controller: MaterialsController.UpdateProduct,
-    //   schema: materialupdateschema,
-    // },
+    UpdateMaterial: {
+      method: 'POST',
+      routeName: '/update-bom',
+      controller: MaterialsController.UpdateBom,
+      schema: materialupdateschema,
+    },
     GetMaterial: {
       method: 'POST',
       routeName: '/get-material',
