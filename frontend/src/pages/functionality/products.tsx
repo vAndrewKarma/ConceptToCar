@@ -146,11 +146,6 @@ function Products() {
     }
   }
 
-  // Compute allowed stage options.
-  const allowedStages: Stage[] = selectedProduct
-    ? getAllowedStages(selectedProduct.stage, currentUserRole)
-    : allStages
-
   const filteredProducts = useMemo(() => {
     if (!searchTerm) return products
     return products.filter((product) =>
