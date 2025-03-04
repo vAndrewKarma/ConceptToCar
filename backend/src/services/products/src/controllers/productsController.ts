@@ -305,6 +305,7 @@ const productsController = {
           throw new BadRequestError('Invalid stage value')
         }
         if (userRole === 'Designer') {
+          console.log('karma')
           const currentStage = currentProduct.stage
           const currentIndex = allStages.indexOf(currentStage)
           if (currentIndex === -1) {
@@ -321,9 +322,10 @@ const productsController = {
             )
           }
         }
+        console.log('karma2')
         updateData.stage = stage
       }
-      console.log(updateData.stage)
+      console.log('STAGE ------' + updateData.stage)
       if (estimated_height !== undefined)
         updateData.estimated_height = estimated_height
       if (estimated_width !== undefined)
