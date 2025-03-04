@@ -277,6 +277,7 @@ function Products() {
         withCredentials: true,
       })
       handleEditClose()
+      window.location.reload()
     } catch (error) {
       console.error('Error updating product:', error)
     }

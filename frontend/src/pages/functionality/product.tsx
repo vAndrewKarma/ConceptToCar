@@ -195,18 +195,15 @@ function Product() {
                     </span>
                     <span className="pad">
                       <strong>Estimated weight:</strong>{' '}
-                      {displayProduct.estimated_weight}{' '}
-                      {displayProduct.weight_unit}
+                      {displayProduct.estimated_weight} kg
                     </span>
                     <span className="pad">
                       <strong>Estimated height:</strong>{' '}
-                      {displayProduct.estimated_height}{' '}
-                      {displayProduct.height_unit}
+                      {displayProduct.estimated_height} cm
                     </span>
                     <span className="pad">
                       <strong>Estimated width:</strong>{' '}
-                      {displayProduct.estimated_width}{' '}
-                      {displayProduct.width_unit}
+                      {displayProduct.estimated_width} cm
                     </span>
                     <span className="pad">
                       <strong>Created By:</strong> {displayProduct.createdBy}

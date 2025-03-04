@@ -226,6 +226,7 @@ const productsController = {
       }
 
       const redis = req.server.redis
+
       const productModel: ProductModel = req.server.productModel
 
       console.log(modifyID)
@@ -234,7 +235,7 @@ const productsController = {
         if (!productRaw) {
           throw new BadRequestError('Invalid or expired request')
         }
-        console.log('1')
+
         const prodReq = JSON.parse(productRaw)
         const boundDevice = getDeviceId(req)
         if (prodReq.fingerprint !== boundDevice) {
@@ -249,10 +250,15 @@ const productsController = {
         console.log('3')
       }
 
-      // Fetch the current product.
       const currentProduct = await productModel.findProductById(productId)
       if (!currentProduct) {
         throw new BadRequestError('Product not found')
+      }
+      await redis.del(`product: ${currentProduct.name}`)
+      await redis.del(`product: ${name}`)
+      const keyz = await redis.keys('products:all:*')
+      if (keyz.length > 0) {
+        await redis.del(...keyz)
       }
 
       // Define allowed stages.
@@ -294,7 +300,6 @@ const productsController = {
         updateData.description = sanitizeHTML(description)
       }
 
-      // ----- Stage Update (RBAC) -----
       if (stage !== undefined) {
         if (!allStages.includes(stage)) {
           throw new BadRequestError('Invalid stage value')
@@ -334,16 +339,6 @@ const productsController = {
       console.log(updated)
       if (!updated) {
         throw new BadRequestError('Product update failed')
-      }
-
-      // Clear cache entries for the updated product.
-      await redis.del(`product:${currentProduct.name}`)
-      if (updateData.name) {
-        await redis.del(`product:${updateData.name}`)
-      }
-      const keys = await redis.keys('products:all:*')
-      if (keys.length) {
-        await redis.del(...keys)
       }
 
       res.send({ ok: true })
