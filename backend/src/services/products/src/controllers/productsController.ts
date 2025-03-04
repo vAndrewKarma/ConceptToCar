@@ -323,7 +323,7 @@ const productsController = {
         }
         updateData.stage = stage
       }
-
+      console.log(updateData.stage)
       if (estimated_height !== undefined)
         updateData.estimated_height = estimated_height
       if (estimated_width !== undefined)

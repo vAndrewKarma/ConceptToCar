@@ -585,7 +585,6 @@ function Products() {
                   'Withdrawal',
                   'Stand-by',
                   'Canceled',
-                  ...allowedStages,
                 ].map((stageOption, idx) => (
                   <option key={idx} value={stageOption}>
                     {stageOption}
