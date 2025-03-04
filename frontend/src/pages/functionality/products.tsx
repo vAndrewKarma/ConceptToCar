@@ -21,30 +21,6 @@ export type Stage =
   | 'standby'
   | 'cancelled'
 
-// Full stages list
-const allStages: Stage[] = [
-  'concept',
-  'feasibility',
-  'design',
-  'production',
-  'withdrawal',
-  'standby',
-  'cancelled',
-]
-
-// For Designers, allow only the current stage or the next stage.
-function getAllowedStages(currentStage: Stage, role: string): Stage[] {
-  if (role === 'Designer') {
-    const idx = allStages.indexOf(currentStage)
-    if (idx === -1) return []
-    return idx < allStages.length - 1
-      ? [allStages[idx], allStages[idx + 1]]
-      : [allStages[idx]]
-  }
-  // Other roles get all options.
-  return allStages
-}
-
 interface Product {
   _id: string
   name: string
@@ -104,7 +80,6 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
 
 function Products() {
   // For demo purposes, assume the currentUserRole is hard-coded.
-  const currentUserRole = 'Designer'
 
   const [currentPage, setCurrentPage] = useState(1)
   const [hasNextPage, setHasNextPage] = useState(false)
