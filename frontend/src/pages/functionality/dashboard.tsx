@@ -1,11 +1,10 @@
 import { Container, Row, Col, Card, Table, Button } from 'react-bootstrap'
 import { FaChartBar, FaUsers, FaClipboardList } from 'react-icons/fa'
-import { useState, useEffect } from 'react'
 import useAxios from 'axios-hooks'
 import '../auth/login.css'
 
 function Dashboard() {
-  const [{ data, loading, error }] = useAxios('https://api.example.com/stats')
+  const [{ data, loading }] = useAxios('https://api.example.com/stats')
 
   return (
     <div className="color-overlay">
@@ -64,6 +63,7 @@ function Dashboard() {
                     </td>
                   </tr>
                 ) : (
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   data?.products?.map((product: any) => (
                     <tr key={product.id}>
                       <td>{product.id}</td>
