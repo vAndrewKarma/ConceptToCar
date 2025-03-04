@@ -390,7 +390,7 @@ export const getmaterialsspecific = {
     },
     searchTerms: {
       type: 'string',
-      minlength: 0,
+      minLength: 0,
       maxLength: 50,
       pattern: '^(?!\\s*$)[A-Za-z0-9 ]+$',
       errorMessage: {
