@@ -553,8 +553,8 @@ function Products() {
                   'Design',
                   'Production',
                   'Withdrawal',
-                  'Stand-by',
-                  'Canceled',
+                  'Standby',
+                  'Cancelled',
                 ].map((stageOption, idx) => (
                   <option key={idx} value={stageOption}>
                     {stageOption}

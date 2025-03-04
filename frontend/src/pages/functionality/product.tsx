@@ -191,7 +191,9 @@ function Product() {
                       <strong>Description:</strong> {displayProduct.description}
                     </span>
                     <span className="pad">
-                      <strong>Stage:</strong> {displayProduct.stage}
+                      <strong>Stage:</strong>{' '}
+                      {displayProduct.stage.charAt(0).toUpperCase() +
+                        displayProduct.stage.slice(1)}
                     </span>
                     <span className="pad">
                       <strong>Estimated weight:</strong>{' '}
