@@ -326,6 +326,22 @@ export const deleteProductSchema = {
         pattern: 'Invalid product ID.',
       },
     },
+    stage: {
+      type: 'string',
+      enum: [
+        'concept',
+        'feasibility',
+        'design',
+        'production',
+        'withdrawal',
+        'standby',
+        'cancelled',
+      ],
+      errorMessage: {
+        type: 'Stage must be a string.',
+        enum: 'Stage must be one of: concept, feasibility, design, production, withdrawal, standby, cancelled.',
+      },
+    },
     modifyID: {
       type: 'string',
       minLength: 32,

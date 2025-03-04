@@ -7,11 +7,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Modal, Spinner, Form } from 'react-bootstrap'
 import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import useAxios from 'axios-hooks'
-import { useMemo } from 'react'
 import './products.css'
-
 import AddProductModal from './addprod.tsx'
 
 export type Stage =
@@ -23,7 +21,7 @@ export type Stage =
   | 'standby'
   | 'cancelled'
 
-// Update the full stages list
+// Full stages list
 const allStages: Stage[] = [
   'concept',
   'feasibility',
@@ -34,7 +32,7 @@ const allStages: Stage[] = [
   'cancelled',
 ]
 
-// Helper function: for Designers, allow only the current stage or the next stage.
+// For Designers, allow only the current stage or the next stage.
 function getAllowedStages(currentStage: Stage, role: string): Stage[] {
   if (role === 'Designer') {
     const idx = allStages.indexOf(currentStage)
@@ -59,7 +57,6 @@ interface Product {
   length_unit: string
 }
 
-// Assume PAGE_SIZE and CACHE_EXPIRY_MS remain the same.
 const PAGE_SIZE = 15
 const CACHE_EXPIRY_MS = 30 * 1000
 
@@ -106,8 +103,7 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
 }
 
 function Products() {
-  // Assume currentUserRole comes from auth/session.
-  // For demo purposes, you can change it to "Admin", "Designer", "Seller", or "Portfolio Manager".
+  // For demo purposes, assume the currentUserRole is hard-coded.
   const currentUserRole = 'Designer'
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -128,13 +124,29 @@ function Products() {
   const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
   const [editEstimatedLength, setEditEstimatedLength] = useState('')
+
+  const cacheRef = useRef<{
+    [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
+  }>({})
+
+  // Refresh products: clear cache, reset page, and re-fetch.
   const refreshProducts = async () => {
     cacheRef.current = {}
     setCurrentPage(1)
-    // Re-fetch by calling execute or other mechanism.
-    await execute({ data: { page: 1 } })
+    const response = await execute({ data: { page: currentPage } })
+    if (response.data) {
+      const { products, hasNext } = response.data
+      cacheRef.current[currentPage] = {
+        products,
+        hasNext,
+        timestamp: Date.now(),
+      }
+      setProducts(products)
+      setHasNextPage(hasNext)
+    }
   }
-  // Compute allowed stage options based on the product's current stage and the user role.
+
+  // Compute allowed stage options.
   const allowedStages: Stage[] = selectedProduct
     ? getAllowedStages(selectedProduct.stage, currentUserRole)
     : allStages
@@ -142,13 +154,9 @@ function Products() {
   const filteredProducts = useMemo(() => {
     if (!searchTerm) return products
     return products.filter((product) =>
-      product.name.includes(searchTerm.toLowerCase())
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
   }, [searchTerm, products])
-
-  const cacheRef = useRef<{
-    [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
-  }>({})
 
   const [{ loading, error }, execute] = useAxios(
     {
@@ -221,7 +229,7 @@ function Products() {
       setEditEstimatedHeight(selectedProduct.estimated_height?.toString() || '')
       setEditEstimatedWidth(selectedProduct.estimated_width?.toString() || '')
       setEditEstimatedWeight(selectedProduct.estimated_weight?.toString() || '')
-      // Set unit fields if available.
+      // Set other unit fields if needed.
     }
   }, [selectedProduct])
 
@@ -242,7 +250,6 @@ function Products() {
     setShowEditModal(false)
     setSelectedProduct(null)
   }
-
   const handleAddShow = (product: Product) => {
     setSelectedProduct(product)
     setShowAddModal(true)
@@ -252,6 +259,7 @@ function Products() {
     setSelectedProduct(null)
   }
 
+  // Updated: After saving changes, clear the cache and refresh the product list.
   const handleSaveChanges = async () => {
     if (!selectedProduct) return
     try {
@@ -267,7 +275,7 @@ function Products() {
           productId: selectedProduct._id,
           name: editName,
           description: editDescription,
-          stage: editStage, // stage updated from dropdown
+          stage: editStage.toLowerCase(),
           estimated_height: parseFloat(editEstimatedHeight),
           estimated_width: parseFloat(editEstimatedWidth),
           estimated_weight: parseFloat(editEstimatedWeight),
@@ -276,8 +284,12 @@ function Products() {
         },
         withCredentials: true,
       })
+
+      // Clear cache and refresh the product list.
+      cacheRef.current = {}
+      await refreshProducts()
+
       handleEditClose()
-      window.location.reload()
     } catch (error) {
       console.error('Error updating product:', error)
     }
@@ -421,7 +433,7 @@ function Products() {
               <FaPlusCircle
                 size={24}
                 style={{ color: 'green', cursor: 'pointer' }}
-                title="Add Material"
+                title="Add Product"
                 onClick={() => handleAddShow({} as Product)}
               />
             </div>
