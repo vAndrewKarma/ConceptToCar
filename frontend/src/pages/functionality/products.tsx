@@ -11,7 +11,8 @@ import { useState, useEffect, useRef } from 'react'
 import useAxios from 'axios-hooks'
 import { useMemo } from 'react'
 import './products.css'
-import './product.tsx'
+
+import AddProductModal from './addprod.tsx'
 
 export type Stage =
   | 'concept'
@@ -127,7 +128,12 @@ function Products() {
   const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
   const [editEstimatedLength, setEditEstimatedLength] = useState('')
-
+  const refreshProducts = async () => {
+    cacheRef.current = {}
+    setCurrentPage(1)
+    // Re-fetch by calling execute or other mechanism.
+    await execute({ data: { page: 1 } })
+  }
   // Compute allowed stage options based on the product's current stage and the user role.
   const allowedStages: Stage[] = selectedProduct
     ? getAllowedStages(selectedProduct.stage, currentUserRole)
@@ -631,85 +637,11 @@ function Products() {
       </Modal>
 
       {/* Add Modal */}
-      <Modal show={showAddModal} onHide={handleAddClose} centered>
-        <Modal.Header closeButton className="bg-dark text-white">
-          <Modal.Title>Add Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="bg-dark shadow-lg">
-          <Form className="text-light modal-form rounded">
-            <Form.Group>
-              <Form.Label className="modal-style">Name:</Form.Label>
-              <Form.Control type="text" value="" onChange={() => {}} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">Description:</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value=""
-                onChange={() => {}}
-              />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">Stage:</Form.Label>
-              <Form.Control
-                as="select"
-                value={editStage || ''}
-                onChange={(e) => setEditStage(e.target.value as Stage)}
-              >
-                <option value="" disabled style={{ fontWeight: 'bold' }}>
-                  Stage
-                </option>
-                {[
-                  'Concept',
-                  'Feasibility',
-                  'Design',
-                  'Production',
-                  'Withdrawal',
-                  'Stand-by',
-                  'Canceled',
-                  ...allowedStages,
-                ].map((stageOption, idx) => (
-                  <option key={idx} value={stageOption}>
-                    {stageOption}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
-                Estimated length (cm):
-              </Form.Label>
-              <Form.Control type="number" value="" onChange={() => {}} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
-                Estimated width (cm):
-              </Form.Label>
-              <Form.Control type="number" value="" onChange={() => {}} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
-                Estimated weight (kg):
-              </Form.Label>
-              <Form.Control type="number" value="" onChange={() => {}} />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer className="bg-dark">
-          <Button variant="secondary" onClick={handleEditClose}>
-            Cancel
-          </Button>
-          <Button variant="warning" onClick={handleSaveChanges}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <AddProductModal
+        show={showAddModal}
+        onClose={handleAddClose}
+        onSuccess={refreshProducts}
+      />
     </>
   )
 }

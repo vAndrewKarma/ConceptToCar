@@ -10,7 +10,7 @@ import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
 import useAxios from 'axios-hooks'
 import './materials.css'
-
+import AddMaterialModal from './addmaterial'
 interface Material {
   _id: string
   name: string
@@ -75,6 +75,13 @@ function Materials() {
     setShowEditModal(true)
   }
   const handleEditClose = () => setShowEditModal(false)
+  const refreshMaterials = async () => {
+    delete cacheRef.current[currentPage]
+    cacheRef.current = {}
+    setCurrentPage(1)
+    await execute({ data: { page: 1 } })
+    window.location.reload()
+  }
 
   const cacheRef = useRef<{
     [key: number]: {
@@ -417,51 +424,11 @@ function Materials() {
       </Modal>
 
       {/* Add Material Modal*/}
-      <Modal show={showAddModal} onHide={handleAddClose} centered>
-        <Modal.Header closeButton className="bg-dark text-white">
-          <Modal.Title>Add Material</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="bg-dark shadow-lg">
-          <Form className="text-light modal-form rounded">
-            <Form.Group>
-              <Form.Label className="modal-style">Name:</Form.Label>
-              <Form.Control type="text" value="" onChange={() => {}} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">Quantity:</Form.Label>
-              <Form.Control type="number" value="" onChange={() => {}} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
-                Estimated length (cm):
-              </Form.Label>
-              <Form.Control type="number" value="" onChange={() => {}} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
-                Estimated width (cm):
-              </Form.Label>
-              <Form.Control type="number" value="" onChange={() => {}} />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
-                Estimated weight (kg):
-              </Form.Label>
-              <Form.Control type="number" value="" onChange={() => {}} />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer className="bg-dark">
-          <Button variant="secondary" onClick={handleAddClose}>
-            Cancel
-          </Button>
-          <Button variant="warning">Add</Button>
-        </Modal.Footer>
-      </Modal>
+      <AddMaterialModal
+        show={showAddModal}
+        onClose={handleAddClose}
+        onSuccess={refreshMaterials}
+      />
 
       {/* Edit Material Modal */}
       <Modal show={showEditModal} onHide={handleEditClose} centered>

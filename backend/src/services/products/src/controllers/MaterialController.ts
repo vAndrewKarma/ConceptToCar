@@ -22,11 +22,8 @@ const MaterialsController = {
         estimated_height,
         estimated_width,
         estimated_weight,
-        weight_unit,
         qty,
-        width_unit,
         length_unit,
-        height_unit,
         productId,
         productName,
       } = req.body
@@ -67,10 +64,10 @@ const MaterialsController = {
         estimated_weight: estimated_weight,
         length_unit: length_unit,
         qty: qty,
-        weight_unit: sanitizeHTML(weight_unit),
-        height_unit: sanitizeHTML(height_unit),
+        weight_unit: 'kg',
+        height_unit: 'cm',
 
-        width_unit: sanitizeHTML(width_unit),
+        width_unit: 'cm',
         product_id: sanitizeHTML(productId),
         product_name: sanitizeHTML(productName),
       }

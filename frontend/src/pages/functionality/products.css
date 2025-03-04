@@ -11,6 +11,63 @@
   justify-content: center;
   align-items: center;
 }
+/* 1. Modal Container */
+.modal-dark .modal-content {
+  background-color: #1f1f1f; /* Dark gray background for the modal */
+  color: #fff; /* White text */
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+}
+
+/* 2. Form Controls (Inputs, Textareas, etc.) */
+.modal-dark .form-control {
+  background-color: #2b2b2b !important; /* Dark background */
+  color: #fff !important; /* White text */
+  border: 1px solid #ffc107 !important;
+  border-radius: 4px !important;
+}
+
+/* Placeholder color */
+.modal-dark .form-control::placeholder {
+  color: #ccc !important;
+}
+
+/* Remove focus outline / box shadow */
+.modal-dark .form-control:focus {
+  background-color: #3a3a3a !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: 1px solid #ffc107 !important;
+}
+
+/* 3. Alert Box (Error messages) */
+.modal-dark .alert-danger {
+  background-color: #66171a; /* Dark red background for error alert */
+  color: #fff; /* White text */
+  border-color: #ff4d4d; /* Lighter red border */
+}
+
+/* 4. Buttons */
+.modal-dark .btn.btn-warning {
+  background-color: #ffc107;
+  border: none;
+}
+
+.modal-dark .btn.btn-warning:hover,
+.modal-dark .btn.btn-warning:focus {
+  background-color: #ffcf40;
+}
+
+.modal-dark .btn.btn-secondary {
+  background-color: #444 !important;
+  border: none !important;
+}
+
+.modal-dark .btn.btn-secondary:hover,
+.modal-dark .btn.btn-secondary:focus {
+  background-color: #555 !important;
+}
 
 @media (max-width: 768px) {
   .color-overlay {
