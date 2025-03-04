@@ -115,19 +115,38 @@ const MaterialsController = {
   async GetMaterials(req, res) {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
-      const { productId, page = 1 } = req.body
+
+      // Extract searchTerms (optional) along with productId and page
+      const { productId, page = 1, searchTerms } = req.body
       const limit = 15
       const redis = req.server.redis
       const materialModel = req.server.materialModel
-      const cacheKey = `materials_lists:${productId}:page:${page}:limit:${limit}`
+
+      // Build a cache key that includes searchTerms if provided
+      let cacheKey = `materials_lists:${productId}:page:${page}:limit:${limit}`
+      if (searchTerms && searchTerms.trim() !== '') {
+        cacheKey += `:search:${searchTerms}`
+      }
+
       const cachedMaterials = await redis.get(cacheKey)
       if (cachedMaterials) return res.send(JSON.parse(cachedMaterials))
-      const materials = await materialModel.getMaterialsByProduct(productId)
+
+      let materials
+      // If searchTerms is provided and nonempty, use the search query.
+      if (searchTerms && searchTerms.trim() !== '') {
+        materials = await materialModel.searchMaterials(productId, searchTerms)
+      } else {
+        materials = await materialModel.getMaterialsByProduct(productId)
+      }
+
       if (!materials || materials.length < 1) {
         throw new BadRequestError('No materials found')
       }
+
+      // Paginate the results
       const startIndex = (page - 1) * limit
       const paginatedMaterials = materials.slice(startIndex, startIndex + limit)
+
       await redis.set(cacheKey, JSON.stringify(paginatedMaterials), 'EX', 3600)
       res.send(paginatedMaterials)
     } catch (err) {

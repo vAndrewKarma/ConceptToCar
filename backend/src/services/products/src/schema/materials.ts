@@ -388,12 +388,23 @@ export const getmaterialsspecific = {
         pattern: 'productId can only contain letters, numbers, and spaces.',
       },
     },
+    searchTerms: {
+      type: 'string',
+      minlength: 0,
+      maxLength: 50,
+      pattern: '^(?!\\s*$)[A-Za-z0-9 ]+$',
+      errorMessage: {
+        type: 'searchTerms must be a string.',
+        minLength: 'searchTerms cannot be empty.',
+        maxLength: 'searchTerms cannot exceed 50 characters.',
+        pattern: 'searchTerms can only contain letters, numbers, and spaces.',
+      },
+    },
   },
   additionalProperties: false,
   errorMessage: {
     required: {
       page: 'page is required',
-
       productId: 'productId is required',
     },
     additionalProperties: 'No additional properties are allowed.',

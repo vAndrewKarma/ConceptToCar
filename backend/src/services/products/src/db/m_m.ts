@@ -168,6 +168,15 @@ export class MaterialModel {
   async getMaterialsByProduct(productId: string): Promise<Material[]> {
     return await this.collection.find({ product_id: productId }).toArray()
   }
+  async searchMaterials(productId, searchTerms) {
+    return await this.collection
+      .find({
+        product_id: productId,
+        name: { $regex: searchTerms, $options: 'i' },
+      })
+      .toArray()
+  }
+
   async getMaterialByProductAndName(
     productId: string,
     materialName: string

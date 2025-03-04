@@ -198,6 +198,7 @@ function Materials() {
 
         setMaterials((prev) => prev.filter((m) => m._id !== selectedId))
         delete cacheRef.current[currentPage]
+        window.location.reload()
       } catch (error) {
         /* empty */
       }
