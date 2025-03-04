@@ -28,9 +28,6 @@ const productsController = {
         estimated_height,
         estimated_width,
         estimated_weight,
-        weight_unit,
-        width_unit,
-        height_unit,
       } = req.body
       const redis = req.server.redis
       const productModel = req.server.productModel
@@ -64,9 +61,6 @@ const productsController = {
         estimated_height,
         estimated_width,
         estimated_weight,
-        weight_unit,
-        width_unit,
-        height_unit,
         stage: 'concept',
         createdBy: req.sessionData.firstName + ' ' + req.sessionData.lastName,
       }
@@ -311,7 +305,7 @@ const productsController = {
           if (currentIndex === -1) {
             throw new BadRequestError('Current stage is invalid')
           }
-          // Designers can only set stage to the current or immediate next stage.
+
           const allowedStages =
             currentIndex < allStages.length - 1
               ? [allStages[currentIndex], allStages[currentIndex + 1]]
@@ -325,7 +319,6 @@ const productsController = {
         updateData.stage = stage
       }
 
-      // ----- Dimensions & Weight (All roles can update these) -----
       if (estimated_height !== undefined)
         updateData.estimated_height = estimated_height
       if (estimated_width !== undefined)
@@ -338,6 +331,7 @@ const productsController = {
 
       // Update the product and set updated_at timestamp.
       const updated = await productModel.updateProduct(productId, updateData)
+      console.log(updated)
       if (!updated) {
         throw new BadRequestError('Product update failed')
       }

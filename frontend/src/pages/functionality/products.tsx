@@ -84,7 +84,6 @@ const generateCodeChallenge = async (verifier: string): Promise<string> => {
 function slugify(text: string): string {
   return text
     .toString()
-    .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')
     .replace(/&/g, '-and-')
@@ -137,7 +136,7 @@ function Products() {
   const filteredProducts = useMemo(() => {
     if (!searchTerm) return products
     return products.filter((product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      product.name.includes(searchTerm.toLowerCase())
     )
   }, [searchTerm, products])
 

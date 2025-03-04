@@ -31,9 +31,7 @@ export const productSchema = {
     'estimated_height',
     'estimated_width',
     'estimated_weight',
-    'weight_unit',
-    'width_unit',
-    'height_unit',
+
     // 'material_number',
     'modifyID',
     'code_verifier',
@@ -146,30 +144,6 @@ export const productSchema = {
         minItems: 'At least one image is required.',
       },
     },
-    width_unit: {
-      type: 'string',
-      enum: ['cm', 'm'],
-      errorMessage: {
-        type: 'Width unit must be a string.',
-        enum: "Width unit must be either 'cm' or 'm'.",
-      },
-    },
-    weight_unit: {
-      type: 'string',
-      enum: ['kg', 'lb'],
-      errorMessage: {
-        type: 'Weight unit must be a string.',
-        enum: "Weight unit must be either 'kg' or 'lb'.",
-      },
-    },
-    height_unit: {
-      type: 'string',
-      enum: ['cm', 'm'],
-      errorMessage: {
-        type: 'Height unit must be a string.',
-        enum: "Height unit must be either 'cm' or 'm'.",
-      },
-    },
   },
   additionalProperties: false,
   errorMessage: {
@@ -182,9 +156,6 @@ export const productSchema = {
       // material_number: 'Material number is required.',
       modifyID: 'Invalid request',
       code_verifier: 'Invalid request',
-      weight_unit: 'Weight unit is required.',
-      width_unit: 'Width unit is required.',
-      height_unit: 'Height unit is required.',
     },
     additionalProperties: 'No additional properties are allowed.',
   },
