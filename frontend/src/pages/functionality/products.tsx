@@ -33,7 +33,7 @@ interface Product {
   length_unit: string
 }
 
-const PAGE_SIZE = 15
+const PAGE_SIZE = 10
 const CACHE_EXPIRY_MS = 30 * 1000
 
 const generateCodeVerifier = (length: number): string => {
