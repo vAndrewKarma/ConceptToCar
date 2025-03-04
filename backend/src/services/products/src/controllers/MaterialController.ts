@@ -132,23 +132,28 @@ const MaterialsController = {
       if (cachedMaterials) return res.send(JSON.parse(cachedMaterials))
 
       let materials
-      // If searchTerms is provided and nonempty, use the search query.
+      // Pass page and limit to the model methods so pagination occurs in the DB query
       if (searchTerms && searchTerms.trim() !== '') {
-        materials = await materialModel.searchMaterials(productId, searchTerms)
+        materials = await materialModel.searchMaterials(
+          productId,
+          searchTerms,
+          page,
+          limit
+        )
       } else {
-        materials = await materialModel.getMaterialsByProduct(productId)
+        materials = await materialModel.getMaterialsByProduct(
+          productId,
+          page,
+          limit
+        )
       }
 
       if (!materials || materials.length < 1) {
         throw new BadRequestError('No materials found')
       }
 
-      // Paginate the results
-      const startIndex = (page - 1) * limit
-      const paginatedMaterials = materials.slice(startIndex, startIndex + limit)
-
-      await redis.set(cacheKey, JSON.stringify(paginatedMaterials), 'EX', 3600)
-      res.send(paginatedMaterials)
+      await redis.set(cacheKey, JSON.stringify(materials), 'EX', 3600)
+      res.send(materials)
     } catch (err) {
       throw err
     }

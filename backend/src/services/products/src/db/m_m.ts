@@ -165,15 +165,24 @@ export class MaterialModel {
     }
   }
 
-  async getMaterialsByProduct(productId: string): Promise<Material[]> {
-    return await this.collection.find({ product_id: productId }).toArray()
+  async getMaterialsByProduct(productId, page, limit) {
+    const skip = (page - 1) * limit
+    return await this.collection
+      .find({ product_id: productId })
+      .skip(skip)
+      .limit(limit)
+      .toArray()
   }
-  async searchMaterials(productId, searchTerms) {
+
+  async searchMaterials(productId, searchTerms, page, limit) {
+    const skip = (page - 1) * limit
     return await this.collection
       .find({
         product_id: productId,
         name: { $regex: searchTerms, $options: 'i' },
       })
+      .skip(skip)
+      .limit(limit)
       .toArray()
   }
 
