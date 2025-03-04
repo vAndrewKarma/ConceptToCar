@@ -153,18 +153,14 @@ export const materialupdateschema = {
   type: 'object',
   required: [
     'material_description',
-    'weight',
+
     'name',
     'estimated_height',
     'estimated_width',
     'estimated_weight',
-    'weight_unit',
-    'width',
+
     'length_unit',
     'qty',
-    'width_unit',
-    'height',
-    'height_unit',
     'productId',
     'productName',
     'originalName',
@@ -302,55 +298,6 @@ export const materialupdateschema = {
         maxLength: 'Material description cannot exceed 255 characters.',
       },
     },
-    weight: {
-      type: 'number',
-      exclusiveMinimum: 0,
-      errorMessage: {
-        type: 'Weight must be a number.',
-        exclusiveMinimum: 'Weight must be greater than 0.',
-      },
-    },
-    weight_unit: {
-      type: 'string',
-      enum: ['kg', 'lb'],
-      errorMessage: {
-        type: 'Weight unit must be a string.',
-        enum: "Weight unit must be either 'kg' or 'lb'.",
-      },
-    },
-    width: {
-      type: 'number',
-      exclusiveMinimum: 0,
-      errorMessage: {
-        type: 'Width must be a number.',
-        exclusiveMinimum: 'Width must be greater than 0.',
-      },
-    },
-    width_unit: {
-      type: 'string',
-      enum: ['cm', 'm'],
-      errorMessage: {
-        type: 'Width unit must be a string.',
-        enum: "Width unit must be either 'cm' or 'm'.",
-      },
-    },
-
-    height: {
-      type: 'number',
-      exclusiveMinimum: 0,
-      errorMessage: {
-        type: 'Height must be a number.',
-        exclusiveMinimum: 'Height must be greater than 0.',
-      },
-    },
-    height_unit: {
-      type: 'string',
-      enum: ['cm', 'm'],
-      errorMessage: {
-        type: 'Height unit must be a string.',
-        enum: "Height unit must be either 'cm' or 'm'.",
-      },
-    },
   },
   additionalProperties: false,
   errorMessage: {
@@ -362,11 +309,9 @@ export const materialupdateschema = {
       name: 'Name is required',
       weight_unit: 'Weight unit is required.',
       width: 'Width is required.',
-      width_unit: 'Width unit is required.',
-      height: 'Height is required.',
+
       modifyID: 'Invalid request',
       code_verifier: 'Invalid request',
-      height_unit: 'Height unit is required.',
       productId: 'productId is required',
       originalName: 'originalName is required',
       productName: 'productName is required',
