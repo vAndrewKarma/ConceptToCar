@@ -12,6 +12,7 @@ import useAxios from 'axios-hooks'
 import './materials.css'
 import AddMaterialModal from './addmaterial'
 import UpdateMaterialModal from './updatematerial'
+import axios from 'axios'
 interface Material {
   _id: string
   name: string
@@ -58,6 +59,7 @@ function Materials() {
   const [materials, setMaterials] = useState<Material[]>([])
   const [hasNextPage, setHasNextPage] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [loadingState, setLoadingState] = useState(false)
@@ -68,30 +70,15 @@ function Materials() {
     null
   )
 
-  const handleAddShow = () => setShowAddModal(true)
-  const handleAddClose = () => setShowAddModal(false)
-
-  const handleEditShow = (material: Material) => {
-    setSelectedMaterial(material)
-    setShowEditModal(true)
-  }
-  const handleEditClose = () => setShowEditModal(false)
-  const refreshMaterials = async () => {
-    delete cacheRef.current[currentPage]
-    cacheRef.current = {}
-    setCurrentPage(1)
-    await execute({ data: { page: 1 } })
-    window.location.reload()
-  }
-
   const cacheRef = useRef<{
-    [key: number]: {
+    [key: string]: {
       materials: Material[]
       hasNext: boolean
       timestamp: number
     }
   }>({})
 
+  // Axios hooks for API calls.
   const [, execute] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-materials',
@@ -117,22 +104,41 @@ function Materials() {
     { manual: true }
   )
 
+  // Fetch materials when productId, currentPage, or searchTerm changes.
   useEffect(() => {
     const fetchMaterials = async () => {
       setError(null)
       setLoadingState(true)
+      // Create a cache key including page and search term.
+      const cacheKey = `${currentPage}-${searchTerm}`
       const now = Date.now()
-      const cached = cacheRef.current[currentPage]
+      const cached = cacheRef.current[cacheKey]
       if (cached && now - cached.timestamp < CACHE_EXPIRY_MS) {
         setMaterials(cached.materials)
         setHasNextPage(cached.hasNext)
         setLoadingState(false)
         return
       }
+
       try {
-        const response = await execute({
-          data: { productId: productId, page: currentPage },
-        })
+        let response
+        if (searchTerm)
+          response = await execute({
+            data: {
+              productId: productId,
+              page: currentPage,
+              // Pass searchTerms (empty string if not provided)
+              searchTerms: searchTerm,
+            },
+          })
+        else
+          response = await execute({
+            data: {
+              productId: productId,
+              page: currentPage,
+            },
+          })
+
         const data = response.data
         if (!data || data.length === 0) {
           setError('No materials found')
@@ -141,15 +147,35 @@ function Materials() {
         } else {
           setMaterials(data)
           setHasNextPage(data.length === PAGE_SIZE)
-          cacheRef.current[currentPage] = {
+          cacheRef.current[cacheKey] = {
             materials: data,
             hasNext: data.length === PAGE_SIZE,
             timestamp: Date.now(),
           }
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        console.error(err)
+        if (axios.isAxiosError(err) && err.response) {
+          if (
+            err.response.data &&
+            err.response.data.errors &&
+            err.response.data.errors.length > 0
+          ) {
+            setError(err.response.data.errors[0].message)
+            setMaterials([])
+            if (
+              err.response.data.errors[0].message ===
+              'searchTerms can only contain letters, numbers, and spaces.'
+            ) {
+              setError('Search cannot contain symbols.')
+              setMaterials([])
+            }
+          } else if (err.response.data.message) {
+            setError(err.response.data.message)
+            setMaterials([])
+          }
+        } else {
+          setMaterials([])
+        }
       }
       setLoadingState(false)
     }
@@ -159,8 +185,16 @@ function Materials() {
     } else {
       setError('Product ID is missing')
     }
-  }, [currentPage, productId, execute])
+  }, [currentPage, productId, searchTerm, execute])
 
+  // Trigger search on Enter key: reset page, update searchTerm, and clear cache.
+  const triggerSearch = () => {
+    setCurrentPage(1)
+    setSearchTerm(searchInput)
+    cacheRef.current = {}
+  }
+
+  // Modal & deletion handlers.
   const handleShow = (id: string) => {
     setSelectedId(id)
     setShowModal(true)
@@ -169,7 +203,6 @@ function Materials() {
     setShowModal(false)
     setSelectedId(null)
   }
-
   const handleDelete = async () => {
     if (selectedId) {
       try {
@@ -197,22 +230,33 @@ function Materials() {
         })
 
         setMaterials((prev) => prev.filter((m) => m._id !== selectedId))
-        delete cacheRef.current[currentPage]
+        // Invalidate cache for the current page/search.
+        delete cacheRef.current[`${currentPage}-${searchTerm}`]
+        cacheRef.current = {}
         window.location.reload()
       } catch (error) {
-        /* empty */
+        console.error(error)
       }
     }
     handleClose()
   }
 
-  const filteredMaterials = useMemo(() => {
-    if (!searchTerm) return materials
-    return materials.filter((m) =>
-      m.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [searchTerm, materials])
+  const handleAddShow = () => setShowAddModal(true)
+  const handleAddClose = () => setShowAddModal(false)
+  const handleEditShow = (material: Material) => {
+    setSelectedMaterial(material)
+    setShowEditModal(true)
+  }
+  const handleEditClose = () => setShowEditModal(false)
+  const refreshMaterials = async () => {
+    // Clear cache and reset to first page.
+    cacheRef.current = {}
+    setCurrentPage(1)
+    await triggerSearch()
+    window.location.reload()
+  }
 
+  // Columns for the table.
   const columns = [
     {
       accessorKey: 'index',
@@ -273,9 +317,10 @@ function Materials() {
     },
   ]
 
+  // Use materials directly since backend search returns filtered results.
   const table = useReactTable({
     columns,
-    data: filteredMaterials,
+    data: materials,
     getCoreRowModel: getCoreRowModel(),
   })
 
@@ -311,8 +356,14 @@ function Materials() {
             <Form.Control
               type="text"
               placeholder="Search by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  triggerSearch()
+                }
+              }}
               className="w-25"
               style={{ fontSize: '14px', marginBottom: '10px' }}
             />
@@ -425,7 +476,7 @@ function Materials() {
         </Modal.Footer>
       </Modal>
 
-      {/* Add Material Modal*/}
+      {/* Add Material Modal */}
       <AddMaterialModal
         show={showAddModal}
         onClose={handleAddClose}
