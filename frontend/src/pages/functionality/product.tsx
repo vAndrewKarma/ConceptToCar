@@ -30,21 +30,77 @@ const generateCodeChallenge = async (verifier: string): Promise<string> => {
   const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
+type Stage =
+  | 'concept'
+  | 'feasibility'
+  | 'design'
+  | 'production'
+  | 'withdrawal'
+  | 'standby'
+  | 'cancelled'
+
+interface ProductData {
+  _id: string
+  name: string
+  description?: string
+  stage?: string
+  estimated_weight?: string
+  estimated_length?: string
+  weight_unit?: string
+  estimated_height?: string
+  height_unit?: string
+  estimated_width?: string
+  width_unit?: string
+  createdBy?: string
+  created_at?: string
+  updated_at?: string
+}
+
 function Product() {
   const { name: productName } = useParams()
   const navigate = useNavigate()
+
+  // Modal visibility states
   const [showModal, setShowModal] = useState(false)
-  const handleClose = () => setShowModal(false)
-  const handleShow = () => setShowModal(true)
   const [showEditModal, setShowEditModal] = useState(false)
 
-  const handleEditShow = () => {
-    setProduct(product)
-    setShowEditModal(true)
+  // Edit form states (controlled inputs)
+  const [editName, setEditName] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+
+  const [editEstimatedHeight, setEditEstimatedHeight] = useState('')
+  const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
+  const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
+
+  const defaultProduct: ProductData = {
+    _id: '1',
+    name: 'Wheel',
+    description:
+      "A wheel is a crucial component of a vehicle's mobility and steering system. It provides the necessary contact with the road, ensuring traction, stability, and smooth movement. In the steering mechanism, the front wheels pivot to change the vehicle’s direction, guided by the steering system.",
+    stage: 'Concept',
+    estimated_weight: '5',
+    estimated_length: '30',
+    weight_unit: 'kg',
+    estimated_height: '60',
+    height_unit: 'cm',
+    estimated_width: '32',
+    width_unit: 'cm',
+    createdBy: 'Stanciu Iustin',
+    created_at: '18.02.2025',
+    updated_at: '20.02.2025',
   }
+  const [editEstimatedLength, setEditEstimatedLength] = useState('')
+  const [product, setProduct] = useState<ProductData | null>(null)
 
-  const handleEditClose = () => setShowEditModal(false)
+  const displayProduct = product || defaultProduct
+  const [editStage, setEditStage] = useState<Stage>(
+    (displayProduct.stage?.toLowerCase() as Stage) || 'concept'
+  )
 
+  const handleClose = () => setShowModal(false)
+  const handleShow = () => setShowModal(true)
+
+  // Axios hook for fetching the product
   const [{ loading, error }, execute] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-product',
@@ -54,24 +110,17 @@ function Product() {
     { manual: true }
   )
 
-  const [product, setProduct] = useState<{
-    _id: string
-    name: string
-    description?: string
-    stage?: string
-    estimated_weight?: string
-    estimated_length?: string
-    weight_unit?: string
-    estimated_height?: string
-    height_unit?: string
-    estimated_width?: string
-    width_unit?: string
-    createdBy?: string
-    created_at?: string
-    updated_at?: string
-  } | null>(null)
+  // Axios hook for updating the product
+  const [, executeUpdate] = useAxios(
+    {
+      url: 'https://backend-tests.conceptocar.xyz/products/update-product',
+      method: 'POST',
+      withCredentials: true,
+    },
+    { manual: true }
+  )
 
-  // Add delete hooks
+  // Axios hook for initiating an update (security challenge)
   const [, executeInit] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/initiate_product',
@@ -80,6 +129,7 @@ function Product() {
     { manual: true }
   )
 
+  // Axios hook for deletion (unchanged)
   const [, executedelete] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/delete-product',
@@ -87,6 +137,7 @@ function Product() {
     },
     { manual: true }
   )
+
   useEffect(() => {
     const pname = productName ? unslugify(productName) : ''
     if (pname) {
@@ -113,23 +164,6 @@ function Product() {
       </div>
     )
 
-  const defaultProduct = {
-    _id: '1',
-    name: 'Wheel',
-    description:
-      "A wheel is a crucial component of a vehicle's mobility and steering system. It provides the necessary contact with the road, ensuring traction, stability, and smooth movement. In the steering mechanism, the front wheels pivot to change the vehicle’s direction, guided by the steering system.",
-    stage: 'Concept',
-    estimated_weight: '5',
-    estimated_length: '30',
-    weight_unit: 'kg',
-    estimated_height: '60',
-    height_unit: 'cm',
-    estimated_width: '32',
-    width_unit: 'cm',
-    createdBy: 'Stanciu Iustin',
-    created_at: '18.02.2025',
-    updated_at: '20.02.2025',
-  }
   const handleDelete = async () => {
     if (!product) return
 
@@ -158,7 +192,68 @@ function Product() {
     }
     handleClose()
   }
-  const displayProduct = product || defaultProduct
+
+  // Use defaultProduct if product data has not been fetched yet.
+
+  // Open the edit modal and populate the edit states with the current product data.
+  const handleEditShow = () => {
+    if (product) {
+      setEditName(product.name)
+      setEditDescription(product.description || '')
+      setEditStage((product.stage || 'concept').toLowerCase() as Stage)
+      setEditEstimatedHeight(product.estimated_height || '')
+      setEditEstimatedWidth(product.estimated_width || '')
+      setEditEstimatedWeight(product.estimated_weight || '')
+      setEditEstimatedLength(product.estimated_length || '')
+    }
+    setShowEditModal(true)
+  }
+  const handleEditClose = () => setShowEditModal(false)
+
+  // Save the changes by calling the update endpoint.
+  const handleSaveChanges = async () => {
+    if (!product) return
+    try {
+      const code_verifier = generateCodeVerifier(43)
+      const challenge = await generateCodeChallenge(code_verifier)
+      const initRes = await executeInit({
+        data: { challenge },
+        withCredentials: true,
+      })
+      const modifyID = initRes.data.id
+      await executeUpdate({
+        data: {
+          productId: product._id,
+          name: editName,
+          description: editDescription,
+          stage: editStage.toLowerCase(),
+          estimated_height: parseFloat(editEstimatedHeight),
+          estimated_width: parseFloat(editEstimatedWidth),
+          estimated_weight: parseFloat(editEstimatedWeight),
+          estimated_length: parseFloat(editEstimatedLength),
+          modifyID: modifyID,
+          code_verifier: code_verifier,
+        },
+        withCredentials: true,
+      })
+
+      // Update the local product state to reflect the changes.
+      setProduct({
+        ...product,
+        name: editName,
+        description: editDescription,
+        stage: editStage.toLowerCase(),
+        estimated_height: editEstimatedHeight,
+        estimated_width: editEstimatedWidth,
+        estimated_weight: editEstimatedWeight,
+        estimated_length: editEstimatedLength,
+      })
+      setShowEditModal(false)
+      navigate(`/product/${editName}/${displayProduct._id}`)
+    } catch (error) {
+      console.error('Error updating product:', error)
+    }
+  }
 
   return (
     <>
@@ -265,7 +360,6 @@ function Product() {
                       }
                       className="btn btn-warning"
                     >
-                      {' '}
                       Materials
                     </Button>
                     <Button
@@ -311,7 +405,7 @@ function Product() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modify Modal */}
+      {/* Edit Modal */}
       <Modal
         show={showEditModal}
         onHide={handleEditClose}
@@ -325,74 +419,96 @@ function Product() {
           <Form className="text-light bg-dark modal-form rounded">
             <Form.Group>
               <Form.Label className="modal-style">Name:</Form.Label>
-              <Form.Control type="text" defaultValue={product?.name} />
+              <Form.Control
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
             </Form.Group>
-
             <Form.Group>
               <Form.Label className="modal-style">Description:</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
-                defaultValue={product?.description}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
               />
             </Form.Group>
-
             <Form.Group>
               <Form.Label className="modal-style">Stage:</Form.Label>
-              <Form.Control type="text" defaultValue={product?.stage} />
+              <Form.Control
+                as="select"
+                value={editStage}
+                onChange={(e) => setEditStage(e.target.value as Stage)}
+              >
+                {[
+                  'concept',
+                  'feasibility',
+                  'design',
+                  'production',
+                  'withdrawal',
+                  'standby',
+                  'cancelled',
+                ].map((stageOption, idx) => (
+                  <option key={idx} value={stageOption}>
+                    {stageOption.charAt(0).toUpperCase() + stageOption.slice(1)}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
-
             <Form.Group>
               <Form.Label className="modal-style">
                 Estimated length (cm):
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={product?.estimated_length}
+                value={editEstimatedLength}
+                onChange={(e) => setEditEstimatedLength(e.target.value)}
               />
             </Form.Group>
-
             <Form.Group>
               <Form.Label className="modal-style">
                 Estimated width (cm):
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={product?.estimated_width}
+                value={editEstimatedWidth}
+                onChange={(e) => setEditEstimatedWidth(e.target.value)}
               />
             </Form.Group>
-
             <Form.Group>
               <Form.Label className="modal-style">
                 Estimated height (cm):
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={product?.estimated_height}
+                value={editEstimatedHeight}
+                onChange={(e) => setEditEstimatedHeight(e.target.value)}
               />
             </Form.Group>
-
             <Form.Group>
               <Form.Label className="modal-style">
                 Estimated weight (kg):
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={product?.estimated_weight}
+                value={editEstimatedWeight}
+                onChange={(e) => setEditEstimatedWeight(e.target.value)}
               />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer className="bg-dark border-warning">
           <Button
-            className="rounded-pill px-4 text-light fw-bold"
             variant="secondary"
             onClick={handleEditClose}
+            className="rounded-pill px-4 text-light fw-bold"
           >
             Cancel
           </Button>
           <Button
             variant="warning"
+            onClick={handleSaveChanges}
             className="rounded-pill px-4 text-dark fw-bold"
           >
             Save Changes

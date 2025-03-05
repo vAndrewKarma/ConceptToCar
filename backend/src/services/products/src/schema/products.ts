@@ -307,20 +307,32 @@ export const upschema = {
     },
     estimated_height: {
       type: 'number',
+      minimum: 0,
+      maximum: 999999,
       errorMessage: {
-        type: 'Estimated height must be a number.',
+        type: 'Height must be a number.',
+        minimum: 'Height cannot be negative.',
+        maximum: 'Height cannot exceed 999999.',
       },
     },
     estimated_width: {
       type: 'number',
+      minimum: 0,
+      maximum: 999999,
       errorMessage: {
-        type: 'Estimated width must be a number.',
+        type: 'Width must be a number.',
+        minimum: 'Width cannot be negative.',
+        maximum: 'Width cannot exceed 999999.',
       },
     },
     estimated_weight: {
       type: 'number',
+      minimum: 0,
+      maximum: 999999,
       errorMessage: {
-        type: 'Estimated weight must be a number.',
+        type: 'Weight must be a number.',
+        minimum: 'Weight cannot be negative.',
+        maximum: 'Weight cannot exceed 999999.',
       },
     },
     weight_unit: {
