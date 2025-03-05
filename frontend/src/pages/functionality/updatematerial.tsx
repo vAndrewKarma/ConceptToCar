@@ -21,7 +21,6 @@ interface UpdateMaterialModalProps {
   selectedMaterial: Material | null
 }
 
-// Helper functions for PKCE
 const generateCodeVerifier = (length: number): string => {
   const allowedChars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'

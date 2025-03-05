@@ -108,7 +108,6 @@ function Products() {
   // Refresh products: clear cache, reset page, and re-fetch.
   const refreshProducts = async () => {
     cacheRef.current = {}
-    setCurrentPage(1)
     const response = await execute({ data: { page: currentPage } })
     if (response.data) {
       const { products, hasNext } = response.data
@@ -259,10 +258,9 @@ function Products() {
       })
 
       // Clear cache and refresh the product list.
+      handleEditClose()
       cacheRef.current = {}
       await refreshProducts()
-
-      handleEditClose()
     } catch (error) {
       console.error('Error updating product:', error)
     }
@@ -594,8 +592,8 @@ function Products() {
               </Form.Label>
               <Form.Control
                 type="number"
-                value={editEstimatedLength}
-                onChange={(e) => setEditEstimatedLength(e.target.value)}
+                value={editEstimatedHeight}
+                onChange={(e) => setEditEstimatedHeight(e.target.value)}
               />
             </Form.Group>
 
