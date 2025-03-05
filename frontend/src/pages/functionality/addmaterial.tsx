@@ -8,7 +8,12 @@ interface AddMaterialModalProps {
   onClose: () => void
   onSuccess?: () => void
 }
-
+function unslugify(slug: string): string {
+  return slug
+    .split('-')
+    .map((word) => word.charAt(0) + word.slice(1))
+    .join(' ')
+}
 // Generate a PKCE code verifier.
 const generateCodeVerifier = (length: number): string => {
   const allowedChars =
@@ -94,8 +99,8 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
         estimated_weight: Number(estimatedWeight),
         qty: Number(qty),
         length_unit: Number(length),
-        productId,
-        productName,
+        productId: unslugify(productId || ''),
+        productName: unslugify(productName || ''),
       }
 
       // 4. Create the material (CreateBom endpoint).

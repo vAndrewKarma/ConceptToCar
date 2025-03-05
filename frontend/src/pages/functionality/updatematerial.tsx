@@ -32,7 +32,12 @@ const generateCodeVerifier = (length: number): string => {
     (byte) => allowedChars[byte % allowedChars.length]
   ).join('')
 }
-
+function unslugify(slug: string): string {
+  return slug
+    .split('-')
+    .map((word) => word.charAt(0) + word.slice(1))
+    .join(' ')
+}
 const generateCodeChallenge = async (verifier: string): Promise<string> => {
   const encoder = new TextEncoder()
   const data = encoder.encode(verifier)
@@ -64,7 +69,6 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // On modal open, set fields from selectedMaterial.
   useEffect(() => {
     if (selectedMaterial) {
       setName(selectedMaterial.name)
@@ -82,7 +86,6 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
     setError('')
     setLoading(true)
 
-    // Basic client-side validation.
     if (
       !name ||
       !estimatedHeight ||
@@ -97,19 +100,17 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
     }
 
     try {
-      // Generate PKCE verifier and challenge.
       const codeVerifier = generateCodeVerifier(43)
       const challenge = await generateCodeChallenge(codeVerifier)
 
-      // Initiate update (using the same initiate endpoint).
       const initiateResponse = await axios.post(
         'https://backend-tests.conceptocar.xyz/products/initiate_material',
         { challenge },
         { withCredentials: true }
       )
       const modifyID = initiateResponse.data.id
-
-      // Build payload according to your update schema.
+      console.log('sugii pula')
+      console.log(unslugify(urlProductId || ''))
       const payload = {
         name,
         originalName,
@@ -119,8 +120,8 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
         estimated_weight: Number(estimatedWeight),
         qty: Number(qty),
         length_unit: Number(length),
-        productId: urlProductId,
-        productName: urlProductName,
+        productId: unslugify(urlProductId || ''),
+        productName: unslugify(urlProductName || ''),
         code_verifier: codeVerifier,
         modifyID,
       }

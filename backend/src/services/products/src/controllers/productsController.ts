@@ -27,6 +27,7 @@ const productsController = {
         code_verifier,
         estimated_height,
         estimated_width,
+        estimated_length,
         estimated_weight,
       } = req.body
       const redis = req.server.redis
@@ -61,6 +62,7 @@ const productsController = {
         estimated_height,
         estimated_width,
         estimated_weight,
+        estimated_length,
         stage: 'concept',
         createdBy: req.sessionData.firstName + ' ' + req.sessionData.lastName,
       }
@@ -124,7 +126,7 @@ const productsController = {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
       const { page = 1 } = req.body
-      const displayLimit = 15
+      const displayLimit = 10
       const redis = req.server.redis
       const productModel = req.server.productModel
 
@@ -196,7 +198,6 @@ const productsController = {
         throw new Unauthorized('Not authorized')
       }
 
-      // Destructure and type the request body.
       const {
         productId,
         name,
@@ -207,6 +208,7 @@ const productsController = {
         estimated_height,
         estimated_width,
         estimated_weight,
+        estimated_length,
         weight_unit,
         width_unit,
         height_unit,
@@ -218,6 +220,7 @@ const productsController = {
         modifyID: string
         code_verifier: string
         estimated_height?: number
+        estimated_length?: number
         estimated_width?: number
         estimated_weight?: number
         weight_unit?: string
@@ -261,7 +264,6 @@ const productsController = {
         await redis.del(...keyz)
       }
 
-      // Define allowed stages.
       const allStages: Stage[] = [
         'concept',
         'feasibility',
@@ -333,11 +335,12 @@ const productsController = {
         updateData.estimated_width = estimated_width
       if (estimated_weight !== undefined)
         updateData.estimated_weight = estimated_weight
+      if (estimated_length !== undefined)
+        updateData.estimated_length = estimated_length
       if (weight_unit !== undefined) updateData.weight_unit = weight_unit
       if (width_unit !== undefined) updateData.width_unit = width_unit
       if (height_unit !== undefined) updateData.height_unit = height_unit
 
-      // Update the product and set updated_at timestamp.
       const updated = await productModel.updateProduct(productId, updateData)
       console.log(updated)
       if (!updated) {
@@ -346,7 +349,6 @@ const productsController = {
 
       res.send({ ok: true })
     } catch (err) {
-      // In production, you may log this error and forward it to a centralized error handler.
       throw err
     }
   },

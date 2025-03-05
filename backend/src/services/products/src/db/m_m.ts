@@ -16,6 +16,7 @@ export interface Product {
   stage: Stage
   description: string
   estimated_height: number
+  estimated_length: number
   estimated_width: number
   weight_unit: string
   width_unit: string
@@ -60,7 +61,7 @@ export class ProductModel {
   async findProductById(id: string): Promise<Product | null> {
     return await this.collection.findOne({ _id: new ObjectId(id) })
   }
-  async findProducts(page = 1, displayLimit = 15): Promise<Product[]> {
+  async findProducts(page = 1, displayLimit = 10): Promise<Product[]> {
     const queryLimit = displayLimit + 1
     const skip = (page - 1) * displayLimit
     return await this.collection.find({}).skip(skip).limit(queryLimit).toArray()
@@ -126,10 +127,7 @@ export interface Material {
   material_description: string
   product_name: string
   weight: number
-  weight_unit: string
   length_unit: number
-  width_unit: string
-  height_unit: string
   qty: number
   width: number
   height: number
