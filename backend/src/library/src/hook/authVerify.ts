@@ -8,7 +8,6 @@ export default async function verifyAuth(req, res, config) {
   const HMAC_ALGORITHM = 'sha256'
   const HMAC_SECRET = config.app.SECRET
   try {
-    console.log('s al')
     const redis = req.server.redis
 
     const {
@@ -88,14 +87,8 @@ export default async function verifyAuth(req, res, config) {
         throw new Unauthorized('Invalid or expired session')
       }
       sessionData = JSON.parse(sessionData)
-      console.log(
-        '-------------------------------- REFRESH TOKEN --------------------------------'
-      )
-      console.log(
-        sessionData.deviceId !== devicebound || userid !== sessionData.id
-      )
+
       if (sessionData.deviceId !== devicebound || userid !== sessionData.id) {
-        console.log('entered here')
         await redis
           .pipeline()
           .del(`refresh_token:${deviceIdCookie}-${refreshToken}`)
@@ -137,30 +130,7 @@ export default async function verifyAuth(req, res, config) {
       return
     }
 
-    // sessionData = JSON.parse(sessionData)
-    // console.log(sessionData)
-    // console.log('--------------------------------')
-    // console.log(sessionData.ip === )
-    // console.log(devicebound === sessionData.deviceId)
-    // console.log(userid === sessionData.id)
-    // console.log('--------------------------------')
-    // console.log(sessionData.ip == req.headers['x-forwarded-for'] || req.ip)
-    // console.log(devicebound == sessionData.deviceId)
-    // console.log(userid == sessionData.id)
-
-    console.log(
-      '-------------------------------- ACCESS TOKEN --------------------------------'
-    )
-    console.log(
-      sessionData.deviceId != devicebound ||
-        sessionData.ip != (req.headers['x-forwarded-for'] || req.ip) ||
-        userid != sessionData.id
-    )
-    console.log(sessionData.deviceId, devicebound)
-    console.log(sessionData.ip, req.headers['x-forwarded-for'] || req.ip)
-    console.log(userid, sessionData.id)
     if (sessionData.deviceId !== devicebound || userid !== sessionData.id) {
-      console.log('entered here23')
       await redis
         .pipeline()
         .del(sessionKey)

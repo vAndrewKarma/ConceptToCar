@@ -100,7 +100,6 @@ const productsController = {
 
       res.send({ ok: true, productId })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -178,7 +177,6 @@ const productsController = {
       )
       res.send({ id: modifyID })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -390,7 +388,6 @@ const productsController = {
 
       res.send({ ok: true })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },

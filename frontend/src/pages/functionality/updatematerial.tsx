@@ -108,7 +108,7 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
         { withCredentials: true }
       )
       const modifyID = initiateResponse.data.id
-      console.log('sugii pula')
+
       console.log(unslugify(urlProductId || ''))
       const payload = {
         name,
@@ -125,7 +125,6 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
         modifyID,
       }
 
-      // Call the update endpoint.
       await axios.post(
         'https://backend-tests.conceptocar.xyz/products/update-bom',
         payload,

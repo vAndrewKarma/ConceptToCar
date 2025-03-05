@@ -86,7 +86,6 @@ const MaterialsController = {
       await pipeline.exec()
       res.send(200)
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -257,7 +256,6 @@ const MaterialsController = {
       await pipeline.exec()
       res.send(200)
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -276,7 +274,6 @@ const MaterialsController = {
       )
       res.send({ id: modifyID })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -327,7 +324,6 @@ const MaterialsController = {
       await pipeline.exec()
       res.send(200)
     } catch (err) {
-      console.log(err)
       throw err
     }
   },

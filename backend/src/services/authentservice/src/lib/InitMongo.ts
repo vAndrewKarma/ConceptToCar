@@ -18,7 +18,6 @@ async function InitMongo(server: FastifyInstance) {
     server.log.info(`Succesfully connected to ${config.app.DB}`)
     server.decorate('userModel', createUserModel(server))
   } catch (err) {
-    console.log(err)
     process.exit(1)
   }
 }
