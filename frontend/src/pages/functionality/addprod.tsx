@@ -145,7 +145,7 @@ const AddProductModal = ({
             </Form.Label>
             <Form.Control
               type="number"
-              value={addheight}
+              value={addLength}
               onChange={(e) => setAddheight(e.target.value)}
               placeholder="e.g., 100 (by default 0)"
             />
@@ -162,12 +162,12 @@ const AddProductModal = ({
             />
           </Form.Group>
           <Form.Group controlId="addProductLength" className="mb-3">
-            <Form.Label className="text-warning fw-bold">
-              Estimated Length (kg):
+            <Form.Label className="text-light fw-bold">
+              Estimated Height (kg):
             </Form.Label>
             <Form.Control
               type="number"
-              value={addLength}
+              value={addheight}
               onChange={(e) => setAddLength(e.target.value)}
               placeholder="e.g., 35  (by default 0) "
             />
@@ -205,7 +205,7 @@ const AddProductModal = ({
           disabled={loading}
           className="rounded-pill px-4 text-dark fw-bold"
         >
-          {loading ? 'Saving...' : 'Save Product'}
+          {loading ? 'Saving...' : 'Add Product'}
         </Button>
       </Modal.Footer>
     </Modal>

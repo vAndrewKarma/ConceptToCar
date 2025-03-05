@@ -513,12 +513,17 @@ function Products() {
       </Modal>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={handleEditClose} centered>
-        <Modal.Header closeButton className="bg-dark text-white">
+      <Modal
+        show={showEditModal}
+        onHide={handleEditClose}
+        centered
+        dialogClassName="modal-dark"
+      >
+        <Modal.Header closeButton className="bg-dark text-white border-warning">
           <Modal.Title>Edit Product</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark shadow-lg">
-          <Form className="text-light modal-form rounded">
+          <Form className="text-light modal-form bg-dark rounded">
             <Form.Group>
               <Form.Label className="modal-style">Name:</Form.Label>
               <Form.Control
@@ -545,9 +550,6 @@ function Products() {
                 value={editStage || ''}
                 onChange={(e) => setEditStage(e.target.value as Stage)}
               >
-                <option value="" disabled style={{ fontWeight: 'bold' }}>
-                  Stage
-                </option>
                 {[
                   'Concept',
                   'Feasibility',
@@ -609,11 +611,19 @@ function Products() {
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer className="bg-dark">
-          <Button variant="secondary" onClick={handleEditClose}>
+        <Modal.Footer className="bg-dark border-warning">
+          <Button
+            variant="secondary"
+            onClick={handleEditClose}
+            className="rounded-pill px-4 text-light fw-bold"
+          >
             Cancel
           </Button>
-          <Button variant="warning" onClick={handleSaveChanges}>
+          <Button
+            variant="warning"
+            onClick={handleSaveChanges}
+            className="rounded-pill px-4 text-dark fw-bold"
+          >
             Save Changes
           </Button>
         </Modal.Footer>

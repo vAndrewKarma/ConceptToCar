@@ -17,6 +17,8 @@
   color: #fff; /* White text */
   border: 1px solid #ffc107;
   border-radius: 8px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* 2. Form Controls (Inputs, Textareas, etc.) */
@@ -92,6 +94,5 @@
 }
 
 .modal-form {
-  padding: 10px;
   padding-bottom: 20px;
 }

@@ -200,20 +200,20 @@ function Product() {
                         : 'N/A'}
                     </span>
                     <span className="pad">
-                      <strong>Estimated weight:</strong>{' '}
-                      {displayProduct.estimated_weight} kg
-                    </span>
-                    <span className="pad">
-                      <strong>Estimated height:</strong>{' '}
-                      {displayProduct.estimated_height} cm
+                      <strong>Estimated length:</strong>{' '}
+                      {displayProduct.estimated_length} cm
                     </span>
                     <span className="pad">
                       <strong>Estimated width:</strong>{' '}
                       {displayProduct.estimated_width} cm
                     </span>
                     <span className="pad">
-                      <strong>Estimated length:</strong>{' '}
-                      {displayProduct.estimated_length} cm
+                      <strong>Estimated height:</strong>{' '}
+                      {displayProduct.estimated_height} cm
+                    </span>
+                    <span className="pad">
+                      <strong>Estimated weight:</strong>{' '}
+                      {displayProduct.estimated_weight} kg
                     </span>
                     <span className="pad">
                       <strong>Created By:</strong> {displayProduct.createdBy}
@@ -312,12 +312,17 @@ function Product() {
       </Modal>
 
       {/* Modify Modal */}
-      <Modal show={showEditModal} onHide={handleEditClose} centered>
-        <Modal.Header closeButton className="bg-dark text-white">
+      <Modal
+        show={showEditModal}
+        onHide={handleEditClose}
+        centered
+        dialogClassName="modal-dark"
+      >
+        <Modal.Header closeButton className="bg-dark text-white border-warning">
           <Modal.Title>Edit Product</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark shadow-lg">
-          <Form className="text-light modal-form rounded">
+          <Form className="text-light bg-dark modal-form rounded">
             <Form.Group>
               <Form.Label className="modal-style">Name:</Form.Label>
               <Form.Control type="text" defaultValue={product?.name} />
@@ -339,21 +344,21 @@ function Product() {
 
             <Form.Group>
               <Form.Label className="modal-style">
-                Estimated weight (kg):
-              </Form.Label>
-              <Form.Control
-                type="number"
-                defaultValue={product?.estimated_weight}
-              />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label className="modal-style">
                 Estimated length (cm):
               </Form.Label>
               <Form.Control
                 type="number"
                 defaultValue={product?.estimated_length}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated width (cm):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={product?.estimated_width}
               />
             </Form.Group>
 
@@ -369,20 +374,29 @@ function Product() {
 
             <Form.Group>
               <Form.Label className="modal-style">
-                Estimated width (cm):
+                Estimated weight (kg):
               </Form.Label>
               <Form.Control
                 type="number"
-                defaultValue={product?.estimated_width}
+                defaultValue={product?.estimated_weight}
               />
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer className="bg-dark">
-          <Button variant="secondary" onClick={handleEditClose}>
+        <Modal.Footer className="bg-dark border-warning">
+          <Button
+            className="rounded-pill px-4 text-light fw-bold"
+            variant="secondary"
+            onClick={handleEditClose}
+          >
             Cancel
           </Button>
-          <Button variant="warning">Save Changes</Button>
+          <Button
+            variant="warning"
+            className="rounded-pill px-4 text-dark fw-bold"
+          >
+            Save Changes
+          </Button>
         </Modal.Footer>
       </Modal>
     </>

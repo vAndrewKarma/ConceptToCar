@@ -164,7 +164,7 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
   }
 
   return (
-    <Modal show={show} onHide={onClose} centered>
+    <Modal show={show} onHide={onClose} centered dialogClassName="modal-dark">
       <Modal.Header closeButton className="bg-dark text-white border-warning">
         <Modal.Title>Update Material</Modal.Title>
       </Modal.Header>
@@ -183,15 +183,25 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
             />
           </Form.Group>
 
-          {/* Estimated Height */}
+          {/* Quantity */}
+          <Form.Group className="mb-3">
+            <Form.Label className="modal-style">Quantity:</Form.Label>
+            <Form.Control
+              type="number"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+            />
+          </Form.Group>
+
+          {/* Length (sent as length_unit) */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">
-              Estimated Height (cm):
+              Estimated Length (cm):
             </Form.Label>
             <Form.Control
               type="number"
-              value={estimatedHeight}
-              onChange={(e) => setEstimatedHeight(e.target.value)}
+              value={length}
+              onChange={(e) => setLength(e.target.value)}
             />
           </Form.Group>
 
@@ -207,6 +217,18 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
             />
           </Form.Group>
 
+          {/* Estimated Height */}
+          <Form.Group className="mb-3">
+            <Form.Label className="modal-style">
+              Estimated Height (cm):
+            </Form.Label>
+            <Form.Control
+              type="number"
+              value={estimatedHeight}
+              onChange={(e) => setEstimatedHeight(e.target.value)}
+            />
+          </Form.Group>
+
           {/* Estimated Weight */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">
@@ -218,38 +240,27 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
               onChange={(e) => setEstimatedWeight(e.target.value)}
             />
           </Form.Group>
-
-          {/* Quantity */}
-          <Form.Group className="mb-3">
-            <Form.Label className="modal-style">Quantity:</Form.Label>
-            <Form.Control
-              type="number"
-              value={qty}
-              onChange={(e) => setQty(e.target.value)}
-            />
-          </Form.Group>
-
-          {/* Length (sent as length_unit) */}
-          <Form.Group className="mb-3">
-            <Form.Label className="modal-style">Length:</Form.Label>
-            <Form.Control
-              type="number"
-              value={length}
-              onChange={(e) => setLength(e.target.value)}
-            />
-          </Form.Group>
-
-          {error && <div className="text-danger mb-3">{error}</div>}
-          <Modal.Footer className="bg-dark border-warning">
-            <Button variant="secondary" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="warning" type="submit" disabled={loading}>
-              {loading ? 'Updating...' : 'Update'}
-            </Button>
-          </Modal.Footer>
         </Form>
       </Modal.Body>
+
+      {error && <div className="text-danger mb-3">{error}</div>}
+      <Modal.Footer className="bg-dark border-warning">
+        <Button
+          className="rounded-pill px-4 text-light fw-bold"
+          variant="secondary"
+          onClick={onClose}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="rounded-pill px-4 text-dark fw-bold"
+          variant="warning"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Updating...' : 'Update'}
+        </Button>
+      </Modal.Footer>
     </Modal>
   )
 }
