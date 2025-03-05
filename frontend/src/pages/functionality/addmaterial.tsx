@@ -137,19 +137,23 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
   }
 
   return (
-    <Modal show={show} onHide={onClose} centered>
-      <Modal.Header closeButton className="bg-dark text-white">
+    <Modal show={show} onHide={onClose} centered dialogClassName="modal-dark">
+      <Modal.Header closeButton className="bg-dark text-white border-warning">
         <Modal.Title>Add Material</Modal.Title>
       </Modal.Header>
       <Modal.Body className="bg-dark shadow-lg">
-        <Form onSubmit={handleSubmit} className="text-light modal-form rounded">
+        <Form
+          onSubmit={handleSubmit}
+          className="text-light modal-form bg-dark rounded"
+        >
           {/* Name */}
           <Form.Group className="mb-3">
-            <Form.Label className="modal-style">Name:</Form.Label>
+            <Form.Label className="modal-style text-light">Name:</Form.Label>
             <Form.Control
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              placeholder="Enter material name"
             />
           </Form.Group>
 
@@ -160,42 +164,7 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
               type="number"
               value={qty}
               onChange={(e) => setQty(e.target.value)}
-            />
-          </Form.Group>
-
-          {/* Estimated Height */}
-          <Form.Group className="mb-3">
-            <Form.Label className="modal-style">
-              Estimated Height (cm):
-            </Form.Label>
-            <Form.Control
-              type="number"
-              value={estimatedHeight}
-              onChange={(e) => setEstimatedHeight(e.target.value)}
-            />
-          </Form.Group>
-
-          {/* Estimated Width */}
-          <Form.Group className="mb-3">
-            <Form.Label className="modal-style">
-              Estimated Width (cm):
-            </Form.Label>
-            <Form.Control
-              type="number"
-              value={estimatedWidth}
-              onChange={(e) => setEstimatedWidth(e.target.value)}
-            />
-          </Form.Group>
-
-          {/* Estimated Weight */}
-          <Form.Group className="mb-3">
-            <Form.Label className="modal-style">
-              Estimated Weight (kg):
-            </Form.Label>
-            <Form.Control
-              type="number"
-              value={estimatedWeight}
-              onChange={(e) => setEstimatedWeight(e.target.value)}
+              placeholder="Enter quantity"
             />
           </Form.Group>
 
@@ -208,20 +177,68 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
               type="number"
               value={length}
               onChange={(e) => setLength(e.target.value)}
+              placeholder="e.g., 100 (by default 0)"
             />
           </Form.Group>
 
-          {error && <div className="text-danger mb-3">{error}</div>}
-          <Modal.Footer className="bg-dark">
-            <Button variant="secondary" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="warning" type="submit" disabled={loading}>
-              {loading ? 'Adding...' : 'Add'}
-            </Button>
-          </Modal.Footer>
+          {/* Estimated Width */}
+          <Form.Group className="mb-3">
+            <Form.Label className="modal-style">
+              Estimated Width (cm):
+            </Form.Label>
+            <Form.Control
+              type="number"
+              value={estimatedWidth}
+              onChange={(e) => setEstimatedWidth(e.target.value)}
+              placeholder="e.g., 50  (by default 0) "
+            />
+          </Form.Group>
+
+          {/* Estimated Height */}
+          <Form.Group className="mb-3">
+            <Form.Label className="modal-style">
+              Estimated Height (cm):
+            </Form.Label>
+            <Form.Control
+              type="number"
+              value={estimatedHeight}
+              onChange={(e) => setEstimatedHeight(e.target.value)}
+              placeholder="e.g., 80  (by default 0)"
+            />
+          </Form.Group>
+
+          {/* Estimated Weight */}
+          <Form.Group className="mb-3">
+            <Form.Label className="modal-style">
+              Estimated Weight (kg):
+            </Form.Label>
+            <Form.Control
+              type="number"
+              value={estimatedWeight}
+              onChange={(e) => setEstimatedWeight(e.target.value)}
+              placeholder="e.g., 2  (by default 0)"
+            />
+          </Form.Group>
         </Form>
       </Modal.Body>
+      {error && <div className="text-danger mb-3">{error}</div>}
+      <Modal.Footer className="bg-dark border-warning">
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          className="rounded-pill px-4 text-LIGHT fw-bold"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="warning"
+          type="submit"
+          disabled={loading}
+          className="rounded-pill px-4 text-dark fw-bold"
+        >
+          {loading ? 'Adding...' : 'Add'}
+        </Button>
+      </Modal.Footer>
     </Modal>
   )
 }

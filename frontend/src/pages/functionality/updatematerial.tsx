@@ -166,11 +166,14 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
 
   return (
     <Modal show={show} onHide={onClose} centered>
-      <Modal.Header closeButton className="bg-dark text-white">
+      <Modal.Header closeButton className="bg-dark text-white border-warning">
         <Modal.Title>Update Material</Modal.Title>
       </Modal.Header>
       <Modal.Body className="bg-dark shadow-lg">
-        <Form onSubmit={handleSubmit} className="text-light modal-form rounded">
+        <Form
+          onSubmit={handleSubmit}
+          className="text-light modal-form bg-dark rounded"
+        >
           {/* Name */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">Name:</Form.Label>
@@ -238,7 +241,7 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
           </Form.Group>
 
           {error && <div className="text-danger mb-3">{error}</div>}
-          <Modal.Footer className="bg-dark">
+          <Modal.Footer className="bg-dark border-warning">
             <Button variant="secondary" onClick={onClose}>
               Cancel
             </Button>

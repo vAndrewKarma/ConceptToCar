@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   flexRender,
 } from '@tanstack/react-table'
-import { Button, Modal, Spinner, Form } from 'react-bootstrap'
+import { Button, Modal, Spinner, Form, Container } from 'react-bootstrap'
 import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
 import useAxios from 'axios-hooks'
@@ -352,71 +352,76 @@ function Materials() {
           {error && (
             <div className="alert alert-danger text-center">{error}</div>
           )}
-          <div className="d-flex align-items-center justify-content-between mb-3">
-            <Form.Control
-              type="text"
-              placeholder="Search by name..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  triggerSearch()
-                }
-              }}
-              className="w-25"
-              style={{ fontSize: '14px', marginBottom: '10px' }}
-            />
-            <div style={{ paddingRight: '15px' }}>
+          <Container fluid>
+            <div className="d-flex align-items-center justify-content-between mb-3">
+              <Form.Control
+                type="text"
+                placeholder="Search by name..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    triggerSearch()
+                  }
+                }}
+                style={{
+                  maxWidth: '200px',
+                  fontSize: '14px',
+                  marginBottom: '10px',
+                }}
+              />
+
               <FaPlusCircle
+                className="ms-auto"
                 size={24}
                 style={{ color: 'green', cursor: 'pointer' }}
                 title="Add Material"
                 onClick={handleAddShow}
               />
             </div>
-          </div>
-          <table
-            className="table table-dark table-striped table-hover text-center"
-            style={{
-              width: '100%',
-              borderCollapse: 'separate',
-              borderSpacing: '0',
-              borderRadius: '15px',
-              overflow: 'hidden',
-              opacity: loadingState ? 0.5 : 1,
-              transition: 'opacity 0.3s ease',
-            }}
-          >
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <table
+              className="table table-dark table-striped table-hover text-center"
+              style={{
+                width: '100%',
+                borderCollapse: 'separate',
+                borderSpacing: '0',
+                borderRadius: '15px',
+                overflow: 'hidden',
+                opacity: loadingState ? 0.5 : 1,
+                transition: 'opacity 0.3s ease',
+              }}
+            >
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id}>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Container>
           <div className="d-flex justify-content-end mt-3">
             <Button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}

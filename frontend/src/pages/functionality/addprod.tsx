@@ -113,10 +113,12 @@ const AddProductModal = ({
       <Modal.Header closeButton className="bg-dark text-white border-warning">
         <Modal.Title>Add Product</Modal.Title>
       </Modal.Header>
-      <Modal.Body className="bg-dark text-light">
-        <Form>
+      <Modal.Body className="bg-dark text-light shadow-lg">
+        <Form className="bg-dark text-light ">
           <Form.Group controlId="addProductName" className="mb-3">
-            <Form.Label className="text-warning fw-bold">Name:</Form.Label>
+            <Form.Label className="text-light fw-bold fw-italic">
+              Name:
+            </Form.Label>
             <Form.Control
               type="text"
               value={addName}
@@ -125,9 +127,7 @@ const AddProductModal = ({
             />
           </Form.Group>
           <Form.Group controlId="addProductDescription" className="mb-3">
-            <Form.Label className="text-warning fw-bold">
-              Description:
-            </Form.Label>
+            <Form.Label className="text-light fw-bold">Description:</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
@@ -137,7 +137,7 @@ const AddProductModal = ({
             />
           </Form.Group>
           <Form.Group controlId="addProductLength" className="mb-3">
-            <Form.Label className="text-warning fw-bold">
+            <Form.Label className="text-light fw-bold">
               Estimated Length (cm):
             </Form.Label>
             <Form.Control
@@ -148,7 +148,7 @@ const AddProductModal = ({
             />
           </Form.Group>
           <Form.Group controlId="addProductWidth" className="mb-3">
-            <Form.Label className="text-warning fw-bold">
+            <Form.Label className="text-light fw-bold">
               Estimated Width (cm):
             </Form.Label>
             <Form.Control
@@ -159,7 +159,7 @@ const AddProductModal = ({
             />
           </Form.Group>
           <Form.Group controlId="addProductWeight" className="mb-3">
-            <Form.Label className="text-warning fw-bold">
+            <Form.Label className="text-light fw-bold">
               Estimated Weight (kg):
             </Form.Label>
             <Form.Control
