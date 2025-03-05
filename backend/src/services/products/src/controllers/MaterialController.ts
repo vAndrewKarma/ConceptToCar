@@ -86,7 +86,6 @@ const MaterialsController = {
       await pipeline.exec()
       res.send(200)
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -116,9 +115,8 @@ const MaterialsController = {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
 
-      // Extract searchTerms (optional) along with productId and page
       const { productId, page = 1, searchTerms } = req.body
-      const limit = 15
+      const limit = 10
       const redis = req.server.redis
       const materialModel = req.server.materialModel
 
@@ -258,7 +256,6 @@ const MaterialsController = {
       await pipeline.exec()
       res.send(200)
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -277,7 +274,6 @@ const MaterialsController = {
       )
       res.send({ id: modifyID })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -328,7 +324,6 @@ const MaterialsController = {
       await pipeline.exec()
       res.send(200)
     } catch (err) {
-      console.log(err)
       throw err
     }
   },

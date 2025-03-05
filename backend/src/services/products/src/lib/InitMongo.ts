@@ -26,7 +26,6 @@ async function InitMongo(server: FastifyInstance) {
     server.decorate('productStageModel', createProductStageHistoryModel(server))
     server.decorate('materialModel', createMaterialModel(server))
   } catch (err) {
-    console.log(err)
     process.exit(1)
   }
 }

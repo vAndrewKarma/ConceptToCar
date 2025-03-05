@@ -3,10 +3,10 @@ import { Modal, Button, Form, Alert } from 'react-bootstrap'
 import axios from 'axios'
 
 import './products.css'
-const generateCodeVerifier = (length = 43) => {
+const generateCodeVerifier = (height = 43) => {
   const allowedChars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
-  const randomArray = new Uint8Array(length)
+  const randomArray = new Uint8Array(height)
   crypto.getRandomValues(randomArray)
   return Array.from(
     randomArray,
@@ -35,9 +35,10 @@ const AddProductModal = ({
 }: AddProductModalProps) => {
   const [addName, setAddName] = useState('')
   const [addDescription, setAddDescription] = useState('')
-  const [addLength, setAddLength] = useState('')
+  const [addheight, setAddheight] = useState('')
   const [addWidth, setAddWidth] = useState('')
   const [addWeight, setAddWeight] = useState('')
+  const [addLength, setAddLength] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -63,7 +64,8 @@ const AddProductModal = ({
         description: addDescription,
         modifyID,
         code_verifier: codeVerifier,
-        estimated_height: parseFloat(addLength),
+        estimated_height: parseFloat(addheight),
+        estimated_length: parseFloat(addLength),
         estimated_width: parseFloat(addWidth),
         estimated_weight: parseFloat(addWeight),
       }
@@ -83,9 +85,10 @@ const AddProductModal = ({
         window.location.reload()
         setAddName('')
         setAddDescription('')
-        setAddLength('')
+        setAddheight('')
         setAddWidth('')
         setAddWeight('')
+        setAddLength('')
       } else {
         setError('Failed to create product.')
       }
@@ -95,7 +98,7 @@ const AddProductModal = ({
         if (
           err.response.data &&
           err.response.data.errors &&
-          err.response.data.errors.length > 0
+          err.response.data.errors.height > 0
         ) {
           setError(err.response.data.errors[0].message)
         } else if (err.response.data.message) {
@@ -142,8 +145,8 @@ const AddProductModal = ({
             </Form.Label>
             <Form.Control
               type="number"
-              value={addLength}
-              onChange={(e) => setAddLength(e.target.value)}
+              value={addheight}
+              onChange={(e) => setAddheight(e.target.value)}
               placeholder="e.g., 100 (by default 0)"
             />
           </Form.Group>
@@ -156,6 +159,17 @@ const AddProductModal = ({
               value={addWidth}
               onChange={(e) => setAddWidth(e.target.value)}
               placeholder="e.g., 50  (by default 0) "
+            />
+          </Form.Group>
+          <Form.Group controlId="addProductLength" className="mb-3">
+            <Form.Label className="text-warning fw-bold">
+              Estimated Length (kg):
+            </Form.Label>
+            <Form.Control
+              type="number"
+              value={addLength}
+              onChange={(e) => setAddLength(e.target.value)}
+              placeholder="e.g., 35  (by default 0) "
             />
           </Form.Group>
           <Form.Group controlId="addProductWeight" className="mb-3">

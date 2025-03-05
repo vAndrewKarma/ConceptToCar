@@ -30,6 +30,7 @@ export const productSchema = {
     'description',
     'estimated_height',
     'estimated_width',
+    'estimated_length',
     'estimated_weight',
 
     // 'material_number',
@@ -89,6 +90,16 @@ export const productSchema = {
         type: 'estimated_height must be a number.',
         minimum: 'estimated_height cannot be negative.',
         maximum: 'estimated_height cannot exceed 999999.',
+      },
+    },
+    estimated_length: {
+      type: 'number',
+      minimum: 0,
+      maximum: 999999,
+      errorMessage: {
+        type: 'estimated_length must be a number.',
+        minimum: 'estimated_length cannot be negative.',
+        maximum: 'estimated_length cannot exceed 999999.',
       },
     },
     estimated_width: {
@@ -153,6 +164,7 @@ export const productSchema = {
       estimated_height: 'estimated_height is required.',
       estimated_width: 'Estimated width is required.',
       estimated_weight: 'Estimated weight is required.',
+      estimated_length: 'Estimated length is required',
       // material_number: 'Material number is required.',
       modifyID: 'Invalid request',
       code_verifier: 'Invalid request',
@@ -251,6 +263,16 @@ export const upschema = {
       errorMessage: {
         type: 'Stage must be a string.',
         enum: 'Stage must be one of: concept, feasibility, design, production, withdrawal, standby, cancelled.',
+      },
+    },
+    estimated_length: {
+      type: 'number',
+      minimum: 0,
+      maximum: 999999,
+      errorMessage: {
+        type: 'estimated_length must be a number.',
+        minimum: 'estimated_length cannot be negative.',
+        maximum: 'estimated_length cannot exceed 999999.',
       },
     },
     code_verifier: {

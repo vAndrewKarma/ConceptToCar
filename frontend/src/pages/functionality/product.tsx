@@ -60,6 +60,7 @@ function Product() {
     description?: string
     stage?: string
     estimated_weight?: string
+    estimated_length?: string
     weight_unit?: string
     estimated_height?: string
     height_unit?: string
@@ -119,6 +120,7 @@ function Product() {
       "A wheel is a crucial component of a vehicle's mobility and steering system. It provides the necessary contact with the road, ensuring traction, stability, and smooth movement. In the steering mechanism, the front wheels pivot to change the vehicle’s direction, guided by the steering system.",
     stage: 'Concept',
     estimated_weight: '5',
+    estimated_length: '30',
     weight_unit: 'kg',
     estimated_height: '60',
     height_unit: 'cm',
@@ -208,6 +210,10 @@ function Product() {
                     <span className="pad">
                       <strong>Estimated width:</strong>{' '}
                       {displayProduct.estimated_width} cm
+                    </span>
+                    <span className="pad">
+                      <strong>Estimated length:</strong>{' '}
+                      {displayProduct.estimated_length} cm
                     </span>
                     <span className="pad">
                       <strong>Created By:</strong> {displayProduct.createdBy}
@@ -338,6 +344,16 @@ function Product() {
               <Form.Control
                 type="number"
                 defaultValue={product?.estimated_weight}
+              />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label className="modal-style">
+                Estimated length (cm):
+              </Form.Label>
+              <Form.Control
+                type="number"
+                defaultValue={product?.estimated_length}
               />
             </Form.Group>
 

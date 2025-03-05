@@ -22,10 +22,7 @@ const authcontroller = {
       // TODO IMPLEMENTARE PT CARE NU AM AVUT TIMP NECESAR, SERVER SIDE EVENTS SI MUT VALIDAREA LA KEY PE SERVICE U KEYS, WILL BE ADDED  */
       const redis = req.server.redis
       const { channel } = req.server.rabbitmq
-      console.log(req.headers['x-forwarded-for'] || req.ip)
-      console.log(req.headers['x-forwarded-for'])
-      console.log(req.ip)
-      console.log(req.headers)
+
       const user = JSON.parse(JSON.stringify(req.body)) as Omit<
         User,
         'confirmPassword'
@@ -55,7 +52,6 @@ const authcontroller = {
 
       res.status(201).send({ message: 'Check your email for validation.' })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -192,7 +188,6 @@ const authcontroller = {
         })
         .send({ message: 'Login Successful' })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -211,7 +206,6 @@ const authcontroller = {
       )
       res.send({ id: loginReqId })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -221,7 +215,6 @@ const authcontroller = {
       if (!req.sessionData) return res.send({ auth: false })
       res.send({ auth: true, session: req.sessionData })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },
@@ -272,7 +265,6 @@ const authcontroller = {
       clearCookie(res)
       res.send({ message: 'Logged out' })
     } catch (err) {
-      console.log(err)
       throw err
     }
   },

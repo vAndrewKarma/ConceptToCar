@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect, useRef } from 'react'
 import {
   useReactTable,
@@ -31,7 +30,7 @@ interface Material {
   updated_at: string
 }
 
-const PAGE_SIZE = 15
+const PAGE_SIZE = 10
 const CACHE_EXPIRY_MS = 30 * 1000
 
 const generateCodeVerifier = (length: number): string => {
@@ -44,7 +43,12 @@ const generateCodeVerifier = (length: number): string => {
     (byte) => allowedChars[byte % allowedChars.length]
   ).join('')
 }
-
+function unslugify(slug: string): string {
+  return slug
+    .split('-')
+    .map((word) => word.charAt(0) + word.slice(1))
+    .join(' ')
+}
 const generateCodeChallenge = async (verifier: string): Promise<string> => {
   const encoder = new TextEncoder()
   const data = encoder.encode(verifier)
@@ -125,7 +129,7 @@ function Materials() {
         if (searchTerm)
           response = await execute({
             data: {
-              productId: productId,
+              productId: unslugify(productId || ''),
               page: currentPage,
               // Pass searchTerms (empty string if not provided)
               searchTerms: searchTerm,
@@ -134,7 +138,7 @@ function Materials() {
         else
           response = await execute({
             data: {
-              productId: productId,
+              productId: unslugify(productId || ''),
               page: currentPage,
             },
           })
@@ -153,6 +157,7 @@ function Materials() {
             timestamp: Date.now(),
           }
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         if (axios.isAxiosError(err) && err.response) {
           if (

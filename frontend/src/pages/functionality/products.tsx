@@ -30,6 +30,7 @@ interface Product {
   estimated_weight?: number
   estimated_height?: string
   estimated_width?: string
+  estimated_length?: string
   length_unit: string
 }
 
@@ -107,7 +108,6 @@ function Products() {
   // Refresh products: clear cache, reset page, and re-fetch.
   const refreshProducts = async () => {
     cacheRef.current = {}
-    setCurrentPage(1)
     const response = await execute({ data: { page: currentPage } })
     if (response.data) {
       const { products, hasNext } = response.data
@@ -199,6 +199,7 @@ function Products() {
       setEditEstimatedHeight(selectedProduct.estimated_height?.toString() || '')
       setEditEstimatedWidth(selectedProduct.estimated_width?.toString() || '')
       setEditEstimatedWeight(selectedProduct.estimated_weight?.toString() || '')
+      setEditEstimatedLength(selectedProduct.estimated_length?.toString() || '')
       // Set other unit fields if needed.
     }
   }, [selectedProduct])
@@ -249,6 +250,7 @@ function Products() {
           estimated_height: parseFloat(editEstimatedHeight),
           estimated_width: parseFloat(editEstimatedWidth),
           estimated_weight: parseFloat(editEstimatedWeight),
+          estimated_length: parseFloat(editEstimatedLength),
           modifyID: modifyID,
           code_verifier: code_verifier,
         },
@@ -256,10 +258,9 @@ function Products() {
       })
 
       // Clear cache and refresh the product list.
+      handleEditClose()
       cacheRef.current = {}
       await refreshProducts()
-
-      handleEditClose()
     } catch (error) {
       console.error('Error updating product:', error)
     }
@@ -569,8 +570,8 @@ function Products() {
               </Form.Label>
               <Form.Control
                 type="number"
-                value={editEstimatedHeight}
-                onChange={(e) => setEditEstimatedHeight(e.target.value)}
+                value={editEstimatedLength}
+                onChange={(e) => setEditEstimatedLength(e.target.value)}
               />
             </Form.Group>
 
@@ -591,8 +592,8 @@ function Products() {
               </Form.Label>
               <Form.Control
                 type="number"
-                value={editEstimatedLength}
-                onChange={(e) => setEditEstimatedLength(e.target.value)}
+                value={editEstimatedHeight}
+                onChange={(e) => setEditEstimatedHeight(e.target.value)}
               />
             </Form.Group>
 
