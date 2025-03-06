@@ -120,7 +120,6 @@ const MaterialsController = {
       const redis = req.server.redis
       const materialModel = req.server.materialModel
 
-      // Build a cache key that includes searchTerms if provided
       let cacheKey = `materials_lists:${productId}:page:${page}:limit:${limit}`
       if (searchTerms && searchTerms.trim() !== '') {
         cacheKey += `:search:${searchTerms}`
@@ -130,7 +129,7 @@ const MaterialsController = {
       if (cachedMaterials) return res.send(JSON.parse(cachedMaterials))
 
       let materials
-      // Pass page and limit to the model methods so pagination occurs in the DB query
+
       if (searchTerms && searchTerms.trim() !== '') {
         materials = await materialModel.searchMaterials(
           productId,

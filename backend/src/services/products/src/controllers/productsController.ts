@@ -124,27 +124,38 @@ const productsController = {
   async GetProducts(req, res) {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
-      const { page = 1 } = req.body
+
+      const { page = 1, searchTerms } = req.body
       const displayLimit = 10
       const redis = req.server.redis
       const productModel = req.server.productModel
 
-      const cacheKey = `products:all:page:${page}:limit:${displayLimit}`
+      let cacheKey = `products:all:page:${page}:limit:${displayLimit}`
+      if (searchTerms && searchTerms.trim() !== '') {
+        cacheKey += `:search:${searchTerms}`
+      }
+
       const cachedData = await redis.get(cacheKey)
       if (cachedData) {
         return res.send(JSON.parse(cachedData))
       }
 
-      const products = await productModel.findProducts(
-        Number(page),
-        displayLimit
-      )
+      let products
+      if (searchTerms && searchTerms.trim() !== '') {
+        products = await productModel.searchProducts(
+          searchTerms,
+          page,
+          displayLimit
+        )
+      } else {
+        products = await productModel.findProducts(Number(page), displayLimit)
+      }
+
       if (!products || products.length === 0) {
         throw new BadRequestError('No products found')
       }
 
       const hasNext = products.length === displayLimit + 1
-
       const displayedProducts = hasNext
         ? products.slice(0, displayLimit)
         : products
@@ -161,7 +172,6 @@ const productsController = {
       throw err
     }
   },
-
   async ProductModify(req, res) {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')

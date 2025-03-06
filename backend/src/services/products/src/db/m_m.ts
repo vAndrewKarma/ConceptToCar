@@ -66,6 +66,16 @@ export class ProductModel {
     const skip = (page - 1) * displayLimit
     return await this.collection.find({}).skip(skip).limit(queryLimit).toArray()
   }
+  async searchProducts(searchTerms, page = 1, displayLimit = 10) {
+    const queryLimit = displayLimit + 1
+    const skip = (page - 1) * displayLimit
+
+    return await this.collection
+      .find({ name: { $regex: searchTerms, $options: 'i' } })
+      .skip(skip)
+      .limit(queryLimit)
+      .toArray()
+  }
 
   async updateProduct(
     id: string,
