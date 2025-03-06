@@ -123,11 +123,12 @@ export class ProductStageHistoryModel {
     }
   }
 
-  async getHistoryByProductId(
-    productId: string
-  ): Promise<ProductStageHistory[]> {
+  async getHistoryByProductId(productId, skip = 0, limit = 5) {
     return await this.collection
       .find({ product_id: new ObjectId(productId) })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .toArray()
   }
 }

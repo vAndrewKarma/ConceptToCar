@@ -5,6 +5,7 @@ import useAxios from 'axios-hooks'
 import './product.css'
 import '../auth/login.css'
 import './products.css'
+import ExportChartPDF from './pdfgen'
 
 function unslugify(slug: string): string {
   return slug
@@ -362,12 +363,7 @@ function Product() {
                     >
                       Materials
                     </Button>
-                    <Button
-                      onClick={() => navigate('/gallery')}
-                      className="btn btn-warning"
-                    >
-                      Export PDF
-                    </Button>
+                    <ExportChartPDF product={product} />
                     <Button className="btn btn-danger" onClick={handleShow}>
                       Delete
                     </Button>

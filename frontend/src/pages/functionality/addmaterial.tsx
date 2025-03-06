@@ -238,6 +238,7 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
         <Button
           variant="warning"
           type="submit"
+          onClick={handleSubmit}
           disabled={loading}
           className="rounded-pill px-4 text-dark fw-bold"
         >

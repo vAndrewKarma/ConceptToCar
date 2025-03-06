@@ -110,13 +110,27 @@ const productsController = {
       const { name } = req.body
       const redis = req.server.redis
       const productModel = req.server.productModel
-      const product = await redis.get(`product: ${name}`)
-      if (product) return res.send(JSON.parse(product))
+      const historyModel = req.server.productStageModel
+      const materialModel = req.server.materialModel
+
+      let cachedProduct = await redis.get(`product:${name}`)
+      if (cachedProduct) {
+        return res.send(JSON.parse(cachedProduct))
+      }
 
       const prodb = await productModel.findProductByName(name)
-      if (!prodb) throw new BadRequestError('Product doesn t exist')
-      await redis.set(`product: ${name}`, JSON.stringify(prodb), 'EX', 3600)
-      res.send(prodb)
+      if (!prodb) throw new BadRequestError("Product doesn't exist")
+
+      const history = await historyModel.getHistoryByProductId(prodb._id, 0, 5)
+
+      const materialsCount = await materialModel.countDocuments({
+        product_id: prodb._id,
+      })
+
+      const infotoshow = { ...prodb, history, materialsCount }
+
+      await redis.set(`product:${name}`, JSON.stringify(infotoshow), 'EX', 3600)
+      res.send(infotoshow)
     } catch (err) {
       throw err
     }
