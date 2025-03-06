@@ -348,15 +348,6 @@ const productsController = {
         }
         console.log('karma2')
         updateData.stage = stage
-
-        const historyRecord = {
-          stage: stage,
-          product_id: new ObjectId(currentProduct._id),
-          start_of_stage: new Date(),
-          name: req.sessionData.firstName + ' ' + req.sessionData.lastName,
-        }
-
-        await productStageModel.addStageHistory(historyRecord)
       }
       console.log('STAGE ------' + updateData.stage)
       if (estimated_height !== undefined)

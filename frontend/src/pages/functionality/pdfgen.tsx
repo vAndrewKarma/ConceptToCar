@@ -32,16 +32,24 @@ interface ExportChartPDFProps {
   product: ProductData | null
 }
 
-const STATUS_COLORS: Record<Stage | 'default', string> = {
-  concept: '#4CAF50',
-  feasibility: '#4CAF50',
-  design: '#4CAF50',
-  production: '#4CAF50',
-  withdrawal: '#FFC107',
+const stagesOrder: Stage[] = [
+  'concept',
+  'feasibility',
+  'design',
+  'production',
+  'withdrawal',
+  'standby',
+  'cancelled',
+]
+
+const STATUS_COLORS = {
+  active: '#4CAF50',
+  inactive: '#F44336',
   standby: '#FFC107',
-  cancelled: '#F44336',
   default: '#9E9E9E',
 }
+
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
 const wrapText = (
   text: string,
@@ -51,7 +59,7 @@ const wrapText = (
   const words = text.split(' ')
   const lines: string[] = []
   let currentLine = ''
-  const charWidth = fontSize * 0.6 // Approximate width calculation
+  const charWidth = fontSize * 0.6
 
   words.forEach((word) => {
     if ((currentLine + word).length * charWidth < maxWidth) {
@@ -67,8 +75,8 @@ const wrapText = (
 
 const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const svgNS = 'http://www.w3.org/2000/svg'
-  const width = 595 // A4 width in pixels (portrait)
-  const height = 842 // A4 height in pixels
+  const width = 595 // A4 width
+  const height = 842 // A4 height
   const svg = document.createElementNS(svgNS, 'svg')
   svg.setAttribute('id', 'chart-svg')
   svg.setAttribute('width', width.toString())
@@ -106,7 +114,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   background.setAttribute('fill', 'url(#background-gradient)')
   svg.appendChild(background)
 
-  // Header section
+  // Header
   const header = document.createElementNS(svgNS, 'rect')
   header.setAttribute('x', '0')
   header.setAttribute('y', '0')
@@ -135,7 +143,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   reportTitle.textContent = 'Product Development Report'
   svg.appendChild(reportTitle)
 
-  // Metadata grid
+  // Metadata
   const metadata = document.createElementNS(svgNS, 'g')
   let metaY = 40
   const addMetadata = (label: string, value?: string) => {
@@ -179,7 +187,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   content.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
   svg.appendChild(content)
 
-  // Product info section
+  // Product info
   let textY = 150
   const maxTextWidth = width - 200
 
@@ -200,12 +208,14 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     labelText.textContent = `${label}:`
     svg.appendChild(labelText)
 
-    // Value with wrapping
+    // Value
+    const displayValue = label === 'Stage' ? capitalize(value) : value
     const lines = wrapText(
-      `${value}${unit ? ` ${unit}` : ''}`,
+      `${displayValue}${unit ? ` ${unit}` : ''}`,
       maxTextWidth,
       14
     )
+
     lines.forEach((line, index) => {
       const valueText = document.createElementNS(svgNS, 'text')
       valueText.setAttribute('x', '200')
@@ -216,6 +226,45 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
       valueText.textContent = line
       svg.appendChild(valueText)
     })
+
+    // Add work status for Stage field
+    if (label === 'Stage') {
+      const currentStage = value as Stage
+      const activeStages: Stage[] = [
+        'concept',
+        'feasibility',
+        'design',
+        'production',
+      ]
+      const isActive = activeStages.includes(currentStage)
+      const statusColor = isActive
+        ? STATUS_COLORS.active
+        : STATUS_COLORS.inactive
+      const statusText = isActive ? 'In Work' : 'Out of Work'
+
+      const statusGroup = document.createElementNS(svgNS, 'g')
+      statusGroup.setAttribute('transform', `translate(500, ${textY - 10})`)
+
+      // Status indicator
+      const indicator = document.createElementNS(svgNS, 'circle')
+      indicator.setAttribute('cx', '0')
+      indicator.setAttribute('cy', '0')
+      indicator.setAttribute('r', '6')
+      indicator.setAttribute('fill', statusColor)
+      statusGroup.appendChild(indicator)
+
+      // Status text
+      const statusLabel = document.createElementNS(svgNS, 'text')
+      statusLabel.setAttribute('x', '15')
+      statusLabel.setAttribute('y', '4')
+      statusLabel.setAttribute('fill', '#fff')
+      statusLabel.setAttribute('font-size', '12px')
+      statusLabel.setAttribute('font-family', 'Arial, sans-serif')
+      statusLabel.textContent = statusText
+      statusGroup.appendChild(statusLabel)
+
+      svg.appendChild(statusGroup)
+    }
 
     textY += lines.length * 20 + 15
   }
@@ -242,61 +291,75 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     addTextBlock('Estimated Width', product.estimated_width, product.width_unit)
   }
 
-  // Status indicator
+  // Status progress circle
   const currentStage = (product?.stage as Stage) || 'default'
-  const isActive = !['cancelled', 'withdrawal', 'standby'].includes(
-    currentStage
-  )
-  const statusColor = STATUS_COLORS[currentStage] || STATUS_COLORS.default
+  const activeStages: Stage[] = [
+    'concept',
+    'feasibility',
+    'design',
+    'production',
+  ]
+  const isActive = activeStages.includes(currentStage)
+  const progress = isActive
+    ? stagesOrder.indexOf(currentStage) / (activeStages.length - 1)
+    : 0
+  const statusColor = isActive
+    ? STATUS_COLORS.active
+    : ['standby', 'withdrawal'].includes(currentStage)
+    ? STATUS_COLORS.standby
+    : STATUS_COLORS.inactive
 
   const statusGroup = document.createElementNS(svgNS, 'g')
   statusGroup.setAttribute('transform', `translate(${width - 200}, 180)`)
 
-  // Status circle
-  const statusCircle = document.createElementNS(svgNS, 'circle')
-  statusCircle.setAttribute('cx', '0')
-  statusCircle.setAttribute('cy', '0')
-  statusCircle.setAttribute('r', '50')
-  statusCircle.setAttribute('fill', statusColor)
-  statusCircle.setAttribute('opacity', '0.2')
-  statusGroup.appendChild(statusCircle)
+  // Background circle
+  const bgCircle = document.createElementNS(svgNS, 'circle')
+  bgCircle.setAttribute('cx', '0')
+  bgCircle.setAttribute('cy', '0')
+  bgCircle.setAttribute('r', '50')
+  bgCircle.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
+  statusGroup.appendChild(bgCircle)
 
-  // Status text
-  const statusText = document.createElementNS(svgNS, 'text')
-  statusText.setAttribute('x', '0')
-  statusText.setAttribute('y', '0')
-  statusText.setAttribute('text-anchor', 'middle')
-  statusText.setAttribute('dominant-baseline', 'middle')
-  statusText.setAttribute('fill', statusColor)
-  statusText.setAttribute('font-size', '18px')
-  statusText.setAttribute('font-weight', 'bold')
-  statusText.setAttribute('font-family', 'Arial, sans-serif')
-  statusText.textContent = isActive ? 'ACTIVE' : 'INACTIVE'
-  statusGroup.appendChild(statusText)
+  // Progress elements
+  if (isActive) {
+    const progressArc = document.createElementNS(svgNS, 'circle')
+    progressArc.setAttribute('cx', '0')
+    progressArc.setAttribute('cy', '0')
+    progressArc.setAttribute('r', '45')
+    progressArc.setAttribute('fill', 'none')
+    progressArc.setAttribute('stroke', statusColor)
+    progressArc.setAttribute('stroke-width', '6')
+    progressArc.setAttribute(
+      'stroke-dasharray',
+      `${2 * Math.PI * 45 * progress} 1000`
+    )
+    progressArc.setAttribute('stroke-linecap', 'round')
+    progressArc.setAttribute('transform', 'rotate(-90 0 0)')
+    statusGroup.appendChild(progressArc)
 
-  // Stage-specific message
-  const stageMessage = document.createElementNS(svgNS, 'text')
-  stageMessage.setAttribute('x', '0')
-  stageMessage.setAttribute('y', '30')
-  stageMessage.setAttribute('text-anchor', 'middle')
-  stageMessage.setAttribute('fill', '#fff')
-  stageMessage.setAttribute('font-size', '14px')
-  stageMessage.setAttribute('font-family', 'Arial, sans-serif')
-
-  switch (currentStage) {
-    case 'cancelled':
-      stageMessage.textContent = 'Project terminated'
-      break
-    case 'standby':
-      stageMessage.textContent = 'On hold'
-      break
-    case 'withdrawal':
-      stageMessage.textContent = 'Being phased out'
-      break
-    default:
-      stageMessage.textContent = 'In development'
+    const percentText = document.createElementNS(svgNS, 'text')
+    percentText.setAttribute('x', '0')
+    percentText.setAttribute('y', '0')
+    percentText.setAttribute('text-anchor', 'middle')
+    percentText.setAttribute('dominant-baseline', 'middle')
+    percentText.setAttribute('fill', statusColor)
+    percentText.setAttribute('font-size', '24px')
+    percentText.setAttribute('font-weight', 'bold')
+    percentText.textContent = `${Math.round(progress * 100)}%`
+    statusGroup.appendChild(percentText)
+  } else {
+    const statusText = document.createElementNS(svgNS, 'text')
+    statusText.setAttribute('x', '0')
+    statusText.setAttribute('y', '0')
+    statusText.setAttribute('text-anchor', 'middle')
+    statusText.setAttribute('dominant-baseline', 'middle')
+    statusText.setAttribute('fill', statusColor)
+    statusText.setAttribute('font-size', '16px')
+    statusText.setAttribute('font-weight', 'bold')
+    statusText.textContent =
+      currentStage === 'cancelled' ? 'Terminated' : 'Out of Work'
+    statusGroup.appendChild(statusText)
   }
-  statusGroup.appendChild(stageMessage)
 
   svg.appendChild(statusGroup)
 
@@ -329,14 +392,16 @@ const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'px',
-      format: [595, 842], // Standard A4 size
+      format: [595, 842],
     })
 
     await svg2pdf(svgElement, pdf, { x: 0, y: 0 })
 
     const fileName = product?.name
-      ? `${product.name.replace(/\s+/g, '_')}_Report.pdf`
-      : 'ConceptoCar_Report.pdf'
+      ? `${product.name.replace(/\s+/g, '_')}_Report_${new Date()
+          .toISOString()
+          .slice(0, 10)}.pdf`
+      : `ConceptoCar_Report_${new Date().toISOString().slice(0, 10)}.pdf`
 
     pdf.save(fileName)
   }
