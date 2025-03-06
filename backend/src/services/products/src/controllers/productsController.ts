@@ -123,9 +123,10 @@ const productsController = {
 
       const history = await historyModel.getHistoryByProductId(prodb._id, 0, 5)
 
-      const materialsCount = await materialModel.countDocuments({
-        product_id: prodb._id,
-      })
+      const materials = await materialModel.collection
+        .find({ product_id: prodb._id })
+        .toArray()
+      const materialsCount = materials.length
 
       const infotoshow = { ...prodb, history, materialsCount }
 

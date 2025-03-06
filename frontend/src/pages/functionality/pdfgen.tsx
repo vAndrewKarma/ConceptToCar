@@ -1,21 +1,15 @@
 import React from 'react'
 import { jsPDF } from 'jspdf'
 import { svg2pdf } from 'svg2pdf.js'
-import { Stage } from './products'
 
-interface ExportChartPDFProps {
-  product: ProductData | null
-}
-
-const stagesOrder: Stage[] = [
-  'concept',
-  'feasibility',
-  'design',
-  'production',
-  'withdrawal',
-  'standby',
-  'cancelled',
-]
+type Stage =
+  | 'concept'
+  | 'feasibility'
+  | 'design'
+  | 'production'
+  | 'withdrawal'
+  | 'standby'
+  | 'cancelled'
 
 interface ProductData {
   _id: string
@@ -34,10 +28,41 @@ interface ProductData {
   updated_at?: string
 }
 
+interface ExportChartPDFProps {
+  product: ProductData | null
+}
+
+const stagesOrder: Stage[] = [
+  'concept',
+  'feasibility',
+  'design',
+  'production',
+  'withdrawal',
+  'standby',
+  'cancelled',
+]
+
+const wrapText = (text: string, maxLength: number): string[] => {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let currentLine = words[0]
+
+  for (let i = 1; i < words.length; i++) {
+    if (currentLine.length + words[i].length + 1 <= maxLength) {
+      currentLine += ' ' + words[i]
+    } else {
+      lines.push(currentLine)
+      currentLine = words[i]
+    }
+  }
+  lines.push(currentLine)
+  return lines
+}
+
 const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const svgNS = 'http://www.w3.org/2000/svg'
-  const width = 600 // Portrait width
-  const height = 800 // Portrait height
+  const width = 600
+  const height = 800
   const svg = document.createElementNS(svgNS, 'svg')
   svg.setAttribute('id', 'chart-svg')
   svg.setAttribute('width', width.toString())
@@ -76,7 +101,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   svg.appendChild(background)
 
   // Header section
-  const headerHeight = 100
+  const headerHeight = 120
   const header = document.createElementNS(svgNS, 'rect')
   header.setAttribute('x', '0')
   header.setAttribute('y', '0')
@@ -85,19 +110,29 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   header.setAttribute('fill', 'rgba(0, 0, 0, 0.3)')
   svg.appendChild(header)
 
-  // Header text
-  const headerText = document.createElementNS(svgNS, 'text')
-  headerText.setAttribute('x', '30')
-  headerText.setAttribute('y', '50')
-  headerText.setAttribute('fill', '#fff')
-  headerText.setAttribute('font-size', '24px')
-  headerText.setAttribute('font-weight', 'bold')
-  headerText.setAttribute('font-family', 'Arial, sans-serif')
-  headerText.textContent = product?.name || 'Product Report'
-  svg.appendChild(headerText)
+  // Main title
+  const mainTitle = document.createElementNS(svgNS, 'text')
+  mainTitle.setAttribute('x', '30')
+  mainTitle.setAttribute('y', '50')
+  mainTitle.setAttribute('fill', '#fff')
+  mainTitle.setAttribute('font-size', '22px')
+  mainTitle.setAttribute('font-weight', 'bold')
+  mainTitle.setAttribute('font-family', 'Arial, sans-serif')
+  mainTitle.textContent = 'ConceptoCar Product Development Report'
+  svg.appendChild(mainTitle)
+
+  // Product name subtitle
+  const productTitle = document.createElementNS(svgNS, 'text')
+  productTitle.setAttribute('x', '30')
+  productTitle.setAttribute('y', '80')
+  productTitle.setAttribute('fill', 'rgba(255, 255, 255, 0.8)')
+  productTitle.setAttribute('font-size', '18px')
+  productTitle.setAttribute('font-family', 'Arial, sans-serif')
+  productTitle.textContent = product?.name || 'General Product Overview'
+  svg.appendChild(productTitle)
 
   // Metadata section
-  let metaY = 70
+  let metaY = 110
   const addMetaText = (text: string, y: number) => {
     const elem = document.createElementNS(svgNS, 'text')
     elem.setAttribute('x', '30')
@@ -115,26 +150,46 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
         `Created: ${new Date(product.created_at).toLocaleDateString()}`,
         metaY
       )
-      metaY += 20
+      metaY += 15
     }
     if (product.updated_at) {
       addMetaText(
         `Updated: ${new Date(product.updated_at).toLocaleDateString()}`,
         metaY
       )
-      metaY += 20
+      metaY += 15
     }
     if (product.createdBy) {
       addMetaText(`Created by: ${product.createdBy}`, metaY)
     }
   }
 
-  // Main content container
+  // Footer section
+  const footerHeight = 40
+  const footer = document.createElementNS(svgNS, 'rect')
+  footer.setAttribute('x', '0')
+  footer.setAttribute('y', (height - footerHeight).toString())
+  footer.setAttribute('width', width.toString())
+  footer.setAttribute('height', footerHeight.toString())
+  footer.setAttribute('fill', 'rgba(0, 0, 0, 0.3)')
+  svg.appendChild(footer)
+
+  const footerText = document.createElementNS(svgNS, 'text')
+  footerText.setAttribute('x', (width / 2).toString())
+  footerText.setAttribute('y', (height - 15).toString())
+  footerText.setAttribute('text-anchor', 'middle')
+  footerText.setAttribute('fill', 'rgba(255, 255, 255, 0.7)')
+  footerText.setAttribute('font-size', '12px')
+  footerText.setAttribute('font-family', 'Arial, sans-serif')
+  footerText.textContent = 'ConceptoCar - Automotive Innovation Platform'
+  svg.appendChild(footerText)
+
+  // Content container
   const content = document.createElementNS(svgNS, 'rect')
   content.setAttribute('x', '20')
-  content.setAttribute('y', '120')
+  content.setAttribute('y', '140')
   content.setAttribute('width', (width - 40).toString())
-  content.setAttribute('height', (height - 180).toString())
+  content.setAttribute('height', (height - 140 - footerHeight - 20).toString())
   content.setAttribute('rx', '10')
   content.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
   svg.appendChild(content)
@@ -143,17 +198,47 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const margin = 40
   let textY = 160
   const lineHeight = 28
+  const maxLineLength = 35
 
   const addTextLine = (
     label: string,
     value?: string | null,
-    unit?: string | null
+    unit?: string | null,
+    isDescription?: boolean
   ) => {
     if (!value) return
 
+    if (isDescription) {
+      const lines = wrapText(value, maxLineLength)
+      lines.forEach((line, index) => {
+        const group = document.createElementNS(svgNS, 'g')
+
+        const labelText = document.createElementNS(svgNS, 'text')
+        labelText.setAttribute('x', margin.toString())
+        labelText.setAttribute('y', (textY + index * 20).toString())
+        labelText.setAttribute('fill', 'rgba(255, 255, 255, 0.8)')
+        labelText.setAttribute('font-size', '14px')
+        labelText.setAttribute('font-family', 'Arial, sans-serif')
+        labelText.textContent = index === 0 ? `${label}:` : ''
+
+        const valueText = document.createElementNS(svgNS, 'text')
+        valueText.setAttribute('x', (margin + 100).toString())
+        valueText.setAttribute('y', (textY + index * 20).toString())
+        valueText.setAttribute('fill', '#fff')
+        valueText.setAttribute('font-size', '14px')
+        valueText.setAttribute('font-family', 'Arial, sans-serif')
+        valueText.textContent = line
+
+        group.appendChild(labelText)
+        group.appendChild(valueText)
+        svg.appendChild(group)
+      })
+      textY += lines.length * 20
+      return
+    }
+
     const group = document.createElementNS(svgNS, 'g')
 
-    // Label
     const labelText = document.createElementNS(svgNS, 'text')
     labelText.setAttribute('x', margin.toString())
     labelText.setAttribute('y', textY.toString())
@@ -162,7 +247,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     labelText.setAttribute('font-family', 'Arial, sans-serif')
     labelText.textContent = `${label}:`
 
-    // Value
     const valueText = document.createElementNS(svgNS, 'text')
     valueText.setAttribute('x', (margin + 150).toString())
     valueText.setAttribute('y', textY.toString())
@@ -180,7 +264,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
 
   if (product) {
     addTextLine('Product Name', product.name)
-    addTextLine('Description', product.description)
+    addTextLine('Description', product.description, undefined, true)
     addTextLine('Stage', product.stage)
     addTextLine(
       'Estimated Weight',
