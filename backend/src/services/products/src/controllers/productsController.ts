@@ -351,7 +351,7 @@ const productsController = {
 
         const historyRecord = {
           stage: stage,
-          product_id: new ObjectId(productId),
+          product_id: new ObjectId(currentProduct._id),
           start_of_stage: new Date(),
           name: req.sessionData.firstName + ' ' + req.sessionData.lastName,
         }
