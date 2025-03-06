@@ -91,7 +91,8 @@ function Products() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
-
+  const [searchInput, setSearchInput] = useState('')
+  const [error, setError] = useState<string | null>(null)
   // Controlled fields for editing
   const [editName, setEditName] = useState('')
   const [editDescription, setEditDescription] = useState('')
@@ -102,7 +103,7 @@ function Products() {
   const [editEstimatedLength, setEditEstimatedLength] = useState('')
 
   const cacheRef = useRef<{
-    [key: number]: { products: Product[]; hasNext: boolean; timestamp: number }
+    [key: string]: { products: Product[]; hasNext: boolean; timestamp: number }
   }>({})
 
   // Refresh products: clear cache, reset page, and re-fetch.
@@ -128,7 +129,10 @@ function Products() {
     )
   }, [searchTerm, products])
 
-  const [{ loading, error }, execute] = useAxios(
+  const [{ loading }, execute] = useAxios<{
+    products: Product[]
+    hasNext: boolean
+  }>(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-products',
       method: 'POST',
@@ -164,19 +168,31 @@ function Products() {
   )
 
   useEffect(() => {
+    setError('')
     const fetchData = async () => {
       const now = Date.now()
-      const cached = cacheRef.current[currentPage]
+
+      const cacheKey = `${currentPage}-${searchTerm}`
+      const cached = cacheRef.current[cacheKey]
       if (cached && now - cached.timestamp < CACHE_EXPIRY_MS) {
         setProducts(cached.products)
         setHasNextPage(cached.hasNext)
         return
       }
       try {
-        const response = await execute({ data: { page: currentPage } })
+        let response
+        if (searchTerm) {
+          response = await execute({
+            data: { page: currentPage, searchTerms: searchTerm },
+          })
+        } else {
+          response = await execute({
+            data: { page: currentPage },
+          })
+        }
         if (response.data) {
           const { products, hasNext } = response.data
-          cacheRef.current[currentPage] = {
+          cacheRef.current[cacheKey] = {
             products,
             hasNext,
             timestamp: Date.now(),
@@ -185,11 +201,36 @@ function Products() {
           setHasNextPage(hasNext)
         }
       } catch (err) {
-        console.error(err)
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const error = err as any
+          if (error.response) {
+            if (
+              error.response.data &&
+              error.response.data.errors &&
+              error.response.data.errors.length > 0
+            ) {
+              setError(error.response.data.errors[0].message)
+              setProducts([])
+              if (
+                error.response.data.errors[0].message ===
+                'searchTerms can only contain letters, numbers, and spaces.'
+              ) {
+                setError('Search cannot contain symbols.')
+                setProducts([])
+              }
+            } else if (error.response.data.message) {
+              setError(error.response.data.message)
+              setProducts([])
+            }
+          } else {
+            setProducts([])
+          }
+        }
       }
     }
     fetchData()
-  }, [currentPage, execute])
+  }, [currentPage, searchTerm, execute])
 
   useEffect(() => {
     if (selectedProduct) {
@@ -359,13 +400,6 @@ function Products() {
     getCoreRowModel: getCoreRowModel(),
   })
 
-  if (error)
-    return (
-      <div className="text-light text-center mt-5">
-        Error loading products: {error.message}
-      </div>
-    )
-
   return (
     <>
       <div
@@ -391,12 +425,21 @@ function Products() {
               </div>
             </div>
           )}
+          {error && (
+            <div className="alert alert-danger text-center">{error}</div>
+          )}
           <div className="d-flex align-items-center justify-content-between mb-3">
             <Form.Control
               type="text"
               placeholder="Search by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setSearchTerm((e.target as HTMLInputElement).value)
+                  setCurrentPage(1)
+                }
+              }}
               className="w-25"
               style={{ fontSize: '14px', marginBottom: '10px' }}
             />
