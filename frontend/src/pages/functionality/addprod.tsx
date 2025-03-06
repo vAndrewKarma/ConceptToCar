@@ -146,7 +146,7 @@ const AddProductModal = ({
             <Form.Control
               type="number"
               value={addLength}
-              onChange={(e) => setAddheight(e.target.value)}
+              onChange={(e) => setAddLength(e.target.value)}
               placeholder="e.g., 100 (by default 0)"
             />
           </Form.Group>
@@ -168,7 +168,7 @@ const AddProductModal = ({
             <Form.Control
               type="number"
               value={addheight}
-              onChange={(e) => setAddLength(e.target.value)}
+              onChange={(e) => setAddheight(e.target.value)}
               placeholder="e.g., 35  (by default 0) "
             />
           </Form.Group>
