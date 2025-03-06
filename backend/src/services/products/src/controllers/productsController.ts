@@ -123,9 +123,7 @@ const productsController = {
 
       const history = await historyModel.getHistoryByProductId(prodb._id, 0, 5)
 
-      const materials = await materialModel.collection
-        .find({ product_id: prodb._id })
-        .toArray()
+      const materials = await materialModel.getMaterialCountByProduct(prodb._id)
       const materialsCount = materials.length
 
       const infotoshow = { ...prodb, history, materialsCount }
@@ -220,7 +218,7 @@ const productsController = {
       if (!allowedRoles.includes(userRole)) {
         throw new Unauthorized('Not authorized')
       }
-
+      const productStageModel = req.server.productStageModel
       const {
         productId,
         name,
@@ -350,6 +348,15 @@ const productsController = {
         }
         console.log('karma2')
         updateData.stage = stage
+
+        const historyRecord = {
+          stage: stage,
+          product_id: new ObjectId(productId),
+          start_of_stage: new Date(),
+          name: req.sessionData.firstName + ' ' + req.sessionData.lastName,
+        }
+
+        await productStageModel.addStageHistory(historyRecord)
       }
       console.log('STAGE ------' + updateData.stage)
       if (estimated_height !== undefined)

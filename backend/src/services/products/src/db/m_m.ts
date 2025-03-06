@@ -182,6 +182,12 @@ export class MaterialModel {
       .limit(limit)
       .toArray()
   }
+  async getMaterialCountByProduct(productId) {
+    const materials = await this.collection
+      .find({ product_id: productId })
+      .toArray()
+    return materials.length
+  }
 
   async searchMaterials(productId, searchTerms, page, limit) {
     const skip = (page - 1) * limit
