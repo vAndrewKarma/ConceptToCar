@@ -69,20 +69,23 @@ const wrapText = (
       currentLine = `${word} `
     }
   })
-  lines.push(currentLine.trim())
+  if (currentLine) lines.push(currentLine.trim())
   return lines
 }
 
 const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const svgNS = 'http://www.w3.org/2000/svg'
-  const width = 595 // A4 width
-  const height = 842 // A4 height
+  const width = 595 // A4 width in px
+  const height = 842 // A4 height in px
+
   const svg = document.createElementNS(svgNS, 'svg')
   svg.setAttribute('id', 'chart-svg')
   svg.setAttribute('width', width.toString())
   svg.setAttribute('height', height.toString())
 
-  // Gradient background
+  // ---------------------------
+  // 1) BACKGROUND GRADIENT
+  // ---------------------------
   const defs = document.createElementNS(svgNS, 'defs')
   const gradient = document.createElementNS(svgNS, 'linearGradient')
   gradient.setAttribute('id', 'background-gradient')
@@ -90,45 +93,47 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   gradient.setAttribute('y1', '0%')
   gradient.setAttribute('x2', '100%')
   gradient.setAttribute('y2', '100%')
-
   const stops = [
-    { offset: '25%', color: 'rgb(5, 10, 17)' },
-    { offset: '50%', color: 'rgb(14, 69, 74)' },
-    { offset: '75%', color: 'rgb(5, 10, 17)' },
+    { offset: '0%', color: '#021124' },
+    { offset: '50%', color: '#0e454a' },
+    { offset: '100%', color: '#021124' },
   ]
-
   stops.forEach((stop) => {
-    const stopElement = document.createElementNS(svgNS, 'stop')
-    stopElement.setAttribute('offset', stop.offset)
-    stopElement.setAttribute('stop-color', stop.color)
-    gradient.appendChild(stopElement)
+    const stopEl = document.createElementNS(svgNS, 'stop')
+    stopEl.setAttribute('offset', stop.offset)
+    stopEl.setAttribute('stop-color', stop.color)
+    gradient.appendChild(stopEl)
   })
-
   defs.appendChild(gradient)
   svg.appendChild(defs)
 
-  // Background rectangle
+  // Background rectangle with gradient fill
   const background = document.createElementNS(svgNS, 'rect')
+  background.setAttribute('x', '0')
+  background.setAttribute('y', '0')
   background.setAttribute('width', width.toString())
   background.setAttribute('height', height.toString())
   background.setAttribute('fill', 'url(#background-gradient)')
   svg.appendChild(background)
 
-  // Header
+  // ---------------------------
+  // 2) HEADER SECTION
+  // ---------------------------
+  const headerHeight = 100
   const header = document.createElementNS(svgNS, 'rect')
   header.setAttribute('x', '0')
   header.setAttribute('y', '0')
   header.setAttribute('width', width.toString())
-  header.setAttribute('height', '100')
-  header.setAttribute('fill', 'rgba(0, 40, 60, 0.8)')
+  header.setAttribute('height', headerHeight.toString())
+  header.setAttribute('fill', 'rgba(0, 40, 60, 0.85)')
   svg.appendChild(header)
 
-  // Company branding
+  // Company Branding
   const logoText = document.createElementNS(svgNS, 'text')
   logoText.setAttribute('x', '40')
   logoText.setAttribute('y', '50')
   logoText.setAttribute('fill', '#fff')
-  logoText.setAttribute('font-size', '24px')
+  logoText.setAttribute('font-size', '26px')
   logoText.setAttribute('font-family', 'Arial, sans-serif')
   logoText.setAttribute('font-weight', 'bold')
   logoText.textContent = 'CONCEPTOCAR'
@@ -137,27 +142,28 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const reportTitle = document.createElementNS(svgNS, 'text')
   reportTitle.setAttribute('x', '40')
   reportTitle.setAttribute('y', '80')
-  reportTitle.setAttribute('fill', 'rgba(255, 255, 255, 0.8)')
+  reportTitle.setAttribute('fill', 'rgba(255, 255, 255, 0.9)')
   reportTitle.setAttribute('font-size', '18px')
   reportTitle.setAttribute('font-family', 'Arial, sans-serif')
   reportTitle.textContent = 'Product Development Report'
   svg.appendChild(reportTitle)
 
-  // Metadata
-  const metadata = document.createElementNS(svgNS, 'g')
-  let metaY = 40
+  // ---------------------------
+  // 3) METADATA (TOP RIGHT)
+  // ---------------------------
+  const metadataGroup = document.createElementNS(svgNS, 'g')
+  let metaY = 30
   const addMetadata = (label: string, value?: string) => {
     if (!value) return
-
-    const text = document.createElementNS(svgNS, 'text')
-    text.setAttribute('x', (width - 200).toString())
-    text.setAttribute('y', metaY.toString())
-    text.setAttribute('fill', '#fff')
-    text.setAttribute('font-size', '12px')
-    text.setAttribute('font-family', 'Arial, sans-serif')
-    text.innerHTML = `<tspan font-weight="bold">${label}:</tspan> ${value}`
-    metadata.appendChild(text)
-    metaY += 20
+    const metaText = document.createElementNS(svgNS, 'text')
+    metaText.setAttribute('x', (width - 220).toString())
+    metaText.setAttribute('y', metaY.toString())
+    metaText.setAttribute('fill', '#fff')
+    metaText.setAttribute('font-size', '12px')
+    metaText.setAttribute('font-family', 'Arial, sans-serif')
+    metaText.innerHTML = `<tspan font-weight="bold">${label}:</tspan> ${value}`
+    metadataGroup.appendChild(metaText)
+    metaY += 18
   }
 
   if (product) {
@@ -175,21 +181,33 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     )
     addMetadata('Created By', product.createdBy || 'N/A')
   }
-  svg.appendChild(metadata)
+  svg.appendChild(metadataGroup)
 
-  // Content container
-  const content = document.createElementNS(svgNS, 'rect')
-  content.setAttribute('x', '40')
-  content.setAttribute('y', '120')
-  content.setAttribute('width', (width - 80).toString())
-  content.setAttribute('height', (height - 200).toString())
-  content.setAttribute('rx', '8')
-  content.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
-  svg.appendChild(content)
+  // ---------------------------
+  // 4) CONTENT AREA
+  // ---------------------------
+  const contentX = 40
+  const contentY = headerHeight + 20
+  const contentWidth = width - 80
+  const contentHeight = height - headerHeight - 100
 
-  // Product info
-  let textY = 150
-  const maxTextWidth = width - 200
+  const contentBg = document.createElementNS(svgNS, 'rect')
+  contentBg.setAttribute('x', contentX.toString())
+  contentBg.setAttribute('y', contentY.toString())
+  contentBg.setAttribute('width', contentWidth.toString())
+  contentBg.setAttribute('height', contentHeight.toString())
+  contentBg.setAttribute('rx', '8')
+  contentBg.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
+  svg.appendChild(contentBg)
+
+  // ---------------------------
+  // 5) PRODUCT INFORMATION
+  // ---------------------------
+  let textY = contentY + 30
+  const labelX = contentX + 20
+  const valueX = labelX + 140
+  const textSpacing = 25
+  const maxTextWidth = contentWidth - 180
 
   const addTextBlock = (
     label: string,
@@ -199,74 +217,30 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     if (!value) return
 
     // Label
-    const labelText = document.createElementNS(svgNS, 'text')
-    labelText.setAttribute('x', '60')
-    labelText.setAttribute('y', textY.toString())
-    labelText.setAttribute('fill', 'rgba(255, 255, 255, 0.8)')
-    labelText.setAttribute('font-size', '14px')
-    labelText.setAttribute('font-family', 'Arial, sans-serif')
-    labelText.textContent = `${label}:`
-    svg.appendChild(labelText)
+    const labelEl = document.createElementNS(svgNS, 'text')
+    labelEl.setAttribute('x', labelX.toString())
+    labelEl.setAttribute('y', textY.toString())
+    labelEl.setAttribute('fill', 'rgba(255, 255, 255, 0.85)')
+    labelEl.setAttribute('font-size', '14px')
+    labelEl.setAttribute('font-family', 'Arial, sans-serif')
+    labelEl.textContent = `${label}:`
+    svg.appendChild(labelEl)
 
-    // Value
+    // Value (wrapped if needed)
     const displayValue = label === 'Stage' ? capitalize(value) : value
-    const lines = wrapText(
-      `${displayValue}${unit ? ` ${unit}` : ''}`,
-      maxTextWidth,
-      14
-    )
-
+    const fullText = unit ? `${displayValue} ${unit}` : displayValue
+    const lines = wrapText(fullText, maxTextWidth, 14)
     lines.forEach((line, index) => {
-      const valueText = document.createElementNS(svgNS, 'text')
-      valueText.setAttribute('x', '200')
-      valueText.setAttribute('y', (textY + index * 20).toString())
-      valueText.setAttribute('fill', '#fff')
-      valueText.setAttribute('font-size', '14px')
-      valueText.setAttribute('font-family', 'Arial, sans-serif')
-      valueText.textContent = line
-      svg.appendChild(valueText)
+      const valueEl = document.createElementNS(svgNS, 'text')
+      valueEl.setAttribute('x', valueX.toString())
+      valueEl.setAttribute('y', (textY + index * 18).toString())
+      valueEl.setAttribute('fill', '#fff')
+      valueEl.setAttribute('font-size', '14px')
+      valueEl.setAttribute('font-family', 'Arial, sans-serif')
+      valueEl.textContent = line
+      svg.appendChild(valueEl)
     })
-
-    // Add work status for Stage field
-    if (label === 'Stage') {
-      const currentStage = value as Stage
-      const activeStages: Stage[] = [
-        'concept',
-        'feasibility',
-        'design',
-        'production',
-      ]
-      const isActive = activeStages.includes(currentStage)
-      const statusColor = isActive
-        ? STATUS_COLORS.active
-        : STATUS_COLORS.inactive
-      const statusText = isActive ? 'In Work' : 'Out of Work'
-
-      const statusGroup = document.createElementNS(svgNS, 'g')
-      statusGroup.setAttribute('transform', `translate(500, ${textY - 10})`)
-
-      // Status indicator
-      const indicator = document.createElementNS(svgNS, 'circle')
-      indicator.setAttribute('cx', '0')
-      indicator.setAttribute('cy', '0')
-      indicator.setAttribute('r', '6')
-      indicator.setAttribute('fill', statusColor)
-      statusGroup.appendChild(indicator)
-
-      // Status text
-      const statusLabel = document.createElementNS(svgNS, 'text')
-      statusLabel.setAttribute('x', '15')
-      statusLabel.setAttribute('y', '4')
-      statusLabel.setAttribute('fill', '#fff')
-      statusLabel.setAttribute('font-size', '12px')
-      statusLabel.setAttribute('font-family', 'Arial, sans-serif')
-      statusLabel.textContent = statusText
-      statusGroup.appendChild(statusLabel)
-
-      svg.appendChild(statusGroup)
-    }
-
-    textY += lines.length * 20 + 15
+    textY += lines.length * 18 + textSpacing
   }
 
   if (product) {
@@ -291,7 +265,30 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     addTextBlock('Estimated Width', product.estimated_width, product.width_unit)
   }
 
-  // Status progress circle
+  // ---------------------------
+  // 6) ROUND PROGRESS CHART
+  //    (Placed near the bottom-left of content area)
+  // ---------------------------
+  const chartGroup = document.createElementNS(svgNS, 'g')
+
+  // Place the chart near the bottom-left inside the content area:
+  const chartCenterX = contentX + 60
+  const chartCenterY = contentY + contentHeight - 100
+  const chartRadius = 40
+  const strokeWidth = 8
+  const circumference = 2 * Math.PI * chartRadius
+
+  // Track circle (background)
+  const trackCircle = document.createElementNS(svgNS, 'circle')
+  trackCircle.setAttribute('cx', chartCenterX.toString())
+  trackCircle.setAttribute('cy', chartCenterY.toString())
+  trackCircle.setAttribute('r', chartRadius.toString())
+  trackCircle.setAttribute('fill', 'none')
+  trackCircle.setAttribute('stroke', '#555')
+  trackCircle.setAttribute('stroke-width', strokeWidth.toString())
+  chartGroup.appendChild(trackCircle)
+
+  // Progress logic (kept as in your current code)
   const currentStage = (product?.stage as Stage) || 'default'
   const activeStages: Stage[] = [
     'concept',
@@ -300,83 +297,107 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     'production',
   ]
   const isActive = activeStages.includes(currentStage)
-  const progress = isActive
-    ? stagesOrder.indexOf(currentStage) / (activeStages.length - 1)
-    : 0
-  const statusColor = isActive
-    ? STATUS_COLORS.active
-    : ['standby', 'withdrawal'].includes(currentStage)
-    ? STATUS_COLORS.standby
-    : STATUS_COLORS.inactive
 
-  const statusGroup = document.createElementNS(svgNS, 'g')
-  statusGroup.setAttribute('transform', `translate(${width - 200}, 180)`)
-
-  // Background circle
-  const bgCircle = document.createElementNS(svgNS, 'circle')
-  bgCircle.setAttribute('cx', '0')
-  bgCircle.setAttribute('cy', '0')
-  bgCircle.setAttribute('r', '50')
-  bgCircle.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
-  statusGroup.appendChild(bgCircle)
-
-  // Progress elements
+  let progress = 0
   if (isActive) {
-    const progressArc = document.createElementNS(svgNS, 'circle')
-    progressArc.setAttribute('cx', '0')
-    progressArc.setAttribute('cy', '0')
-    progressArc.setAttribute('r', '45')
-    progressArc.setAttribute('fill', 'none')
-    progressArc.setAttribute('stroke', statusColor)
-    progressArc.setAttribute('stroke-width', '6')
-    progressArc.setAttribute(
-      'stroke-dasharray',
-      `${2 * Math.PI * 45 * progress} 1000`
-    )
-    progressArc.setAttribute('stroke-linecap', 'round')
-    progressArc.setAttribute('transform', 'rotate(-90 0 0)')
-    statusGroup.appendChild(progressArc)
-
-    const percentText = document.createElementNS(svgNS, 'text')
-    percentText.setAttribute('x', '0')
-    percentText.setAttribute('y', '0')
-    percentText.setAttribute('text-anchor', 'middle')
-    percentText.setAttribute('dominant-baseline', 'middle')
-    percentText.setAttribute('fill', statusColor)
-    percentText.setAttribute('font-size', '24px')
-    percentText.setAttribute('font-weight', 'bold')
-    percentText.textContent = `${Math.round(progress * 100)}%`
-    statusGroup.appendChild(percentText)
-  } else {
-    const statusText = document.createElementNS(svgNS, 'text')
-    statusText.setAttribute('x', '0')
-    statusText.setAttribute('y', '0')
-    statusText.setAttribute('text-anchor', 'middle')
-    statusText.setAttribute('dominant-baseline', 'middle')
-    statusText.setAttribute('fill', statusColor)
-    statusText.setAttribute('font-size', '16px')
-    statusText.setAttribute('font-weight', 'bold')
-    statusText.textContent =
-      currentStage === 'cancelled' ? 'Terminated' : 'Out of Work'
-    statusGroup.appendChild(statusText)
+    progress = stagesOrder.indexOf(currentStage) / (activeStages.length - 1)
   }
 
-  svg.appendChild(statusGroup)
+  let strokeColor = STATUS_COLORS.default
+  if (isActive) {
+    strokeColor = STATUS_COLORS.active
+  } else if (['standby', 'withdrawal'].includes(currentStage)) {
+    strokeColor = STATUS_COLORS.standby
+  } else if (currentStage === 'cancelled') {
+    strokeColor = STATUS_COLORS.inactive
+  }
 
-  // Footer
+  // Progress arc
+  const progressCircle = document.createElementNS(svgNS, 'circle')
+  progressCircle.setAttribute('cx', chartCenterX.toString())
+  progressCircle.setAttribute('cy', chartCenterY.toString())
+  progressCircle.setAttribute('r', chartRadius.toString())
+  progressCircle.setAttribute('fill', 'none')
+  progressCircle.setAttribute('stroke', strokeColor)
+  progressCircle.setAttribute('stroke-width', strokeWidth.toString())
+  progressCircle.setAttribute('stroke-linecap', 'round')
+
+  // Calculate dasharray based on progress
+  const dashLength = progress * circumference
+  const gapLength = circumference - dashLength
+  progressCircle.setAttribute('stroke-dasharray', `${dashLength} ${gapLength}`)
+  progressCircle.setAttribute(
+    'transform',
+    `rotate(-90 ${chartCenterX} ${chartCenterY})`
+  )
+  chartGroup.appendChild(progressCircle)
+
+  // Percentage text in the center of the circle
+  const percentText = document.createElementNS(svgNS, 'text')
+  percentText.setAttribute('x', chartCenterX.toString())
+  percentText.setAttribute('y', (chartCenterY + 5).toString())
+  percentText.setAttribute('text-anchor', 'middle')
+  percentText.setAttribute('dominant-baseline', 'middle')
+  percentText.setAttribute('fill', strokeColor)
+  percentText.setAttribute('font-size', '16px')
+  percentText.setAttribute('font-weight', 'bold')
+  percentText.setAttribute('font-family', 'Arial, sans-serif')
+  percentText.textContent = `${Math.round(progress * 100)}%`
+  chartGroup.appendChild(percentText)
+
+  // Determine Active/Inactive/Standby/Terminated label
+  let statusText = ''
+  if (isActive) {
+    statusText = 'Active'
+  } else if (['standby', 'withdrawal'].includes(currentStage)) {
+    statusText = 'Standby'
+  } else if (currentStage === 'cancelled') {
+    statusText = 'Terminated'
+  } else {
+    statusText = 'Inactive'
+  }
+
+  // Show status text just below the circle
+  const statusLabel = document.createElementNS(svgNS, 'text')
+  statusLabel.setAttribute('x', chartCenterX.toString())
+  statusLabel.setAttribute('y', (chartCenterY + chartRadius + 20).toString())
+  statusLabel.setAttribute('text-anchor', 'middle')
+  statusLabel.setAttribute('fill', strokeColor)
+  statusLabel.setAttribute('font-size', '12px')
+  statusLabel.setAttribute('font-family', 'Arial, sans-serif')
+  statusLabel.textContent = statusText
+  chartGroup.appendChild(statusLabel)
+
+  // Also show a "Progress: XX%" label below that
+  const percentLabel = document.createElementNS(svgNS, 'text')
+  percentLabel.setAttribute('x', chartCenterX.toString())
+  percentLabel.setAttribute('y', (chartCenterY + chartRadius + 40).toString())
+  percentLabel.setAttribute('text-anchor', 'middle')
+  percentLabel.setAttribute('fill', strokeColor)
+  percentLabel.setAttribute('font-size', '12px')
+  percentLabel.setAttribute('font-family', 'Arial, sans-serif')
+  percentLabel.textContent = `Progress: ${Math.round(progress * 100)}%`
+  chartGroup.appendChild(percentLabel)
+
+  svg.appendChild(chartGroup)
+
+  // ---------------------------
+  // 7) FOOTER SECTION
+  // ---------------------------
+  const footerHeight = 60
   const footer = document.createElementNS(svgNS, 'rect')
   footer.setAttribute('x', '0')
-  footer.setAttribute('y', (height - 60).toString())
+  footer.setAttribute('y', (height - footerHeight).toString())
   footer.setAttribute('width', width.toString())
-  footer.setAttribute('height', '60')
-  footer.setAttribute('fill', 'rgba(0, 40, 60, 0.8)')
+  footer.setAttribute('height', footerHeight.toString())
+  footer.setAttribute('fill', 'rgba(0, 40, 60, 0.85)')
   svg.appendChild(footer)
 
   const footerText = document.createElementNS(svgNS, 'text')
   footerText.setAttribute('x', (width / 2).toString())
   footerText.setAttribute('y', (height - 20).toString())
   footerText.setAttribute('text-anchor', 'middle')
-  footerText.setAttribute('fill', 'rgba(255, 255, 255, 0.7)')
+  footerText.setAttribute('fill', 'rgba(255, 255, 255, 0.8)')
   footerText.setAttribute('font-size', '12px')
   footerText.setAttribute('font-family', 'Arial, sans-serif')
   footerText.textContent = `Confidential Document - ${new Date().toLocaleDateString()} - ConceptoCar Systems`
@@ -388,13 +409,11 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
 const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
   const handleExportPDF = async () => {
     const svgElement = generateChartSVG(product)
-
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'px',
       format: [595, 842],
     })
-
     await svg2pdf(svgElement, pdf, { x: 0, y: 0 })
 
     const fileName = product?.name

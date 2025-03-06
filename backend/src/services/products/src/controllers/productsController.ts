@@ -103,33 +103,19 @@ const productsController = {
       throw err
     }
   },
-
   async GetProduct(req, res) {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
       const { name } = req.body
       const redis = req.server.redis
       const productModel = req.server.productModel
-      const historyModel = req.server.productStageModel
-      const materialModel = req.server.materialModel
-
-      let cachedProduct = await redis.get(`product:${name}`)
-      if (cachedProduct) {
-        return res.send(JSON.parse(cachedProduct))
-      }
+      const product = await redis.get(`product: ${name}`)
+      if (product) return res.send(JSON.parse(product))
 
       const prodb = await productModel.findProductByName(name)
-      if (!prodb) throw new BadRequestError("Product doesn't exist")
-
-      const history = await historyModel.getHistoryByProductId(prodb._id, 0, 5)
-
-      const materials = await materialModel.getMaterialCountByProduct(prodb._id)
-      const materialsCount = materials.length
-
-      const infotoshow = { ...prodb, history, materialsCount }
-
-      await redis.set(`product:${name}`, JSON.stringify(infotoshow), 'EX', 3600)
-      res.send(infotoshow)
+      if (!prodb) throw new BadRequestError('Product doesn t exist')
+      await redis.set(`product: ${name}`, JSON.stringify(prodb), 'EX', 3600)
+      res.send(prodb)
     } catch (err) {
       throw err
     }
