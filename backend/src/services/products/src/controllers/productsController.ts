@@ -125,7 +125,12 @@ const productsController = {
         stageHistory,
       }
       await redis.set(`product: ${name}`, JSON.stringify(data), 'EX', 3600)
-      res.send(prodb)
+      res.send({
+        prodb,
+        history: {
+          stageHistory,
+        },
+      })
     } catch (err) {
       throw err
     }
