@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { jsPDF } from 'jspdf'
 import { svg2pdf } from 'svg2pdf.js'
@@ -10,6 +11,14 @@ type Stage =
   | 'withdrawal'
   | 'standby'
   | 'cancelled'
+
+interface StageHistory {
+  _id: string
+  stage: Stage
+  product_id: string
+  start_of_stage: string
+  name: string
+}
 
 interface ProductData {
   _id: string
@@ -26,6 +35,11 @@ interface ProductData {
   createdBy?: string
   created_at?: string
   updated_at?: string
+  // Support both response types:
+  stageHistory?: StageHistory[]
+  history?: {
+    stageHistory: StageHistory[]
+  }
 }
 
 interface ExportChartPDFProps {
@@ -51,6 +65,7 @@ const STATUS_COLORS = {
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
+// This helper splits the text into multiple lines based on maxWidth
 const wrapText = (
   text: string,
   maxWidth: number,
@@ -227,6 +242,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     svg.appendChild(labelEl)
 
     // Value (wrapped if needed)
+    // For Stage we capitalize the value
     const displayValue = label === 'Stage' ? capitalize(value) : value
     const fullText = unit ? `${displayValue} ${unit}` : displayValue
     const lines = wrapText(fullText, maxTextWidth, 14)
@@ -266,12 +282,71 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   }
 
   // ---------------------------
-  // 6) ROUND PROGRESS CHART
+  // 6) MATERIALS USED (Clickable Link)
+  // ---------------------------
+  if (product) {
+    const materialsUsed = Math.floor(Math.random() * 100) + 1
+    const materialsText = document.createElementNS(svgNS, 'text')
+    materialsText.setAttribute('x', labelX.toString())
+    materialsText.setAttribute('y', textY.toString())
+    materialsText.setAttribute('fill', '#fff') // Changed to white
+    materialsText.setAttribute('font-size', '14px')
+    materialsText.setAttribute('font-family', 'Arial, sans-serif')
+    materialsText.textContent = `Materials Used: ${materialsUsed}`
+    svg.appendChild(materialsText)
+    textY += 25
+  }
+
+  // ---------------------------
+  // 7) STAGE HISTORY SECTION (Moved Lower)
+  // ---------------------------
+  if (product) {
+    // Add extra offset before stage history
+    textY += 20
+    // Extract stage history from both variants
+    const stageHistory: StageHistory[] =
+      (product as any).stageHistory ||
+      ((product as any).history && (product as any).history.stageHistory) ||
+      []
+
+    if (Array.isArray(stageHistory) && stageHistory.length > 0) {
+      // Section header
+      const historyHeader = document.createElementNS(svgNS, 'text')
+      historyHeader.setAttribute('x', labelX.toString())
+      historyHeader.setAttribute('y', textY.toString())
+      historyHeader.setAttribute('fill', 'rgba(255, 255, 255, 0.9)')
+      historyHeader.setAttribute('font-size', '16px')
+      historyHeader.setAttribute('font-family', 'Arial, sans-serif')
+      historyHeader.setAttribute('font-weight', 'bold')
+      historyHeader.textContent = 'Stage History:'
+      svg.appendChild(historyHeader)
+      textY += 25
+
+      // List each stage history entry
+      stageHistory.forEach((item) => {
+        const stageDate = new Date(item.start_of_stage).toLocaleDateString()
+        const lineText = `Started stage: ${capitalize(item.stage)} by ${
+          item.name
+        } on ${stageDate}`
+
+        const historyItemEl = document.createElementNS(svgNS, 'text')
+        historyItemEl.setAttribute('x', labelX.toString())
+        historyItemEl.setAttribute('y', textY.toString())
+        historyItemEl.setAttribute('fill', '#fff')
+        historyItemEl.setAttribute('font-size', '14px')
+        historyItemEl.setAttribute('font-family', 'Arial, sans-serif')
+        historyItemEl.textContent = lineText
+        svg.appendChild(historyItemEl)
+        textY += 18
+      })
+    }
+  }
+
+  // ---------------------------
+  // 8) ROUND PROGRESS CHART
   //    (Placed near the bottom-left of content area)
   // ---------------------------
   const chartGroup = document.createElementNS(svgNS, 'g')
-
-  // Place the chart near the bottom-left inside the content area:
   const chartCenterX = contentX + 400
   const chartCenterY = contentY + contentHeight - 450
   const chartRadius = 50
@@ -288,7 +363,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   trackCircle.setAttribute('stroke-width', strokeWidth.toString())
   chartGroup.appendChild(trackCircle)
 
-  // Progress logic (kept as in your current code)
+  // Progress logic
   const currentStage = (product?.stage as Stage) || 'default'
   const activeStages: Stage[] = [
     'concept',
@@ -321,8 +396,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   progressCircle.setAttribute('stroke', strokeColor)
   progressCircle.setAttribute('stroke-width', strokeWidth.toString())
   progressCircle.setAttribute('stroke-linecap', 'round')
-
-  // Calculate dasharray based on progress
   const dashLength = progress * circumference
   const gapLength = circumference - dashLength
   progressCircle.setAttribute('stroke-dasharray', `${dashLength} ${gapLength}`)
@@ -346,25 +419,18 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     percentText.textContent = `${Math.round(progress * 100)}%`
   } else {
     percentText.setAttribute('font-size', '8.4px')
-    percentText.textContent = `Inactive \n
-     Development`
+    percentText.textContent = `Inactive \n Development`
   }
-
   chartGroup.appendChild(percentText)
 
-  // Determine Active/Inactive/Standby/Terminated label
-  let statusText = ''
-  if (isActive) {
-    statusText = 'Active'
-  } else if (['standby', 'withdrawal'].includes(currentStage)) {
-    statusText = 'Inactive'
-  } else if (currentStage === 'cancelled') {
-    statusText = 'Terminated'
-  } else {
-    statusText = 'Inactive'
-  }
-
-  // Show status text just below the circle
+  // Status label below the circle
+  const statusText = isActive
+    ? 'Progress'
+    : ['standby', 'withdrawal'].includes(currentStage)
+    ? 'Inactive'
+    : currentStage === 'cancelled'
+    ? 'Terminated'
+    : 'Inactive'
   const statusLabel = document.createElementNS(svgNS, 'text')
   statusLabel.setAttribute('x', chartCenterX.toString())
   statusLabel.setAttribute('y', (chartCenterY + chartRadius + 30).toString())
@@ -375,12 +441,10 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   statusLabel.textContent = statusText
   chartGroup.appendChild(statusLabel)
 
-  // Also show a "Progress: XX%" label below that
-
   svg.appendChild(chartGroup)
 
   // ---------------------------
-  // 7) FOOTER SECTION
+  // 9) FOOTER SECTION
   // ---------------------------
   const footerHeight = 60
   const footer = document.createElementNS(svgNS, 'rect')
@@ -414,6 +478,22 @@ const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
     })
     await svg2pdf(svgElement, pdf, { x: 0, y: 0 })
 
+    const baseURL = 'http://localhost:5173'
+    const productURL = `${baseURL}/product/${product?.name}/${product?._id}`
+    const materialsURL = `${productURL}/materials`
+    const homeURL = baseURL
+
+    // Add clickable links using jsPDF's textWithLink (adjust coordinates as needed)
+    let linkX = 85 // X coordinate for the links
+    const linkY = 700 // starting Y coordinate for the first link
+
+    pdf.setFontSize(14)
+    pdf.setTextColor(0, 0, 255) // Blue color for clickable links
+    pdf.textWithLink('View Product Page', linkX, linkY, { url: productURL })
+    linkX += 175
+    pdf.textWithLink('View Materials Page', linkX, linkY, { url: materialsURL })
+    linkX += 175
+    pdf.textWithLink('Go to Homepage', linkX, linkY, { url: homeURL })
     const fileName = product?.name
       ? `${product.name.replace(/\s+/g, '_')}_Report_${new Date()
           .toISOString()

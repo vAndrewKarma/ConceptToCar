@@ -122,15 +122,10 @@ const productsController = {
       )
       const data = {
         ...prodb,
-        stageHistory,
+        history: stageHistory,
       }
       await redis.set(`product: ${name}`, JSON.stringify(data), 'EX', 3600)
-      res.send({
-        prodb,
-        history: {
-          stageHistory,
-        },
-      })
+      res.send(data)
     } catch (err) {
       throw err
     }
@@ -352,7 +347,7 @@ const productsController = {
           stage: stage,
           product_id: productId,
           start_of_stage: new Date(),
-          name: currentProduct.createdBy,
+          name: req.sessionData.firstName + ' ' + req.sessionData.lastName,
         }
 
         await productStageModel.addStageHistory(historyRecord)

@@ -144,7 +144,11 @@ function Product() {
     if (pname) {
       execute({ data: { name: pname } })
         .then((response) => {
-          if (response.data) {
+          if (response.data._id) {
+            setProduct(response.data)
+          } else if (response.data.prodb._id) {
+            setProduct(response.data.prodb_id)
+          } else {
             setProduct(response.data)
           }
         })
@@ -239,17 +243,10 @@ function Product() {
       })
 
       // Update the local product state to reflect the changes.
-      setProduct({
-        ...product,
-        name: editName,
-        description: editDescription,
-        stage: editStage.toLowerCase(),
-        estimated_height: editEstimatedHeight,
-        estimated_width: editEstimatedWidth,
-        estimated_weight: editEstimatedWeight,
-        estimated_length: editEstimatedLength,
-      })
+      await execute({ data: { name: editName } })
+
       setShowEditModal(false)
+
       navigate(`/product/${editName}/${displayProduct._id}`)
     } catch (error) {
       console.error('Error updating product:', error)
