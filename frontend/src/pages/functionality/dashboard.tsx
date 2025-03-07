@@ -41,9 +41,6 @@ function Dashboard() {
                 <Tooltip />
                 <Legend />
               </PieChart>
-              <p className="text-light" style={{ paddingTop: '20px' }}>
-                📅 Data from the last 90 days
-              </p>
             </Card>
           </Col>
         </Row>

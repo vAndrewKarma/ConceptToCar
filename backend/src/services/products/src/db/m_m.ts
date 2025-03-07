@@ -173,6 +173,14 @@ export class MaterialModel {
       return false
     }
   }
+  async getMaterialCountByProduct(productId: string): Promise<number> {
+    try {
+      return await this.collection.countDocuments({ product_id: productId })
+    } catch (error) {
+      console.error('Error counting materials for product:', error)
+      throw error
+    }
+  }
 
   async getMaterialsByProduct(productId, page, limit) {
     const skip = (page - 1) * limit
@@ -181,12 +189,6 @@ export class MaterialModel {
       .skip(skip)
       .limit(limit)
       .toArray()
-  }
-  async getMaterialCountByProduct(productId) {
-    const materials = await this.collection
-      .find({ product_id: productId })
-      .toArray()
-    return materials.length
   }
 
   async searchMaterials(productId, searchTerms, page, limit) {

@@ -246,7 +246,16 @@ function Product() {
       await execute({ data: { name: editName } })
 
       setShowEditModal(false)
-
+      setProduct({
+        ...product,
+        name: editName,
+        description: editDescription,
+        stage: editStage,
+        estimated_height: editEstimatedHeight,
+        estimated_width: editEstimatedWidth,
+        estimated_weight: editEstimatedWeight,
+        estimated_length: editEstimatedLength,
+      })
       navigate(`/product/${editName}/${displayProduct._id}`)
     } catch (error) {
       console.error('Error updating product:', error)

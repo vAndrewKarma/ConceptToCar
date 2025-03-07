@@ -110,6 +110,7 @@ const productsController = {
       const redis = req.server.redis
       const productModel = req.server.productModel
       const productStageModel = req.server.productStageModel
+      const materialModel = req.server.materialModel
       const product = await redis.get(`product: ${name}`)
       if (product) return res.send(JSON.parse(product))
 
@@ -120,10 +121,14 @@ const productsController = {
         0,
         5
       )
+      const materials = await materialModel.getMaterialCountByProduct(prodb._id)
       const data = {
         ...prodb,
         history: stageHistory,
+        materialength: materials,
       }
+      console.log(data)
+      console.log(materials.length)
       await redis.set(`product: ${name}`, JSON.stringify(data), 'EX', 3600)
       res.send(data)
     } catch (err) {

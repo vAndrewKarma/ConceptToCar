@@ -35,11 +35,8 @@ interface ProductData {
   createdBy?: string
   created_at?: string
   updated_at?: string
-  // Support both response types:
   stageHistory?: StageHistory[]
-  history?: {
-    stageHistory: StageHistory[]
-  }
+  history?: [stageHistory: StageHistory[]]
 }
 
 interface ExportChartPDFProps {
@@ -65,13 +62,9 @@ const STATUS_COLORS = {
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
-// This helper splits the text into multiple lines based on maxWidth
-const wrapText = (
-  text: string,
-  maxWidth: number,
-  fontSize: number
-): string[] => {
-  const words = text.split(' ')
+const wrapText = (text: any, maxWidth: number, fontSize: number): string[] => {
+  const textStr = typeof text === 'string' ? text : String(text)
+  const words = textStr.split(' ')
   const lines: string[] = []
   let currentLine = ''
   const charWidth = fontSize * 0.6
@@ -90,17 +83,15 @@ const wrapText = (
 
 const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const svgNS = 'http://www.w3.org/2000/svg'
-  const width = 595 // A4 width in px
-  const height = 842 // A4 height in px
+  const width = 595
+  const height = 842
 
   const svg = document.createElementNS(svgNS, 'svg')
   svg.setAttribute('id', 'chart-svg')
   svg.setAttribute('width', width.toString())
   svg.setAttribute('height', height.toString())
 
-  // ---------------------------
-  // 1) BACKGROUND GRADIENT
-  // ---------------------------
+  // Background gradient
   const defs = document.createElementNS(svgNS, 'defs')
   const gradient = document.createElementNS(svgNS, 'linearGradient')
   gradient.setAttribute('id', 'background-gradient')
@@ -122,7 +113,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   defs.appendChild(gradient)
   svg.appendChild(defs)
 
-  // Background rectangle with gradient fill
   const background = document.createElementNS(svgNS, 'rect')
   background.setAttribute('x', '0')
   background.setAttribute('y', '0')
@@ -131,9 +121,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   background.setAttribute('fill', 'url(#background-gradient)')
   svg.appendChild(background)
 
-  // ---------------------------
-  // 2) HEADER SECTION
-  // ---------------------------
+  // Header
   const headerHeight = 100
   const header = document.createElementNS(svgNS, 'rect')
   header.setAttribute('x', '0')
@@ -143,7 +131,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   header.setAttribute('fill', 'rgba(0, 40, 60, 0.85)')
   svg.appendChild(header)
 
-  // Company Branding
   const logoText = document.createElementNS(svgNS, 'text')
   logoText.setAttribute('x', '40')
   logoText.setAttribute('y', '50')
@@ -163,9 +150,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   reportTitle.textContent = 'Product Development Report'
   svg.appendChild(reportTitle)
 
-  // ---------------------------
-  // 3) METADATA (TOP RIGHT)
-  // ---------------------------
+  // Metadata
   const metadataGroup = document.createElementNS(svgNS, 'g')
   let metaY = 30
   const addMetadata = (label: string, value?: string) => {
@@ -198,9 +183,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   }
   svg.appendChild(metadataGroup)
 
-  // ---------------------------
-  // 4) CONTENT AREA
-  // ---------------------------
+  // Content area
   const contentX = 40
   const contentY = headerHeight + 20
   const contentWidth = width - 80
@@ -215,9 +198,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   contentBg.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
   svg.appendChild(contentBg)
 
-  // ---------------------------
-  // 5) PRODUCT INFORMATION
-  // ---------------------------
+  // Product information
   let textY = contentY + 30
   const labelX = contentX + 20
   const valueX = labelX + 140
@@ -231,7 +212,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   ) => {
     if (!value) return
 
-    // Label
     const labelEl = document.createElementNS(svgNS, 'text')
     labelEl.setAttribute('x', labelX.toString())
     labelEl.setAttribute('y', textY.toString())
@@ -241,8 +221,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     labelEl.textContent = `${label}:`
     svg.appendChild(labelEl)
 
-    // Value (wrapped if needed)
-    // For Stage we capitalize the value
     const displayValue = label === 'Stage' ? capitalize(value) : value
     const fullText = unit ? `${displayValue} ${unit}` : displayValue
     const lines = wrapText(fullText, maxTextWidth, 14)
@@ -281,15 +259,13 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     addTextBlock('Estimated Width', product.estimated_width, product.width_unit)
   }
 
-  // ---------------------------
-  // 6) MATERIALS USED (Clickable Link)
-  // ---------------------------
+  // Materials Used
   if (product) {
     const materialsUsed = Math.floor(Math.random() * 100) + 1
     const materialsText = document.createElementNS(svgNS, 'text')
     materialsText.setAttribute('x', labelX.toString())
     materialsText.setAttribute('y', textY.toString())
-    materialsText.setAttribute('fill', '#fff') // Changed to white
+    materialsText.setAttribute('fill', '#fff')
     materialsText.setAttribute('font-size', '14px')
     materialsText.setAttribute('font-family', 'Arial, sans-serif')
     materialsText.textContent = `Materials Used: ${materialsUsed}`
@@ -297,20 +273,22 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     textY += 25
   }
 
-  // ---------------------------
-  // 7) STAGE HISTORY SECTION (Moved Lower)
-  // ---------------------------
+  // Stage History
   if (product) {
-    // Add extra offset before stage history
     textY += 20
-    // Extract stage history from both variants
-    const stageHistory: StageHistory[] =
-      (product as any).stageHistory ||
-      ((product as any).history && (product as any).history.stageHistory) ||
-      []
+    let stageHistory: StageHistory[] = []
+    if ((product as any).stageHistory) {
+      stageHistory = (product as any).stageHistory
+    } else if (Array.isArray((product as any).history)) {
+      stageHistory = (product as any).history
+    } else if (
+      (product as any).history &&
+      Array.isArray((product as any).history.stageHistory)
+    ) {
+      stageHistory = (product as any).history.stageHistory
+    }
 
-    if (Array.isArray(stageHistory) && stageHistory.length > 0) {
-      // Section header
+    if (stageHistory.length > 0) {
       const historyHeader = document.createElementNS(svgNS, 'text')
       historyHeader.setAttribute('x', labelX.toString())
       historyHeader.setAttribute('y', textY.toString())
@@ -322,7 +300,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
       svg.appendChild(historyHeader)
       textY += 25
 
-      // List each stage history entry
       stageHistory.forEach((item) => {
         const stageDate = new Date(item.start_of_stage).toLocaleDateString()
         const lineText = `Started stage: ${capitalize(item.stage)} by ${
@@ -342,18 +319,18 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     }
   }
 
-  // ---------------------------
-  // 8) ROUND PROGRESS CHART
-  //    (Placed near the bottom-left of content area)
-  // ---------------------------
-  const chartGroup = document.createElementNS(svgNS, 'g')
-  const chartCenterX = contentX + 400
-  const chartCenterY = contentY + contentHeight - 450
+  // Dynamic chart positioning
   const chartRadius = 50
   const strokeWidth = 9
+  const chartVerticalSpacing = 50
+
+  const chartCenterY = textY / 2 + chartVerticalSpacing
+  const chartCenterX = contentX + 400
+
+  // Progress chart
+  const chartGroup = document.createElementNS(svgNS, 'g')
   const circumference = 2 * Math.PI * chartRadius
 
-  // Track circle (background)
   const trackCircle = document.createElementNS(svgNS, 'circle')
   trackCircle.setAttribute('cx', chartCenterX.toString())
   trackCircle.setAttribute('cy', chartCenterY.toString())
@@ -363,7 +340,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   trackCircle.setAttribute('stroke-width', strokeWidth.toString())
   chartGroup.appendChild(trackCircle)
 
-  // Progress logic
   const currentStage = (product?.stage as Stage) || 'default'
   const activeStages: Stage[] = [
     'concept',
@@ -387,7 +363,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     strokeColor = STATUS_COLORS.inactive
   }
 
-  // Progress arc
   const progressCircle = document.createElementNS(svgNS, 'circle')
   progressCircle.setAttribute('cx', chartCenterX.toString())
   progressCircle.setAttribute('cy', chartCenterY.toString())
@@ -405,7 +380,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   )
   chartGroup.appendChild(progressCircle)
 
-  // Percentage text in the center of the circle
   const percentText = document.createElementNS(svgNS, 'text')
   percentText.setAttribute('x', chartCenterX.toString())
   percentText.setAttribute('y', (chartCenterY + 5).toString())
@@ -423,7 +397,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   }
   chartGroup.appendChild(percentText)
 
-  // Status label below the circle
   const statusText = isActive
     ? 'Progress'
     : ['standby', 'withdrawal'].includes(currentStage)
@@ -443,9 +416,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
 
   svg.appendChild(chartGroup)
 
-  // ---------------------------
-  // 9) FOOTER SECTION
-  // ---------------------------
+  // Footer
   const footerHeight = 60
   const footer = document.createElementNS(svgNS, 'rect')
   footer.setAttribute('x', '0')
@@ -470,6 +441,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
 
 const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
   const handleExportPDF = async () => {
+    console.log('Exporting PDF for:', product)
     const svgElement = generateChartSVG(product)
     const pdf = new jsPDF({
       orientation: 'portrait',
