@@ -43,7 +43,7 @@ const stagesOrder: Stage[] = [
 ]
 
 const STATUS_COLORS = {
-  active: '#4CAF50',
+  active: '#3633ec',
   inactive: '#F44336',
   standby: '#FFC107',
   default: '#9E9E9E',
@@ -272,10 +272,10 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const chartGroup = document.createElementNS(svgNS, 'g')
 
   // Place the chart near the bottom-left inside the content area:
-  const chartCenterX = contentX + 60
-  const chartCenterY = contentY + contentHeight - 100
-  const chartRadius = 40
-  const strokeWidth = 8
+  const chartCenterX = contentX + 400
+  const chartCenterY = contentY + contentHeight - 450
+  const chartRadius = 50
+  const strokeWidth = 9
   const circumference = 2 * Math.PI * chartRadius
 
   // Track circle (background)
@@ -342,7 +342,14 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   percentText.setAttribute('font-size', '16px')
   percentText.setAttribute('font-weight', 'bold')
   percentText.setAttribute('font-family', 'Arial, sans-serif')
-  percentText.textContent = `${Math.round(progress * 100)}%`
+  if (!['standby', 'withdrawal', 'cancelled'].includes(currentStage)) {
+    percentText.textContent = `${Math.round(progress * 100)}%`
+  } else {
+    percentText.setAttribute('font-size', '8.4px')
+    percentText.textContent = `Inactive \n
+     Development`
+  }
+
   chartGroup.appendChild(percentText)
 
   // Determine Active/Inactive/Standby/Terminated label
@@ -350,7 +357,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   if (isActive) {
     statusText = 'Active'
   } else if (['standby', 'withdrawal'].includes(currentStage)) {
-    statusText = 'Standby'
+    statusText = 'Inactive'
   } else if (currentStage === 'cancelled') {
     statusText = 'Terminated'
   } else {
@@ -360,7 +367,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   // Show status text just below the circle
   const statusLabel = document.createElementNS(svgNS, 'text')
   statusLabel.setAttribute('x', chartCenterX.toString())
-  statusLabel.setAttribute('y', (chartCenterY + chartRadius + 20).toString())
+  statusLabel.setAttribute('y', (chartCenterY + chartRadius + 30).toString())
   statusLabel.setAttribute('text-anchor', 'middle')
   statusLabel.setAttribute('fill', strokeColor)
   statusLabel.setAttribute('font-size', '12px')
@@ -369,15 +376,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   chartGroup.appendChild(statusLabel)
 
   // Also show a "Progress: XX%" label below that
-  const percentLabel = document.createElementNS(svgNS, 'text')
-  percentLabel.setAttribute('x', chartCenterX.toString())
-  percentLabel.setAttribute('y', (chartCenterY + chartRadius + 40).toString())
-  percentLabel.setAttribute('text-anchor', 'middle')
-  percentLabel.setAttribute('fill', strokeColor)
-  percentLabel.setAttribute('font-size', '12px')
-  percentLabel.setAttribute('font-family', 'Arial, sans-serif')
-  percentLabel.textContent = `Progress: ${Math.round(progress * 100)}%`
-  chartGroup.appendChild(percentLabel)
 
   svg.appendChild(chartGroup)
 
@@ -400,7 +398,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   footerText.setAttribute('fill', 'rgba(255, 255, 255, 0.8)')
   footerText.setAttribute('font-size', '12px')
   footerText.setAttribute('font-family', 'Arial, sans-serif')
-  footerText.textContent = `Confidential Document - ${new Date().toLocaleDateString()} - ConceptoCar Systems`
+  footerText.textContent = `Confidential Document - ${new Date().toLocaleDateString()} - ConceptToCar`
   svg.appendChild(footerText)
 
   return svg
@@ -419,15 +417,19 @@ const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
     const fileName = product?.name
       ? `${product.name.replace(/\s+/g, '_')}_Report_${new Date()
           .toISOString()
-          .slice(0, 10)}.pdf`
-      : `ConceptoCar_Report_${new Date().toISOString().slice(0, 10)}.pdf`
+          .slice(0, 10)}_${Math.random().toString(32)}.pdf`
+      : `ConceptoCar_Report_${new Date()
+          .toISOString()
+          .slice(0, 10)}_${Math.random()
+          .toString(36)
+          .substring(2, 15)}_${Math.random().toString(32)}.pdf`
 
     pdf.save(fileName)
   }
 
   return (
     <button className="btn btn-warning" onClick={handleExportPDF}>
-      Generate Professional Report
+      Export To PDF
     </button>
   )
 }

@@ -75,7 +75,7 @@ const productsController = {
 
           const historyRecord = {
             stage: 'concept',
-            product_id: new ObjectId(productId),
+            product_id: productId,
             start_of_stage: new Date(),
             name: product.createdBy,
           }
@@ -109,12 +109,22 @@ const productsController = {
       const { name } = req.body
       const redis = req.server.redis
       const productModel = req.server.productModel
+      const productStageModel = req.server.productStageModel
       const product = await redis.get(`product: ${name}`)
       if (product) return res.send(JSON.parse(product))
 
       const prodb = await productModel.findProductByName(name)
       if (!prodb) throw new BadRequestError('Product doesn t exist')
-      await redis.set(`product: ${name}`, JSON.stringify(prodb), 'EX', 3600)
+      const stageHistory = await productStageModel.getHistoryByProductId(
+        prodb._id,
+        0,
+        5
+      )
+      const data = {
+        ...prodb,
+        stageHistory,
+      }
+      await redis.set(`product: ${name}`, JSON.stringify(data), 'EX', 3600)
       res.send(prodb)
     } catch (err) {
       throw err
@@ -205,6 +215,7 @@ const productsController = {
         throw new Unauthorized('Not authorized')
       }
       const productStageModel = req.server.productStageModel
+
       const {
         productId,
         name,
@@ -332,7 +343,14 @@ const productsController = {
             )
           }
         }
-        console.log('karma2')
+        const historyRecord = {
+          stage: stage,
+          product_id: productId,
+          start_of_stage: new Date(),
+          name: currentProduct.createdBy,
+        }
+
+        await productStageModel.addStageHistory(historyRecord)
         updateData.stage = stage
       }
       console.log('STAGE ------' + updateData.stage)
