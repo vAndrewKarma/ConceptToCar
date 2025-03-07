@@ -105,6 +105,14 @@ const productsController = {
   },
   async GetProduct(req, res) {
     try {
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
       if (!req.sessionData) throw new Unauthorized('Not authorized')
       const { name } = req.body
       const redis = req.server.redis
@@ -122,15 +130,57 @@ const productsController = {
         5
       )
       console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
       const materials = await materialModel.getMaterialCountByProduct(prodb._id)
       const data = {
         ...prodb,
         history: stageHistory,
         materialength: materials,
       }
-      console.log(data)
+      req.server.log(data)
+      req.server.log(data)
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      req.server.log(data)
+      req.server.log(data)
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
       console.log(materials.length)
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
       await redis.set(`product: ${name}`, JSON.stringify(data), 'EX', 3600)
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
+      console.log('EXECUTED ???? ')
       res.send(data)
     } catch (err) {
       throw err
