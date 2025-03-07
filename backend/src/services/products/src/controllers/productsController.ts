@@ -121,6 +121,7 @@ const productsController = {
         0,
         5
       )
+      console.log('EXECUTED ???? ')
       const materials = await materialModel.getMaterialCountByProduct(prodb._id)
       const data = {
         ...prodb,
