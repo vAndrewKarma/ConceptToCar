@@ -336,7 +336,6 @@ const productsController = {
       }
       console.log('STAGE BODY' + stage)
       if (stage !== undefined) {
-        console.log('sccriudelafac')
         if (!allStages.includes(stage)) {
           throw new BadRequestError('Invalid stage value')
         }
@@ -360,7 +359,7 @@ const productsController = {
         }
         const historyRecord = {
           stage: stage,
-          product_id: productId,
+          product_id: new ObjectId(productId),
           start_of_stage: new Date(),
           name: req.sessionData.firstName + ' ' + req.sessionData.lastName,
         }

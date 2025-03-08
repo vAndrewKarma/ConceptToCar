@@ -93,7 +93,6 @@ export class ProductModel {
     return result.deletedCount > 0
   }
 }
-
 export interface ProductStageHistory {
   _id?: ObjectId
   stage: Stage
@@ -123,9 +122,11 @@ export class ProductStageHistoryModel {
     }
   }
 
-  async getHistoryByProductId(productId, skip = 0, limit = 5) {
+  async getHistoryByProductId(productId: string, skip = 0, limit = 5) {
     return await this.collection
-      .find({ product_id: productId })
+      // Convert productId to ObjectId to match the stored type
+      .find({ product_id: new ObjectId(productId) })
+      // Sort by the timestamp field we actually use
       .sort({ start_of_stage: -1 })
       .skip(skip)
       .limit(limit)
