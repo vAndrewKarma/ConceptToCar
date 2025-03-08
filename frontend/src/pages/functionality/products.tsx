@@ -187,7 +187,7 @@ function Products() {
             data: {
               page: currentPage,
               searchTerms: searchTerm,
-              category: filterCategory.toLowerCase(),
+              stage: filterCategory.toLowerCase(),
             },
           })
         } else {
