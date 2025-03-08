@@ -96,3 +96,62 @@
 .modal-form {
   padding-bottom: 20px;
 }
+.awesome-search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Force icon to the right */
+  width: 100%; /* Ensure full width */
+}
+.awesome-search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ensures icon stays on the right */
+  width: 100%;
+  max-width: 100%;
+}
+
+.awesome-search {
+  flex: 1; /* Makes search bar take up all available space */
+  border-radius: 25px;
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 0; /* Prevents flex from breaking */
+}
+
+.awesome-search:focus {
+  border-color: #80bdff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1),
+    0 0 8px rgba(128, 189, 255, 0.6);
+  outline: none;
+}
+
+.add-icon {
+  margin-left: 15px; /* Ensures space from search */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  flex-shrink: 0; /* Prevents icon from resizing */
+}
+.filter-select {
+  width: 200px;
+  margin-left: 15px;
+  background-color: #495057;
+  color: white;
+  border: 1px solid #6c757d;
+}
+.add-icon:hover {
+  transform: scale(1.2); /* Icon zoom on hover */
+}
+
+/* Ensure full width on small screens */
+@media (max-width: 768px) {
+  .awesome-search-container {
+    width: 100%;
+  }
+
+  .awesome-search {
+    width: 100%; /* Force full width */
+  }
+}

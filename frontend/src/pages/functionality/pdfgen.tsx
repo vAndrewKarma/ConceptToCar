@@ -241,22 +241,10 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     addTextBlock('Product Name', product.name)
     addTextBlock('Description', product.description)
     addTextBlock('Stage', product.stage)
-    addTextBlock(
-      'Estimated Weight',
-      product.estimated_weight,
-      product.weight_unit
-    )
-    addTextBlock(
-      'Estimated Length',
-      product.estimated_length,
-      product.weight_unit
-    )
-    addTextBlock(
-      'Estimated Height',
-      product.estimated_height,
-      product.height_unit
-    )
-    addTextBlock('Estimated Width', product.estimated_width, product.width_unit)
+    addTextBlock('Estimated Weight', product.estimated_weight, 'kg')
+    addTextBlock('Estimated Length', product.estimated_length, 'cm')
+    addTextBlock('Estimated Height', product.estimated_height, 'cm')
+    addTextBlock('Estimated Width', product.estimated_width, 'cm')
   }
 
   // Materials Used
@@ -267,7 +255,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     pdftimestamp.setAttribute('fill', '#fff')
     pdftimestamp.setAttribute('font-size', '14px')
     pdftimestamp.setAttribute('font-family', 'Arial, sans-serif')
-    pdftimestamp.textContent = `PDF TIMESTAMP - ${new Date().toLocaleDateString()}`
+    pdftimestamp.textContent = `PDF TIMESTAMP - ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`
     svg.appendChild(pdftimestamp)
     textY += 25
   }
@@ -454,17 +442,35 @@ const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
     const materialsURL = `${productURL}/materials`
     const homeURL = baseURL
 
-    // Add clickable links using jsPDF's textWithLink (adjust coordinates as needed)
-    let linkX = 85 // X coordinate for the links
-    const linkY = 700 // starting Y coordinate for the first link
+    // Set up links – white text, with white underline.
+    let linkX = 85 // starting X coordinate
+    const linkY = 700 // Y coordinate for links
 
     pdf.setFontSize(14)
-    pdf.setTextColor(0, 0, 255) // Blue color for clickable links
-    pdf.textWithLink('View Product Page', linkX, linkY, { url: productURL })
+    pdf.setTextColor(255, 255, 255) // white text for links
+    pdf.setDrawColor(255, 255, 255) // white color for underline
+    pdf.setLineWidth(0.5)
+
+    // Link 1: "View Product Page"
+    const linkText1 = 'View Product Page'
+    pdf.textWithLink(linkText1, linkX, linkY, { url: productURL })
+    const textWidth1 = pdf.getTextWidth(linkText1)
+    pdf.line(linkX, linkY + 2, linkX + textWidth1, linkY + 2)
+
+    // Link 2: "View Materials Page"
     linkX += 175
-    pdf.textWithLink('View Materials Page', linkX, linkY, { url: materialsURL })
+    const linkText2 = 'View Materials Page'
+    pdf.textWithLink(linkText2, linkX, linkY, { url: materialsURL })
+    const textWidth2 = pdf.getTextWidth(linkText2)
+    pdf.line(linkX, linkY + 2, linkX + textWidth2, linkY + 2)
+
+    // Link 3: "Go to Homepage"
     linkX += 175
-    pdf.textWithLink('Go to Homepage', linkX, linkY, { url: homeURL })
+    const linkText3 = 'Go to Homepage'
+    pdf.textWithLink(linkText3, linkX, linkY, { url: homeURL })
+    const textWidth3 = pdf.getTextWidth(linkText3)
+    pdf.line(linkX, linkY + 2, linkX + textWidth3, linkY + 2)
+
     const fileName = product?.name
       ? `${product.name.replace(/\s+/g, '_')}_Report_${new Date()
           .toISOString()

@@ -1,4 +1,4 @@
-import { Form, Button, Modal } from 'react-bootstrap'
+import { Form, Button, Modal, Alert } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import useAxios from 'axios-hooks'
@@ -6,6 +6,7 @@ import './product.css'
 import '../auth/login.css'
 import './products.css'
 import ExportChartPDF from './pdfgen'
+import axios from 'axios'
 
 function unslugify(slug: string): string {
   return slug
@@ -68,7 +69,7 @@ function Product() {
   // Edit form states (controlled inputs)
   const [editName, setEditName] = useState('')
   const [editDescription, setEditDescription] = useState('')
-
+  const [serror, ssetError] = useState('')
   const [editEstimatedHeight, setEditEstimatedHeight] = useState('')
   const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
@@ -159,7 +160,7 @@ function Product() {
   if (loading)
     return (
       <div className="color-overlay d-flex justify-content-center align-items-center">
-        Loading...
+        <div className="spinner"></div>
       </div>
     )
   if (error)
@@ -219,6 +220,7 @@ function Product() {
   const handleSaveChanges = async () => {
     if (!product) return
     try {
+      ssetError('')
       const code_verifier = generateCodeVerifier(43)
       const challenge = await generateCodeChallenge(code_verifier)
       const initRes = await executeInit({
@@ -257,8 +259,21 @@ function Product() {
         estimated_length: editEstimatedLength,
       })
       navigate(`/product/${editName}/${displayProduct._id}`)
-    } catch (error) {
-      console.error('Error updating product:', error)
+    } catch (err) {
+      console.error(err)
+      if (axios.isAxiosError(err) && err.response) {
+        if (
+          err.response.data &&
+          err.response.data.errors &&
+          err.response.data.errors.length > 0
+        ) {
+          ssetError(err.response.data.errors[0].message)
+        } else if (err.response.data.message) {
+          ssetError(err.response.data.message)
+        }
+      } else {
+        ssetError('Failed to create product. Please try again.')
+      }
     }
   }
 
@@ -498,6 +513,11 @@ function Product() {
                 onChange={(e) => setEditEstimatedWeight(e.target.value)}
               />
             </Form.Group>
+            {serror && (
+              <Alert variant="danger" className="mt-3">
+                {serror}
+              </Alert>
+            )}
           </Form>
         </Modal.Body>
         <Modal.Footer className="bg-dark border-warning">

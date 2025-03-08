@@ -198,7 +198,6 @@ export const getproductbyname = {
     additionalProperties: 'No additional properties are allowed.',
   },
 }
-
 export const getproducts = {
   type: 'object',
   required: ['page'],
@@ -223,6 +222,22 @@ export const getproducts = {
         minLength: 'searchTerms cannot be empty.',
         maxLength: 'searchTerms cannot exceed 50 characters.',
         pattern: 'searchTerms can only contain letters, numbers, and spaces.',
+      },
+    },
+    stage: {
+      type: 'string',
+      enum: [
+        'concept',
+        'feasibility',
+        'design',
+        'production',
+        'withdrawal',
+        'standby',
+        'cancelled',
+      ],
+      errorMessage: {
+        type: 'stage must be a string.',
+        enum: 'Invalid stage value provided.',
       },
     },
   },

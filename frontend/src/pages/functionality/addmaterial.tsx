@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal, Form, Button } from 'react-bootstrap'
+import { Modal, Form, Button, Alert } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 
@@ -182,7 +182,7 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
               type="number"
               value={length}
               onChange={(e) => setLength(e.target.value)}
-              placeholder="e.g., 100 (by default 0)"
+              placeholder="e.g., 100 "
             />
           </Form.Group>
 
@@ -195,7 +195,7 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
               type="number"
               value={estimatedWidth}
               onChange={(e) => setEstimatedWidth(e.target.value)}
-              placeholder="e.g., 50  (by default 0) "
+              placeholder="e.g., 50   "
             />
           </Form.Group>
 
@@ -208,7 +208,7 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
               type="number"
               value={estimatedHeight}
               onChange={(e) => setEstimatedHeight(e.target.value)}
-              placeholder="e.g., 80  (by default 0)"
+              placeholder="e.g., 80  "
             />
           </Form.Group>
 
@@ -221,12 +221,16 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
               type="number"
               value={estimatedWeight}
               onChange={(e) => setEstimatedWeight(e.target.value)}
-              placeholder="e.g., 2  (by default 0)"
+              placeholder="e.g., 2  "
             />
           </Form.Group>
         </Form>
       </Modal.Body>
-      {error && <div className="text-danger mb-3">{error}</div>}
+      {error && (
+        <Alert variant="danger" className="mt-3">
+          {error}
+        </Alert>
+      )}
       <Modal.Footer className="bg-dark border-warning">
         <Button
           variant="secondary"

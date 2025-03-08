@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Form, Button } from 'react-bootstrap'
+import { Modal, Form, Button, Alert } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 
@@ -243,7 +243,12 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
         </Form>
       </Modal.Body>
 
-      {error && <div className="text-danger mb-3">{error}</div>}
+      {error && (
+        <Alert variant="danger" className="mt-3">
+          {' '}
+          {error}
+        </Alert>
+      )}
       <Modal.Footer className="bg-dark border-warning">
         <Button
           className="rounded-pill px-4 text-light fw-bold"
@@ -255,6 +260,7 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
         <Button
           className="rounded-pill px-4 text-dark fw-bold"
           variant="warning"
+          onClick={(e) => handleSubmit(e)}
           type="submit"
           disabled={loading}
         >

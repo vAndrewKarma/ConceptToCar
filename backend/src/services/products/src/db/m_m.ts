@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { ObjectId } from '@fastify/mongodb'
-import { Collection } from 'mongodb'
+import { Collection, Filter } from 'mongodb'
 export type Stage =
   | 'concept'
   | 'feasibility'
@@ -35,8 +35,8 @@ export class ProductModel {
     this.collection
       .createIndex({ name: 1 }, { unique: true })
       .catch(console.error)
+    this.collection.createIndex({ stage: 1 }).catch(console.error)
   }
-
   async createProduct(
     data: Omit<Product, '_id' | 'created_at' | 'updated_at' | 'material_number'>
   ): Promise<ObjectId> {
@@ -75,6 +75,34 @@ export class ProductModel {
       .skip(skip)
       .limit(queryLimit)
       .toArray()
+  }
+
+  async findProductsWithFilters({
+    page = 1,
+    displayLimit = 10,
+    searchTerms,
+    stage,
+  }: {
+    page: number
+    displayLimit: number
+    searchTerms?: string
+    stage?: Stage
+  }): Promise<Product[]> {
+    const queryLimit = displayLimit + 1
+    const skip = (page - 1) * displayLimit
+
+    // Build dynamic query
+    const query: Filter<Product> = {}
+
+    if (searchTerms?.trim()) {
+      query.name = { $regex: searchTerms, $options: 'i' }
+    }
+
+    if (stage) {
+      query.stage = stage
+    }
+
+    return this.collection.find(query).skip(skip).limit(queryLimit).toArray()
   }
 
   async updateProduct(

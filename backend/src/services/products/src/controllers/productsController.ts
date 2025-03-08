@@ -149,31 +149,26 @@ const productsController = {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')
 
-      const { page = 1, searchTerms } = req.body
+      const { page = 1, searchTerms, stage } = req.body
       const displayLimit = 10
       const redis = req.server.redis
       const productModel = req.server.productModel
 
       let cacheKey = `products:all:page:${page}:limit:${displayLimit}`
-      if (searchTerms && searchTerms.trim() !== '') {
-        cacheKey += `:search:${searchTerms}`
-      }
+      if (searchTerms?.trim()) cacheKey += `:search:${searchTerms}`
+      if (stage?.trim()) cacheKey += `:stage:${stage}`
 
       const cachedData = await redis.get(cacheKey)
       if (cachedData) {
         return res.send(JSON.parse(cachedData))
       }
 
-      let products
-      if (searchTerms && searchTerms.trim() !== '') {
-        products = await productModel.searchProducts(
-          searchTerms,
-          page,
-          displayLimit
-        )
-      } else {
-        products = await productModel.findProducts(Number(page), displayLimit)
-      }
+      const products = await productModel.findProductsWithFilters({
+        page: Number(page),
+        displayLimit,
+        searchTerms,
+        stage,
+      })
 
       if (!products || products.length === 0) {
         throw new BadRequestError('No products found')

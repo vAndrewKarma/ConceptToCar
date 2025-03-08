@@ -4,13 +4,14 @@ import {
   flexRender,
 } from '@tanstack/react-table'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Button, Modal, Spinner, Form } from 'react-bootstrap'
+import { Button, Modal, Spinner, Form, Alert } from 'react-bootstrap'
 import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import useAxios from 'axios-hooks'
 import './products.css'
 import AddProductModal from './addprod.tsx'
+import axios from 'axios'
 
 export type Stage =
   | 'concept'
@@ -81,7 +82,7 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
 
 function Products() {
   // For demo purposes, assume the currentUserRole is hard-coded.
-
+  const [filterCategory, setFilterCategory] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [hasNextPage, setHasNextPage] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -101,7 +102,7 @@ function Products() {
   const [editEstimatedWidth, setEditEstimatedWidth] = useState('')
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
   const [editEstimatedLength, setEditEstimatedLength] = useState('')
-
+  const [serror, ssetError] = useState('')
   const cacheRef = useRef<{
     [key: string]: { products: Product[]; hasNext: boolean; timestamp: number }
   }>({})
@@ -181,9 +182,13 @@ function Products() {
       }
       try {
         let response
-        if (searchTerm) {
+        if (searchTerm || filterCategory) {
           response = await execute({
-            data: { page: currentPage, searchTerms: searchTerm },
+            data: {
+              page: currentPage,
+              searchTerms: searchTerm,
+              category: filterCategory.toLowerCase(),
+            },
           })
         } else {
           response = await execute({
@@ -230,7 +235,7 @@ function Products() {
       }
     }
     fetchData()
-  }, [currentPage, searchTerm, execute])
+  }, [currentPage, searchTerm, filterCategory, execute])
 
   useEffect(() => {
     if (selectedProduct) {
@@ -275,6 +280,7 @@ function Products() {
   const handleSaveChanges = async () => {
     if (!selectedProduct) return
     try {
+      ssetError('')
       const code_verifier = generateCodeVerifier(43)
       const challenge = await generateCodeChallenge(code_verifier)
       const initRes = await executeInit({
@@ -302,8 +308,20 @@ function Products() {
       handleEditClose()
       cacheRef.current = {}
       await refreshProducts()
-    } catch (error) {
-      console.error('Error updating product:', error)
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        if (
+          err.response.data &&
+          err.response.data.errors &&
+          err.response.data.errors.length > 0
+        ) {
+          ssetError(err.response.data.errors[0].message)
+        } else if (err.response.data.message) {
+          ssetError(err.response.data.message)
+        }
+      } else {
+        ssetError('Failed to create product. Please try again.')
+      }
     }
   }
 
@@ -429,29 +447,53 @@ function Products() {
             <div className="alert alert-danger text-center">{error}</div>
           )}
           <div className="d-flex align-items-center justify-content-between mb-3">
-            <Form.Control
-              type="text"
-              placeholder="Search by name..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setSearchTerm((e.target as HTMLInputElement).value)
+            <div className="awesome-search-container mb-3">
+              <Form.Control
+                type="text"
+                placeholder="Search by name..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setSearchTerm((e.target as HTMLInputElement).value)
+                    setCurrentPage(1)
+                  }
+                }}
+                className="awesome-search"
+              />
+              <Form.Select
+                value={filterCategory}
+                onChange={(e) => {
+                  setFilterCategory(e.target.value as Stage | '')
                   setCurrentPage(1)
-                }
-              }}
-              className="w-25"
-              style={{ fontSize: '14px', marginBottom: '10px' }}
-            />
-            <div style={{ paddingRight: '15px' }}>
+                }}
+                className="filter-select"
+              >
+                <option value="">All Stages</option>
+                {[
+                  'Concept',
+                  'Feasibility',
+                  'Design',
+                  'Production',
+                  'Withdrawal',
+                  'Standby',
+                  'Cancelled',
+                ].map((stageOption, idx) => (
+                  <option key={idx} value={stageOption}>
+                    {stageOption}
+                  </option>
+                ))}
+              </Form.Select>
               <FaPlusCircle
                 size={24}
-                style={{ color: 'green', cursor: 'pointer' }}
+                className="add-icon"
+                style={{ color: 'green' }}
                 title="Add Product"
                 onClick={() => handleAddShow({} as Product)}
               />
             </div>
           </div>
+
           <table
             className="table table-dark table-striped table-hover text-center"
             style={{
@@ -652,6 +694,11 @@ function Products() {
                 onChange={(e) => setEditEstimatedWeight(e.target.value)}
               />
             </Form.Group>
+            {serror && (
+              <Alert variant="danger" className="mt-3">
+                {serror}
+              </Alert>
+            )}
           </Form>
         </Modal.Body>
         <Modal.Footer className="bg-dark border-warning">
