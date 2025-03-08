@@ -261,15 +261,14 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
 
   // Materials Used
   if (product) {
-    const materialsUsed = Math.floor(Math.random() * 100) + 1
-    const materialsText = document.createElementNS(svgNS, 'text')
-    materialsText.setAttribute('x', labelX.toString())
-    materialsText.setAttribute('y', textY.toString())
-    materialsText.setAttribute('fill', '#fff')
-    materialsText.setAttribute('font-size', '14px')
-    materialsText.setAttribute('font-family', 'Arial, sans-serif')
-    materialsText.textContent = `Materials Used: ${materialsUsed}`
-    svg.appendChild(materialsText)
+    const pdftimestamp = document.createElementNS(svgNS, 'text')
+    pdftimestamp.setAttribute('x', labelX.toString())
+    pdftimestamp.setAttribute('y', textY.toString())
+    pdftimestamp.setAttribute('fill', '#fff')
+    pdftimestamp.setAttribute('font-size', '14px')
+    pdftimestamp.setAttribute('font-family', 'Arial, sans-serif')
+    pdftimestamp.textContent = `PDF TIMESTAMP - ${new Date().toLocaleDateString()}`
+    svg.appendChild(pdftimestamp)
     textY += 25
   }
 
