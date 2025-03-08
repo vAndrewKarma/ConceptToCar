@@ -126,7 +126,7 @@ export class ProductStageHistoryModel {
   async getHistoryByProductId(productId, skip = 0, limit = 5) {
     return await this.collection
       .find({ product_id: productId })
-      .sort({ createdAt: -1 })
+      .sort({ start_of_stage: -1 })
       .skip(skip)
       .limit(limit)
       .toArray()
