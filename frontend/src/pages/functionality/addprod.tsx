@@ -58,6 +58,11 @@ const AddProductModal = ({
         }
       )
       const modifyID = initRes.data.id
+      if (!addName || !addDescription) {
+        setError('Description and name must be filled out')
+        setLoading(false)
+        return
+      }
 
       const productData = {
         name: addName,

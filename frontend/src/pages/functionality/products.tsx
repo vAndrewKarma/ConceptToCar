@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Modal, Spinner, Form, Alert } from 'react-bootstrap'
 import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import useAxios from 'axios-hooks'
 import './products.css'
 import AddProductModal from './addprod.tsx'
@@ -36,7 +36,6 @@ interface Product {
 }
 
 const PAGE_SIZE = 10
-const CACHE_EXPIRY_MS = 30 * 1000
 
 const generateCodeVerifier = (length: number): string => {
   const allowedChars =
@@ -103,21 +102,13 @@ function Products() {
   const [editEstimatedWeight, setEditEstimatedWeight] = useState('')
   const [editEstimatedLength, setEditEstimatedLength] = useState('')
   const [serror, ssetError] = useState('')
-  const cacheRef = useRef<{
-    [key: string]: { products: Product[]; hasNext: boolean; timestamp: number }
-  }>({})
 
   // Refresh products: clear cache, reset page, and re-fetch.
   const refreshProducts = async () => {
-    cacheRef.current = {}
     const response = await execute({ data: { page: currentPage } })
-    if (response.data) {
+    if (response && response.data) {
       const { products, hasNext } = response.data
-      cacheRef.current[currentPage] = {
-        products,
-        hasNext,
-        timestamp: Date.now(),
-      }
+
       setProducts(products)
       setHasNextPage(hasNext)
     }
@@ -171,37 +162,40 @@ function Products() {
   useEffect(() => {
     setError('')
     const fetchData = async () => {
-      const now = Date.now()
-
-      const cacheKey = `${currentPage}-${searchTerm}`
-      const cached = cacheRef.current[cacheKey]
-      if (cached && now - cached.timestamp < CACHE_EXPIRY_MS) {
-        setProducts(cached.products)
-        setHasNextPage(cached.hasNext)
-        return
-      }
       try {
         let response
         if (searchTerm || filterCategory) {
-          response = await execute({
-            data: {
-              page: currentPage,
-              searchTerms: searchTerm,
-              stage: filterCategory.toLowerCase(),
-            },
-          })
+          if (!filterCategory)
+            response = await execute({
+              data: {
+                page: currentPage,
+                searchTerms: searchTerm,
+              },
+            })
+          else if (!searchTerm)
+            response = await execute({
+              data: {
+                page: currentPage,
+                stage: filterCategory.toLowerCase(),
+              },
+            })
+          else {
+            response = await execute({
+              data: {
+                page: currentPage,
+                searchTerms: searchTerm,
+                stage: filterCategory.toLowerCase(),
+              },
+            })
+          }
         } else {
           response = await execute({
             data: { page: currentPage },
           })
         }
-        if (response.data) {
+        if (response && response.data) {
           const { products, hasNext } = response.data
-          cacheRef.current[cacheKey] = {
-            products,
-            hasNext,
-            timestamp: Date.now(),
-          }
+
           setProducts(products)
           setHasNextPage(hasNext)
         }
@@ -306,7 +300,7 @@ function Products() {
 
       // Clear cache and refresh the product list.
       handleEditClose()
-      cacheRef.current = {}
+
       await refreshProducts()
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
@@ -352,7 +346,6 @@ function Products() {
         setProducts((prev) =>
           prev.filter((product) => product._id !== selectedId)
         )
-        delete cacheRef.current[currentPage]
       } catch (error) {
         console.error('Error deleting product:', error)
       }
