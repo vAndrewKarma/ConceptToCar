@@ -1,0 +1,64 @@
+/* dashboard.css */
+
+body,
+html {
+  overflow-x: hidden;
+  overflow-y: auto; /* Permite scroll pe verticală */
+  background: rgb(5, 10, 17);
+  background: linear-gradient(
+    208deg,
+    rgba(5, 10, 17, 1) 25%,
+    rgba(14, 69, 74, 1) 50%,
+    rgba(5, 10, 17, 1) 75%
+  ) !important;
+  height: 100%;
+}
+
+.color-overlay {
+  background: none; /* Elimină suprascrierea pentru a folosi fundalul global */
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.recharts-legend-item text {
+  font-size: 12px !important; /* Reduce dimensiunea fontului pentru legendă */
+}
+
+.recharts-legend-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .line-chart {
+    width: 100% !important;
+    height: 300px !important;
+  }
+
+  .pie-chart {
+    width: 100% !important;
+    height: 300px !important;
+  }
+
+  .card {
+    width: 100% !important;
+    margin-bottom: 15px;
+  }
+
+  .d-flex.justify-content-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

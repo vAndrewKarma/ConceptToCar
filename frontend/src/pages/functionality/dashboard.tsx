@@ -1,6 +1,18 @@
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from 'recharts'
 import { Card, Container, Row, Col } from 'react-bootstrap'
 import '../auth/login.css'
+import './dashboard.css'
 
 const data = [
   { name: 'Concept', value: 40, color: '#17a2b8' },
@@ -11,6 +23,19 @@ const data = [
   { name: 'StandBy', value: 40, color: '#ff5e00' },
   { name: 'Cancelled', value: 20, color: '#dc3545' },
 ]
+
+const generateData = () => {
+  const data = []
+  for (let i = 30; i >= 1; i--) {
+    data.push({
+      date: `${i}d ago`,
+      products: Math.floor(Math.random() * 100) + 10, // Între 10 și 110
+    })
+  }
+  return data
+}
+
+const productData = generateData()
 
 const stats = [
   {
@@ -51,7 +76,7 @@ function Dashboard() {
             <Row>
               {stats.map((stat, index) => (
                 <Col key={index} md={3} sm={6} className="mb-3">
-                  <Card className="p-3 text-center  bg-dark text-light shadow-sm ">
+                  <Card className="p-3 text-center bg-dark text-light shadow-sm">
                     <h6>{stat.title}</h6>
                     <h2 className="fw-bold">{stat.value}</h2>
                     <p className="text-success mb-1">{stat.change}</p>
@@ -61,28 +86,61 @@ function Dashboard() {
               ))}
             </Row>
           </Col>
-          <Col xs="auto">
-            <Card className="p-3 bg-dark text-light">
-              <h5>Stages Statistics</h5>
-              <PieChart width={500} height={500}>
-                <Pie
-                  data={data}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={150}
-                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+
+          <Row className="chart-container">
+            <Col className="mb-4">
+              <Card className="p-3 bg-dark text-light">
+                <h5>Products Created - Last 30 Days</h5>
+                <LineChart
+                  width={1200}
+                  height={450}
+                  data={productData}
+                  className="line-chart"
                 >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </Card>
-          </Col>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="products"
+                    stroke="#8884d8"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </Card>
+            </Col>
+
+            <Col className="mb-4">
+              <div className="d-flex justify-content-center">
+                <Card className="p-3 bg-dark text-light">
+                  <h5>Stages Statistics</h5>
+                  <PieChart
+                    width={400}
+                    height={450}
+                    className="pie-chart recharts-legend-item text"
+                  >
+                    <Pie
+                      data={data}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={150}
+                      label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                    >
+                      {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend className="recharts-legend-wrapper" />
+                  </PieChart>
+                </Card>
+              </div>
+            </Col>
+          </Row>
         </Row>
       </Container>
     </div>
