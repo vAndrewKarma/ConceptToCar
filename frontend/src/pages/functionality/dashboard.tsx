@@ -2,7 +2,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Tooltip,
   Legend,
   LineChart,
   Line,
@@ -29,7 +28,7 @@ const generateData = () => {
   for (let i = 30; i >= 1; i--) {
     data.push({
       date: `${i}d ago`,
-      products: Math.floor(Math.random() * 100) + 10, // Între 10 și 110
+      Products: Math.floor(Math.random() * 100) + 10, // Între 10 și 110
     })
   }
   return data
@@ -66,7 +65,7 @@ const stats = [
 
 function Dashboard() {
   return (
-    <div className="color-overlay d-flex">
+    <div className="color-overlay d-flex structure">
       <Container fluid>
         <Row
           className="vh-100 justify-content-end"
@@ -100,11 +99,11 @@ function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <Tooltip />
+
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="products"
+                    dataKey="Products"
                     stroke="#8884d8"
                     strokeWidth={2}
                   />
@@ -119,7 +118,7 @@ function Dashboard() {
                   <PieChart
                     width={400}
                     height={450}
-                    className="pie-chart recharts-legend-item text"
+                    className="pie-chart legend-chart align-items-center"
                   >
                     <Pie
                       data={data}
@@ -134,8 +133,7 @@ function Dashboard() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
-                    <Legend className="recharts-legend-wrapper" />
+                    <Legend />
                   </PieChart>
                 </Card>
               </div>
