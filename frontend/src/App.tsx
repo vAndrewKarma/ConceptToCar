@@ -20,7 +20,6 @@ import Products from './pages/functionality/products.tsx'
 import Profile from './pages/account/profile.tsx'
 import Product from './pages/functionality/product.tsx'
 import Materials from './pages/functionality/materials.tsx'
-import Gallery from './pages/functionality/gallery.tsx'
 
 function App() {
   const auth = useAuth()
@@ -84,14 +83,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/gallery"
-            element={
-              <ProtectedRoute>
-                <Gallery />
-              </ProtectedRoute>
-            }
-          />
+
           <Route
             path="/profile"
             element={
