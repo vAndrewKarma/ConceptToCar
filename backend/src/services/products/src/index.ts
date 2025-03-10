@@ -5,7 +5,7 @@ AI: (nana2237)
 Data Science: (nana2237)
 QA: (karma_andrew_)
 Project Manager: (karma_andrew_)
-Frontend members: (iustin10, karma_andrew_)
+Frontend members: (iustin10, karma_andrew_ )
 Security: (karma_andrew_)
 Testers: (karma_andrew_) TODO: create tests, had only one on the testing cluster on the health endpoint
 
