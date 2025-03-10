@@ -1,5 +1,15 @@
 export default function clearCookie(res) {
-  res.clearCookie('deviceId', { path: '/' })
-  res.clearCookie('access_token', { path: '/' })
-  res.clearCookie('refresh_token', { path: '/' })
+  const cookieOptions = {
+    path: '/',
+    domain: '.conceptocar.xyz',
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  }
+
+  res.clearCookie('deviceId', cookieOptions)
+  res.clearCookie('access_token', cookieOptions)
+  res.clearCookie('refresh_token', cookieOptions)
+
+  console.log('Cookies cleared')
 }
