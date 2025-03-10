@@ -1,0 +1,12 @@
+.copyright {
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  text-align: center;
+  position: flex;
+
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  color: white;
+  z-index: 1000;
+}

@@ -5,10 +5,6 @@
   overflow-y: auto; /* Permite scroll pe verticală */
 }
 
-.legend-chart {
-  font-size: 16px !important; /* Reduce dimensiunea fontului pentru legendă */
-}
-
 .legend-pie {
   display: flex;
   flex-wrap: wrap;
@@ -20,6 +16,10 @@
   .chart-container {
     flex-direction: column;
     align-items: center;
+  }
+
+  .legend-chart {
+    font-size: 16px !important; /* Reduce dimensiunea fontului pentru legendă */
   }
 
   .line-chart {

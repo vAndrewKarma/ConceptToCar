@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-table'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Modal, Spinner, Form, Alert } from 'react-bootstrap'
-import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
+import { FaEdit, FaTrash, FaPlusCircle, FaEye } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useMemo } from 'react'
 import useAxios from 'axios-hooks'
@@ -390,6 +390,15 @@ function Products() {
           className="d-flex justify-content-center gap-2"
           style={{ height: '100%' }}
         >
+          <FaEye
+            style={{ color: '#ffffff', cursor: 'pointer' }}
+            title="View"
+            href="/product"
+            onClick={() => {
+              const slug = slugify(row.original.name)
+              window.location.href = `/product/${slug}/${row.original._id}`
+            }}
+          ></FaEye>
           <FaEdit
             style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
             title="Edit"

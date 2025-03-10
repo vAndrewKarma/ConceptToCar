@@ -9,6 +9,7 @@ import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
 import useAxios from 'axios-hooks'
 import './materials.css'
+import './products.css'
 import AddMaterialModal from './addmaterial'
 import UpdateMaterialModal from './updatematerial'
 import axios from 'axios'
@@ -358,7 +359,7 @@ function Materials() {
             <div className="alert alert-danger text-center">{error}</div>
           )}
           <Container fluid>
-            <div className="d-flex align-items-center justify-content-between mb-3">
+            <div className="d-flex align-items-center justify-content-end mb-3 ">
               <Form.Control
                 type="text"
                 placeholder="Search by name..."
@@ -371,14 +372,14 @@ function Materials() {
                   }
                 }}
                 style={{
-                  maxWidth: '200px',
+                  maxWidth: '600px',
                   fontSize: '14px',
                   marginBottom: '10px',
                 }}
               />
 
               <FaPlusCircle
-                className="ms-auto"
+                className=" ms-auto d-block d-sm-block"
                 size={24}
                 style={{ color: 'green', cursor: 'pointer' }}
                 title="Add Material"
