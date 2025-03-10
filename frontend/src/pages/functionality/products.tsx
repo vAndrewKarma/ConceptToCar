@@ -448,11 +448,17 @@ function Products() {
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
+                    e.preventDefault()
                     setSearchTerm((e.target as HTMLInputElement).value)
                     setCurrentPage(1)
                   }
                 }}
                 className="awesome-search"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                  }
+                }}
               />
               <Form.Select
                 value={filterCategory}
