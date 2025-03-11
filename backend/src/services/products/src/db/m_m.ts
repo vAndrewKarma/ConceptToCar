@@ -91,7 +91,7 @@ export class ProductModel {
     const queryLimit = displayLimit + 1
     const skip = (page - 1) * displayLimit
 
-    // Build dynamic query
+   
     const query: Filter<Product> = {}
 
     if (searchTerms?.trim()) {

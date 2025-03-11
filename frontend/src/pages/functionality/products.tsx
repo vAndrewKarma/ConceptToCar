@@ -441,25 +441,23 @@ function Products() {
           )}
           <div className="d-flex align-items-center justify-content-between mb-3">
             <div className="awesome-search-container mb-3">
-              <Form.Control
-                type="text"
-                placeholder="Search by name..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    setSearchTerm((e.target as HTMLInputElement).value)
-                    setCurrentPage(1)
-                  }
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  setSearchTerm(searchInput)
+                  setCurrentPage(1)
                 }}
-                className="awesome-search"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                  }
-                }}
-              />
+                style={{ display: 'contents' }}
+              >
+                <Form.Control
+                  type="text"
+                  placeholder="Search by name..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="awesome-search"
+                />
+                <button type="submit" style={{ display: 'none' }} />
+              </form>
               <Form.Select
                 value={filterCategory}
                 onChange={(e) => {

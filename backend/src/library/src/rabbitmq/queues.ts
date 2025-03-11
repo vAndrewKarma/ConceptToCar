@@ -6,7 +6,18 @@ export const rabbitConfig = {
         durable: true,
         autoDelete: false,
         arguments: {
-          //   'x-dead-letter-exchange': 'dlx_exchange',
+          'x-message-ttl': 60000,
+
+          'x-expires': 3600000,
+        },
+      },
+    },
+    AUTH_SEND_EMAIL_VALIDATION: {
+      name: 'auth.sendEmail',
+      options: {
+        durable: true,
+        autoDelete: false,
+        arguments: {
           'x-message-ttl': 60000,
 
           'x-expires': 3600000,
