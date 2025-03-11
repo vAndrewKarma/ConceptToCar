@@ -9,7 +9,7 @@ import Home from './pages/home'
 import SignUp from './pages/auth/sign-up'
 import Contact from './pages/contact'
 import PageNotFound from './pages/404'
-import Copyright from './components/copyright'
+// import Copyright from './components/copyright.tsx'
 import Recover from './pages/auth/forgot-password/recover.tsx'
 import NewPassword from './pages/auth/forgot-password/new-password.tsx'
 import EmailVerification from './pages/auth/email-verification.tsx'
@@ -100,7 +100,7 @@ function App() {
           />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
-        <Copyright />
+        {/* <Copyright /> */}
       </BrowserRouter>
     </AuthProvider>
   )

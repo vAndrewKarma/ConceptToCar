@@ -119,6 +119,8 @@ function Dashboard() {
                     width={400}
                     height={450}
                     className="pie-chart legend-chart align-items-center"
+                    tabIndex={-1}
+                    style={{ fontSize: '18px' }}
                   >
                     <Pie
                       data={data}
