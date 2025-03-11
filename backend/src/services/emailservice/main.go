@@ -40,13 +40,13 @@ func sendEmail(to, subject, body string) error {
 func main() {
 	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
-		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+		log.Fatalf("failed: %v", err)
 	}
 	defer conn.Close()
 
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Fatalf("Failed to open a channel:  %v", err)
+		log.Fatalf("failed:  %v", err)
 	}
 	defer ch.Close()
 
@@ -62,7 +62,7 @@ func main() {
 		},
 	)
 	if err != nil {
-		log.Fatalf("Failed to declare a queue: %v", err)
+		log.Fatalf("failed: %v", err)
 	}
 
 	
@@ -76,7 +76,7 @@ func main() {
 		nil,    
 	)
 	if err != nil {
-		log.Fatalf("Failed to register a consumer: %v", err)
+		log.Fatalf("failed: %v", err)
 	}
 
 	forever := make(chan bool)
@@ -85,14 +85,14 @@ func main() {
 		for d := range msgs {
 			var emailMsg EmailMessage
 			if err := json.Unmarshal(d.Body, &emailMsg); err != nil {
-				log.Printf("Error decoding JSON: %v", err)
+				log.Printf("error: %v", err)
 				continue
 			}
 
 			if err := sendEmail(emailMsg.To, emailMsg.Subject,emailMsg.Body); err != nil {
-				log.Printf("Error sending email to %s: %v", emailMsg.To, err)
+				log.Printf("error sending email to %s: %v", emailMsg.To, err)
 			} else {
-				log.Printf("Email sent to %s successfully", emailMsg.To)
+				log.Printf("email sent to %s successfully", emailMsg.To)
 			}
 		}
 	}()
