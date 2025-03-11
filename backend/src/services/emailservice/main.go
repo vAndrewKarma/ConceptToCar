@@ -51,7 +51,7 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"auth.sendEmail ", 
+		"auth.sendEmail", 
 		true,                 
 		false,                
 		false,                
