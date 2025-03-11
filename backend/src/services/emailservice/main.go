@@ -46,7 +46,7 @@ func main() {
 
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Fatalf("Failed to open a channel: %v", err)
+		log.Fatalf("Failed to open a channel:  %v", err)
 	}
 	defer ch.Close()
 
