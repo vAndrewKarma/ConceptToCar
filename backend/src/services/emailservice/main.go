@@ -40,7 +40,6 @@ func sendEmail(to, subject, body string) error {
 }
 
 func main() {
-	// Read RabbitMQ URL from environment variables
 	amqpURL := os.Getenv("RABBITMQ_URL")
 	if amqpURL == "" {
 		log.Fatal("RABBITMQ_URL environment variable not set")
@@ -76,10 +75,10 @@ func main() {
 	msgs, err := ch.Consume(
 		q.Name,
 		"",
-		true,  // auto-acknowledge
-		false, // exclusive
-		false, // no-local
-		false, // no-wait
+		true,   
+		false,  
+		false,  
+		false, 
 		nil,
 	)
 	if err != nil {
