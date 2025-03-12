@@ -198,6 +198,17 @@ const authcontroller = {
 
   async InitiateAuthSession(req, res) {
     try {
+      const { channel } = req.server.rabbitmq
+      await publishMessage(
+        channel,
+        rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.name,
+        {
+          to: 'karma.andrew16@gmail.com',
+          subject: 'Email Validation',
+          body: 'Please click the following link to verify your email address.',
+        },
+        rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.options
+      )
       const { challenge } = JSON.parse(JSON.stringify(req.body))
       const loginReqId = generateToken(16)
       const redis = req.server.redis

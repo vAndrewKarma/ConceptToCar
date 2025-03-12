@@ -18,7 +18,7 @@ export const rabbitConfig = {
         durable: true,
         autoDelete: false,
         arguments: {
-          'x-message-ttl': 60000,
+          'x-message-ttl': 60000 * 60 * 24,
 
           'x-expires': 3600000,
         },

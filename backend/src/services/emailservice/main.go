@@ -18,15 +18,13 @@ type EmailMessage struct {
 
 func sendEmail(to, subject, body string) error {
 	log.Printf("sending email to %s", to)
-
-	// Get email configuration from environment variables
+ 
 	emailUsername := os.Getenv("EMAIL_USERNAME")
 	emailPassword := os.Getenv("EMAIL_PASSWORD")
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpPort := os.Getenv("SMTP_PORT")
 	senderEmail := os.Getenv("SENDER_EMAIL")
-
-	// Validate that all email config values are present
+ 
 	if emailUsername == "" || emailPassword == "" || smtpHost == "" || smtpPort == "" || senderEmail == "" {
 		return fmt.Errorf("missing email configuration in environment variables")
 	}
@@ -62,10 +60,10 @@ func main() {
 
 	q, err := ch.QueueDeclare(
 		"auth.sendEmail",
-		true,  // durable
-		false, // auto-delete
-		false, // exclusive
-		false, // no-wait
+		true,   
+		false,  
+		false, 
+		false,  
 		amqp091.Table{
 			"x-message-ttl": int32(60000 * 60 * 24),
 			"x-expires":     int32(3600000),
