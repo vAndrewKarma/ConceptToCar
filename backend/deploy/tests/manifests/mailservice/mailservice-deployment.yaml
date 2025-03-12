@@ -30,15 +30,3 @@ spec:
             limits:
               cpu: '500m'
               memory: '512Mi'
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 50051
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 50051
-            initialDelaySeconds: 30
-            periodSeconds: 20
