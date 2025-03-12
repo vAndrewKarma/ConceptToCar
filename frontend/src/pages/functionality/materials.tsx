@@ -13,6 +13,7 @@ import './products.css'
 import AddMaterialModal from './addmaterial'
 import UpdateMaterialModal from './updatematerial'
 import axios from 'axios'
+import { useAuth } from '../../hook/useAuth'
 interface Material {
   _id: string
   name: string
@@ -59,6 +60,8 @@ const generateCodeChallenge = async (verifier: string): Promise<string> => {
 }
 
 function Materials() {
+  const { data } = useAuth()
+  const role = data.session.role
   const { productId } = useParams<{ productId: string }>()
   const [currentPage, setCurrentPage] = useState(1)
   const [materials, setMaterials] = useState<Material[]>([])
@@ -209,6 +212,11 @@ function Materials() {
     setShowModal(false)
     setSelectedId(null)
   }
+  useEffect(() => {
+    if (role === 'Admin' || role === 'Portfolio Manager') {
+      window.location.href = '/'
+    }
+  }, [role])
   const handleDelete = async () => {
     if (selectedId) {
       try {

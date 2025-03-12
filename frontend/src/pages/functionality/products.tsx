@@ -12,6 +12,7 @@ import useAxios from 'axios-hooks'
 import './products.css'
 import AddProductModal from './addprod.tsx'
 import axios from 'axios'
+import { useAuth } from '../../hook/useAuth.tsx'
 
 export type Stage =
   | 'concept'
@@ -80,7 +81,8 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
 }
 
 function Products() {
-  const role: string = 'Designer' // or 'Admin' based on your logic
+  const { data } = useAuth()
+  const role = data.session.role
   // For demo purposes, assume the currentUserRole is hard-coded.
   const [filterCategory, setFilterCategory] = useState('')
   const [currentPage, setCurrentPage] = useState(1)

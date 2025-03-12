@@ -7,6 +7,7 @@ import '../auth/login.css'
 import './products.css'
 import ExportChartPDF from './pdfgen'
 import axios from 'axios'
+import { useAuth } from '../../hook/useAuth'
 
 function unslugify(slug: string): string {
   return slug
@@ -61,7 +62,8 @@ interface ProductData {
 function Product() {
   const { name: productName } = useParams()
   const navigate = useNavigate()
-  const role: string = 'Admin'
+  const { data } = useAuth()
+  const role = data.session.role
   // Modal visibility states
   const [showModal, setShowModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
