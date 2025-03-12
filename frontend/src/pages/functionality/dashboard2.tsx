@@ -1,13 +1,14 @@
 import { Card, Container, Row, Col } from 'react-bootstrap'
 // import { TrendingUp } from "lucide-react"
 // import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
-import {
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+// import {
+//   CardContent,
+//   CardDescription,
+//   CardFooter,
+//   CardHeader,
+//   CardTitle,
+// } from '@/components/ui/card'
+
 import '../auth/login.css'
 
 const stats = [
