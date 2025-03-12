@@ -62,6 +62,11 @@ jobs:
         run: docker build -t gcr.io/spheric-temple-451313-b7/products:latest .
         working-directory: backend/src/services/products
 
+      - name: Build Docker image
+        run: docker build -t gcr.io/spheric-temple-451313-b7/mailservice:latest .
+        working-directory: backend/src/services/emailservice
+      - name: Push Docker image to GCR
+        run: docker push gcr.io/spheric-temple-451313-b7/mailservice:latest
       - name: Push Docker image to GCR
         run: docker push gcr.io/spheric-temple-451313-b7/authentservice:latest
 
@@ -79,12 +84,14 @@ jobs:
           kubectl rollout restart deployment/authentservice-deployment -n deployments
           kubectl rollout restart deployment/keyservice-deployment -n deployments
           kubectl rollout restart deployment/productservice-deployment -n deployments
+          kubectl rollout restart deployment/mailservice-deployment -n deployments
 
       - name: Wait for deployments to be ready
         run: |
           kubectl rollout status deployment/authentservice-deployment -n deployments
           kubectl rollout status deployment/keyservice-deployment -n deployments
           kubectl rollout status deployment/productservice-deployment -n deployments
+          kubectl rollout status deployment/mailservice-deployment -n deployments
 
       - name: Test /health endpoint
         run: |
