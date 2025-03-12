@@ -80,6 +80,7 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
 }
 
 function Products() {
+  const role: string = 'Designer' // or 'Admin' based on your logic
   // For demo purposes, assume the currentUserRole is hard-coded.
   const [filterCategory, setFilterCategory] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -399,16 +400,20 @@ function Products() {
               window.location.href = `/product/${slug}/${row.original._id}`
             }}
           ></FaEye>
-          <FaEdit
-            style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
-            title="Edit"
-            onClick={() => handleEditShow(row.original)}
-          />
-          <FaTrash
-            style={{ color: '#F64B4B', cursor: 'pointer' }}
-            title="Delete"
-            onClick={() => handleShow(row.original._id)}
-          />
+          {role != 'Designer' ? (
+            <FaEdit
+              style={{ color: 'rgb(255, 165, 0)', cursor: 'pointer' }}
+              title="Edit"
+              onClick={() => handleEditShow(row.original)}
+            />
+          ) : null}
+          {role === 'Admin' ? (
+            <FaTrash
+              style={{ color: '#F64B4B', cursor: 'pointer' }}
+              title="Delete"
+              onClick={() => handleShow(row.original._id)}
+            />
+          ) : null}
         </div>
       ),
     },

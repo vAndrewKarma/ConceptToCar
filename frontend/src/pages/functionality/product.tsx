@@ -61,7 +61,7 @@ interface ProductData {
 function Product() {
   const { name: productName } = useParams()
   const navigate = useNavigate()
-
+  const role: string = 'Admin'
   // Modal visibility states
   const [showModal, setShowModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -374,20 +374,43 @@ function Product() {
                     >
                       Modify
                     </Button>
-                    <Button
-                      onClick={() =>
-                        navigate(
-                          `/product/${productName}/${displayProduct._id}/materials`
-                        )
-                      }
-                      className="btn btn-warning"
-                    >
-                      Materials
-                    </Button>
-                    <ExportChartPDF product={product} />
-                    <Button className="btn btn-danger" onClick={handleShow}>
-                      Delete
-                    </Button>
+                    {role === 'Admin' && (
+                      <>
+                        <Button
+                          onClick={() =>
+                            navigate(
+                              `/product/${productName}/${displayProduct._id}/materials`
+                            )
+                          }
+                          className="btn btn-warning"
+                        >
+                          Materials
+                        </Button>
+                        <ExportChartPDF product={product} />
+                        <Button className="btn btn-danger" onClick={handleShow}>
+                          Delete
+                        </Button>
+                      </>
+                    )}
+                    {role === 'Portfolio Manager' && (
+                      <>
+                        <Button
+                          onClick={() =>
+                            navigate(
+                              `/product/${productName}/${displayProduct._id}/materials`
+                            )
+                          }
+                          className="btn btn-warning"
+                        >
+                          Materials
+                        </Button>
+                      </>
+                    )}
+                    {role === 'Seller' && (
+                      <>
+                        <ExportChartPDF product={product} />
+                      </>
+                    )}
                   </div>
                 </Form>
               </div>
