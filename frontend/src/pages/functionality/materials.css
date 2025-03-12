@@ -9,3 +9,10 @@
     max-height: 70vh;
   }
 }
+@media (max-width: 769px) {
+  .mq {
+    position: absolute;
+    right: max(0px, 50% - 100px);
+    top: 25px;
+  }
+}

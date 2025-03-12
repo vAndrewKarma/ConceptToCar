@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailservice
+  namespace: deployments
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    prometheus.io/scrape: 'true'
+spec:
+  type: ClusterIP
+  selector:
+    app: mailservice
+  ports:
+    - name: http
+      port: 80
+      targetPort: 50051

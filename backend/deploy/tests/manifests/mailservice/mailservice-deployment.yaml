@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailservice-deployment
+  namespace: deployments
+  labels:
+    app: mailservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailservice
+  template:
+    metadata:
+      labels:
+        app: mailservice
+    spec:
+      containers:
+        - name: server
+          image: gcr.io/spheric-temple-451313-b7/mailservice:latest
+          ports:
+            - containerPort: 50051
+          envFrom:
+            - secretRef:
+                name: authservice-secrets
+          resources:
+            requests:
+              cpu: '250m'
+              memory: '256Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'

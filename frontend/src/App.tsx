@@ -20,6 +20,7 @@ import Products from './pages/functionality/products.tsx'
 import Profile from './pages/account/profile.tsx'
 import Product from './pages/functionality/product.tsx'
 import Materials from './pages/functionality/materials.tsx'
+import Dashboard2 from './pages/functionality/dashboard2.tsx'
 
 function App() {
   const auth = useAuth()
@@ -56,6 +57,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard2"
+            element={
+              <ProtectedRoute>
+                <Dashboard2 />
               </ProtectedRoute>
             }
           />

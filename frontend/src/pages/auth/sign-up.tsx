@@ -223,7 +223,9 @@ function SignUp() {
                       <Form.Label className="custom-label">Password</Form.Label>
                       <div className="position-relative">
                         <Form.Control
-                          className={`cb-b ${errors.password ? 'custom-error-border' : ''}`}
+                          className={`cb-b ${
+                            errors.password ? 'custom-error-border' : ''
+                          }`}
                           type={showPassword ? 'text' : 'password'}
                           {...register('password')}
                           style={{
@@ -266,7 +268,9 @@ function SignUp() {
                       </Form.Label>
                       <div className="position-relative">
                         <Form.Control
-                          className={`cb-b ${errors.confirmPassword ? 'custom-error-border' : ''}`}
+                          className={`cb-b ${
+                            errors.confirmPassword ? 'custom-error-border' : ''
+                          }`}
                           type={showConfirmPassword ? 'text' : 'password'}
                           {...register('confirmPassword')}
                           style={{
@@ -322,9 +326,9 @@ function SignUp() {
                           Designer
                         </Dropdown.Item>
                         <Dropdown.Item
-                          onClick={() => handleRoleSelect('Portofolio manager')}
+                          onClick={() => handleRoleSelect('Portfolio Manager')}
                         >
-                          Portofolio manager
+                          Portfolio Manager
                         </Dropdown.Item>
                         <Dropdown.Item
                           onClick={() => handleRoleSelect('Seller')}

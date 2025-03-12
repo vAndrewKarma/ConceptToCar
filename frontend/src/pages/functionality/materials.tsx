@@ -13,6 +13,7 @@ import './products.css'
 import AddMaterialModal from './addmaterial'
 import UpdateMaterialModal from './updatematerial'
 import axios from 'axios'
+import { useAuth } from '../../hook/useAuth'
 interface Material {
   _id: string
   name: string
@@ -59,6 +60,8 @@ const generateCodeChallenge = async (verifier: string): Promise<string> => {
 }
 
 function Materials() {
+  const { data } = useAuth()
+  const role = data.session.role
   const { productId } = useParams<{ productId: string }>()
   const [currentPage, setCurrentPage] = useState(1)
   const [materials, setMaterials] = useState<Material[]>([])
@@ -209,6 +212,11 @@ function Materials() {
     setShowModal(false)
     setSelectedId(null)
   }
+  useEffect(() => {
+    if (role !== 'Admin' && role !== 'Portfolio Manager') {
+      window.location.href = '/'
+    }
+  }, [role])
   const handleDelete = async () => {
     if (selectedId) {
       try {
@@ -359,32 +367,34 @@ function Materials() {
             <div className="alert alert-danger text-center">{error}</div>
           )}
           <Container fluid>
-            <div className="d-flex align-items-center justify-content-end mb-3 ">
-              <Form.Control
-                type="text"
-                placeholder="Search by name..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    triggerSearch()
-                  }
-                }}
-                style={{
-                  maxWidth: '600px',
-                  fontSize: '14px',
-                  marginBottom: '10px',
-                }}
-              />
-
-              <FaPlusCircle
-                className=" ms-auto d-block d-sm-block"
-                size={24}
-                style={{ color: 'green', cursor: 'pointer' }}
-                title="Add Material"
-                onClick={handleAddShow}
-              />
+            <div className="d-flex justify-content-between">
+              <div className="d-flex align-items-center justify-content-end mb-3 ">
+                <Form.Control
+                  type="text"
+                  placeholder="Search by name..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      triggerSearch()
+                    }
+                  }}
+                  style={{
+                    maxWidth: '600px',
+                    fontSize: '14px',
+                    marginBottom: '10px',
+                  }}
+                />
+              </div>
+              <div className="mq">
+                <FaPlusCircle
+                  size={24}
+                  style={{ color: 'green', cursor: 'pointer' }}
+                  title="Add Material"
+                  onClick={handleAddShow}
+                />
+              </div>
             </div>
             <table
               className="table table-dark table-striped table-hover text-center"
