@@ -213,7 +213,7 @@ function Materials() {
     setSelectedId(null)
   }
   useEffect(() => {
-    if (role === 'Admin' || role === 'Portfolio Manager') {
+    if (role !== 'Admin' && role !== 'Portfolio Manager') {
       window.location.href = '/'
     }
   }, [role])
