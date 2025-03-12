@@ -30,6 +30,7 @@
     "react-simple-typewriter": "^5.0.1",
     "react-typed": "^2.0.12",
     "recharts": "^2.15.1",
+    "shadcn-ui": "^0.9.5",
     "svg2pdf.js": "^2.4.0",
     "zod": "^3.24.1"
   },

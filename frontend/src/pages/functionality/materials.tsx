@@ -359,32 +359,34 @@ function Materials() {
             <div className="alert alert-danger text-center">{error}</div>
           )}
           <Container fluid>
-            <div className="d-flex align-items-center justify-content-end mb-3 ">
-              <Form.Control
-                type="text"
-                placeholder="Search by name..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    triggerSearch()
-                  }
-                }}
-                style={{
-                  maxWidth: '600px',
-                  fontSize: '14px',
-                  marginBottom: '10px',
-                }}
-              />
-
-              <FaPlusCircle
-                className=" ms-auto d-block d-sm-block"
-                size={24}
-                style={{ color: 'green', cursor: 'pointer' }}
-                title="Add Material"
-                onClick={handleAddShow}
-              />
+            <div className="d-flex justify-content-between">
+              <div className="d-flex align-items-center justify-content-end mb-3 ">
+                <Form.Control
+                  type="text"
+                  placeholder="Search by name..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      triggerSearch()
+                    }
+                  }}
+                  style={{
+                    maxWidth: '600px',
+                    fontSize: '14px',
+                    marginBottom: '10px',
+                  }}
+                />
+              </div>
+              <div className="mq">
+                <FaPlusCircle
+                  size={24}
+                  style={{ color: 'green', cursor: 'pointer' }}
+                  title="Add Material"
+                  onClick={handleAddShow}
+                />
+              </div>
             </div>
             <table
               className="table table-dark table-striped table-hover text-center"
