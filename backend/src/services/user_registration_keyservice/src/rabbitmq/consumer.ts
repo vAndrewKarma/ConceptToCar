@@ -1,4 +1,7 @@
-import { rabbitConfig } from '@karma-packages/conceptocar-common'
+import {
+  publishMessage,
+  rabbitConfig,
+} from '@karma-packages/conceptocar-common'
 import { createUserModel } from '../db/m_m'
 async function startKeyConsumers(channel, server) {
   try {
@@ -18,6 +21,22 @@ async function startKeyConsumers(channel, server) {
         try {
           const userModel = createUserModel(server)
           await userModel.createUser(message)
+          await publishMessage(
+            channel,
+            rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.name,
+            {
+              to: 'karma.andrew16@gmail.com',
+              subject: 'Email Validation',
+              body: 'Please click the following link to verify your email address.',
+            },
+            rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.options
+          )
+          await server.redis.set(
+            `email_validation:${message.email}`,
+            'pending',
+            'EX',
+            86400
+          )
           console.log('acc created with data', JSON.stringify(message))
           channel.ack(msg)
         } catch (error) {
