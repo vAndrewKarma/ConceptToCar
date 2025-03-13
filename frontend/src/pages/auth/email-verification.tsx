@@ -28,13 +28,9 @@ function EmailVerification() {
       try {
         const response = await axios.post(
           'https://backend-tests.conceptocar.xyz/auth/verify-email',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ code }),
-          }
+
+          { code: code },
+          { withCredentials: true }
         )
 
         if (response.status !== 200) {
@@ -46,7 +42,12 @@ function EmailVerification() {
         setTimeout(() => navigate('/dashboard'), 3000)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        setState((s) => ({ ...s, loading: false, error: err.message }))
+        console.log(err)
+        setState((s) => ({
+          ...s,
+          loading: false,
+          error: err.response.data.message,
+        }))
       }
     }
 
@@ -81,10 +82,10 @@ function EmailVerification() {
           </div>
         ) : (
           <div className="verification-error">
-            <h2 style={{ color: '#fff' }}>Email Verification Failed</h2>
+            <h1 style={{ color: '#fff' }}>Email Verification Failed</h1>
 
             <div className="resend-section">
-              {state.error && <p className="error-message">{state.error}</p>}
+              {state.error && <h2 className="error-message">{state.error}</h2>}
             </div>
           </div>
         )}

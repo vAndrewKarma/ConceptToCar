@@ -113,6 +113,7 @@ const authcontroller = {
         email,
         firstName: userfound.firstName,
         lastName: userfound.lastName,
+        verified: userfound.verified,
         id: userfound._id,
         role: userfound.role,
         ip: req.headers['x-forwarded-for'] || req.ip,
@@ -222,6 +223,7 @@ const authcontroller = {
       const { code } = req.body
       const key = `email_validation:${code}`
       const emailredis = await redis.get(key)
+      console.log(emailredis)
       if (!emailredis) throw new BadRequestError('Invalid or expired key')
       const user = usermodel.findUserByEmail(emailredis)
       console.log(user)

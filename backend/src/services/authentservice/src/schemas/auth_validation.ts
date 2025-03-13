@@ -204,7 +204,6 @@ export const verifyEmailSchema = {
   errorMessage: {
     required: {
       challenge: 'Invalid code.',
-      email: 'Invalid email.',
     },
     additionalProperties: 'Invalid code.',
   },
