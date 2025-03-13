@@ -188,7 +188,7 @@ export const verifyEmailSchema = {
   type: 'object',
   required: ['code'],
   properties: {
-    challenge: {
+    code: {
       type: 'string',
       minLength: 20,
       maxLength: 45,
@@ -203,7 +203,7 @@ export const verifyEmailSchema = {
   additionalProperties: false,
   errorMessage: {
     required: {
-      challenge: 'Invalid code.',
+      code: 'Invalid code.',
     },
     additionalProperties: 'Invalid code.',
   },

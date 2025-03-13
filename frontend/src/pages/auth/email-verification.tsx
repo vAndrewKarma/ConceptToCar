@@ -22,14 +22,13 @@ function EmailVerification() {
     resent: false,
   })
 
-  // Handle email verification
   useEffect(() => {
     const verifyEmail = async () => {
       try {
         const response = await axios.post(
           'https://backend-tests.conceptocar.xyz/auth/verify-email',
 
-          { code: code },
+          { code },
           { withCredentials: true }
         )
 
