@@ -220,6 +220,7 @@ const authcontroller = {
       const redis = req.server.redis
 
       const usermodel = req.server.userModel
+      console.log(JSON.stringify(req.body))
       const { code } = req.body
       const key = `email_validation:${code}`
       console.log(key)
