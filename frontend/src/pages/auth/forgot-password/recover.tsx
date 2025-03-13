@@ -9,9 +9,10 @@ import axios from 'axios'
 import { Eye, EyeOff } from 'lucide-react'
 
 import './recover.css'
+import { useQueryClient } from '@tanstack/react-query'
 
 function NewPassword() {
-  // Extract the verification code from the URL
+  const queryClient = useQueryClient()
   const { code } = useParams()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -111,6 +112,11 @@ function NewPassword() {
       )
       setAlertMessage(response.data.message)
       setAlertVariant('success')
+      setTimeout(() => {
+        queryClient.removeQueries({ queryKey: ['authUser'] })
+        localStorage.removeItem('authUser')
+        window.location.replace('/sign-in')
+      }, 2000)
     } catch (error: any) {
       const errMsg =
         error?.response?.data?.message ||
