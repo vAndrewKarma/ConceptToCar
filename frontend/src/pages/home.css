@@ -6,6 +6,15 @@
   transform: translate(-50%, -50%);
   text-align: center;
   color: white;
+  width: 90%;
+  max-width: 1000px;
+  white-space: nowrap;
+}
+
+.home span {
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
 .home-logo {
@@ -15,7 +24,8 @@
 
 @media (max-width: 768px) {
   .home {
-    font-size: 1.8rem;
+    font-size: 2rem;
+    width: 95%;
   }
 
   .home-logo {
@@ -25,10 +35,20 @@
 
 @media (max-width: 480px) {
   .home {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    width: 100%;
   }
 
   .home-logo {
-    max-height: 100px;
+    max-height: 120px;
   }
+}
+
+.typewriter {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.typewriter span {
+  display: inline;
 }

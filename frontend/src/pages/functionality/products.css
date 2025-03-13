@@ -165,3 +165,9 @@
     border: 1px solid #6c757d;
   }
 }
+
+th,
+td {
+  text-align: center;
+  vertical-align: middle;
+}
