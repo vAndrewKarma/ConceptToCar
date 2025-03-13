@@ -4,10 +4,13 @@ import profile from '../../assets/profile.png'
 import './profile.css'
 import { useAuth } from '../../hook/useAuth'
 import { useState } from 'react'
+import axios from 'axios'
 
 function Profile() {
   const auth = useAuth()
   const firstName = auth.data?.session?.firstName
+  const verified = auth.data?.session.verified
+  console.log(verified)
   const lastName = auth.data?.session?.lastName
   const email = auth.data?.session?.email
   const role = auth.data?.session?.role
@@ -26,10 +29,15 @@ function Profile() {
   const [isVerifyDisabled, setIsVerifyDisabled] = useState(false)
   const [isResetDisabled, setIsResetDisabled] = useState(false)
 
-  const handleButtonClick = (type: string) => {
+  const handleButtonClick = async (type: string) => {
     if (type === 'verify') {
       setIsVerifyDisabled(true)
       setTimeout(() => setIsVerifyDisabled(false), 120000)
+      await axios.post(
+        'https://backend-tests.conceptocar.xyz/auth/request-verification',
+        { d: 'd' },
+        { withCredentials: true }
+      )
     } else if (type === 'reset') {
       setIsResetDisabled(true)
       setTimeout(() => setIsResetDisabled(false), 120000)
@@ -91,17 +99,24 @@ function Profile() {
                   <strong>Role:</strong> {role}
                 </span>
                 <span style={{ paddingTop: '10px', lineHeight: '1.5' }}>
+                  <strong>Email status:</strong>{' '}
+                  {verified || 'not implemented at that point'}
+                </span>
+                <span style={{ paddingTop: '10px', lineHeight: '1.5' }}>
                   <strong>Join Date:</strong> {date}
                 </span>
                 <div className="d-flex justify-content-between align-items-center w-100">
-                  <Button
-                    variant="dark"
-                    className="mt-3"
-                    onClick={() => handleButtonClick('verify')}
-                    disabled={isVerifyDisabled}
-                  >
-                    {isVerifyDisabled ? 'Please wait...' : 'Verify Email'}
-                  </Button>
+                  {!verified ? (
+                    <Button
+                      variant="dark"
+                      className="mt-3"
+                      onClick={() => handleButtonClick('verify')}
+                      disabled={isVerifyDisabled}
+                    >
+                      {isVerifyDisabled ? 'Please wait...' : 'Verify Email'}
+                    </Button>
+                  ) : null}
+
                   <Button
                     variant="dark"
                     className="mt-3 ms-auto"
