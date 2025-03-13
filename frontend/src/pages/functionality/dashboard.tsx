@@ -1,40 +1,18 @@
+import { Card, Container, Row, Col } from 'react-bootstrap'
 import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
   Legend,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  LabelList,
 } from 'recharts'
-import { Card, Container, Row, Col } from 'react-bootstrap'
+import { useState, useEffect } from 'react'
 import '../auth/login.css'
-import './dashboard.css'
-
-const data = [
-  { name: 'Concept', value: 40, color: '#17a2b8' },
-  { name: 'Feasibility', value: 20, color: '#cfc208' },
-  { name: 'Design', value: 40, color: '#eb02df' },
-  { name: 'Production', value: 40, color: '#2c9901' },
-  { name: 'Withdrawal', value: 40, color: '#6100cf' },
-  { name: 'StandBy', value: 40, color: '#ff5e00' },
-  { name: 'Cancelled', value: 20, color: '#dc3545' },
-]
-
-const generateData = () => {
-  const data = []
-  for (let i = 30; i >= 1; i--) {
-    data.push({
-      date: `${i}d ago`,
-      Products: Math.floor(Math.random() * 100) + 10, // Între 10 și 110
-    })
-  }
-  return data
-}
-
-const productData = generateData()
 
 const stats = [
   {
@@ -63,88 +41,143 @@ const stats = [
   },
 ]
 
-function Dashboard() {
+const barChartData = [
+  { name: 'January', value: 186 },
+  { name: 'February', value: 305 },
+  { name: 'March', value: 237 },
+  { name: 'April', value: 73 },
+  { name: 'May', value: 209 },
+  { name: 'June', value: 214 },
+]
+
+const pieChartData = [
+  { name: 'Concept', value: 40 },
+  { name: 'Feasibility', value: 20 },
+  { name: 'Design', value: 40 },
+  { name: 'Production', value: 40 },
+  { name: 'Withdrawal', value: 40 },
+  { name: 'StandBy', value: 40 },
+  { name: 'Cancelled', value: 20 },
+]
+
+const COLORS = [
+  '#17a2b8',
+  '#cfc208',
+  '#eb02df',
+  '#2c9901',
+  '#7851ac',
+  '#ff5e00',
+  '#dc3545',
+]
+
+function Dashboard2() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const totalValue = pieChartData.reduce((acc, item) => acc + item.value, 0)
+
   return (
-    <div className="color-overlay d-flex structure">
+    <div className="color-background scroll-container">
       <Container fluid>
-        <Row
-          className="vh-100 justify-content-end"
-          style={{ paddingTop: '80px' }}
-        >
-          <Col xs="12" className="mb-4">
-            <Row>
-              {stats.map((stat, index) => (
-                <Col key={index} md={3} sm={6} className="mb-3">
-                  <Card className="p-3 text-center bg-dark text-light shadow-sm">
-                    <h6>{stat.title}</h6>
-                    <h2 className="fw-bold">{stat.value}</h2>
-                    <p className="text-success mb-1">{stat.change}</p>
-                    <small>{stat.description}</small>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </Col>
-
-          <Row className="chart-container">
-            <Col className="mb-4">
-              <Card className="p-3 bg-dark text-light">
-                <h5>Products Created - Last 30 Days</h5>
-                <LineChart
-                  width={1200}
-                  height={450}
-                  data={productData}
-                  className="line-chart"
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="Products"
-                    stroke="#8884d8"
-                    strokeWidth={2}
-                  />
-                </LineChart>
+        {/* Secțiunea cu statisticile */}
+        <Row className="justify-content-center " style={{ paddingTop: '80px' }}>
+          {stats.map((stat, index) => (
+            <Col key={index} md={3} sm={6} xs={12} className="mb-3">
+              <Card className="p-3 text-center bg-dark text-light shadow-sm">
+                <h6 className="stat-title">{stat.title}</h6>
+                <h2 className="fw-bold stat-value">{stat.value}</h2>
+                <p className="text-success mb-1">{stat.change}</p>
+                <small>{stat.description}</small>
               </Card>
             </Col>
+          ))}
+        </Row>
 
-            <Col className="mb-4">
-              <div className="d-flex justify-content-center">
-                <Card className="p-3 bg-dark text-light">
-                  <h5>Stages Statistics</h5>
-                  <PieChart
-                    width={400}
-                    height={450}
-                    className="pie-chart legend-chart align-items-center"
-                    tabIndex={-1}
-                    style={{ fontSize: '18px' }}
-                  >
-                    <Pie
-                      data={data}
+        {/* Secțiunea cu graficele */}
+        <Row className="justify-content-center" style={{ paddingTop: '40px' }}>
+          <Col lg={8} md={10} sm={12} xs={12} className="mb-4">
+            <Card className="p-3 bg-dark text-white shadow chart-card">
+              <h5 className="chart-title">Bar Chart - Custom Label</h5>
+              <p className="chart-subtitle">January - June 2024</p>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart
+                  layout="vertical"
+                  data={barChartData}
+                  margin={{ left: 30, right: 20 }}
+                >
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={isMobile ? 40 : 100}
+                  />
+                  <Bar dataKey="value" fill="#287bff" barSize={25}>
+                    <LabelList
                       dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={150}
-                      label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                    >
-                      {data.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Legend />
-                  </PieChart>
-                </Card>
-              </div>
-            </Col>
-          </Row>
+                      position="right"
+                      fill="white"
+                      fontSize={14}
+                      fontWeight="bold"
+                    />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <p className="mt-3">
+                <strong>Trending up by 5.2% this month 🔼</strong>
+              </p>
+            </Card>
+          </Col>
+
+          {/* 🟢 AICI AM ADAUGAT PIE CHART-UL */}
+          <Col lg={4} md={10} sm={12} xs={12}>
+            <Card className="p-3 bg-dark text-white shadow chart-card ">
+              <h5 className="chart-title">Stage Statistics</h5>
+              <p className="chart-subtitle">January - June 2024</p>
+              <ResponsiveContainer width="100%" height={400}>
+                <PieChart className="pie-font" style={{ fontSize: '16px' }}>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={isMobile ? 90 : 140}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, value }) =>
+                      isMobile
+                        ? `${((value / totalValue) * 100).toFixed(1)}%`
+                        : `${name} ${((value / totalValue) * 100).toFixed(1)}%`
+                    }
+                    isAnimationActive={false}
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseEnter={(e) => e.stopPropagation()}
+                    onMouseMove={(e) => e.stopPropagation()}
+                    onMouseLeave={(e) => e.stopPropagation()}
+                  >
+                    {pieChartData.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                        pointerEvents="none"
+                      />
+                    ))}
+                  </Pie>
+                  {isMobile && <Legend />}
+                </PieChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
         </Row>
       </Container>
     </div>
   )
 }
 
-export default Dashboard
+export default Dashboard2

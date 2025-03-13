@@ -1,39 +1,95 @@
-/* dashboard.css */
-
-.structure {
-  overflow-x: hidden;
-  overflow-y: auto; /* Permite scroll pe verticală */
+.color-background {
+  background: rgb(5, 10, 17);
+  background: linear-gradient(
+    208deg,
+    rgba(5, 10, 17, 1) 25%,
+    rgba(14, 69, 74, 1) 50%,
+    rgba(5, 10, 17, 1) 75%
+  );
+  min-height: 100vh;
+  width: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: -1;
 }
 
-.legend-pie {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 10px;
+/* Container principal */
+.scroll-container {
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Cardurile pentru statistici */
+.stat-title {
+  font-size: 1rem;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+}
+
+/* Cardul cu grafic */
+.chart-card {
+  min-height: 450px;
+}
+
+/* MEDIA QUERIES PENTRU MOBILE */
+@media (max-width: 1024px) {
+  .scroll-container {
+    overflow-y: auto;
+  }
+
+  .stat-title {
+    font-size: 0.9rem;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .chart-card {
+    min-height: 400px;
+  }
 }
 
 @media (max-width: 768px) {
-  .chart-container {
-    flex-direction: column;
-    align-items: center;
+  .scroll-container {
+    padding-bottom: 30px;
   }
 
-  .legend-chart {
-    font-size: 16px !important; /* Reduce dimensiunea fontului pentru legendă */
+  .stat-title {
+    font-size: 0.85rem;
   }
 
-  .line-chart {
-    width: 100% !important;
-    height: 300px !important;
+  .stat-value {
+    font-size: 1.4rem;
   }
 
-  .pie-chart {
-    width: 100% !important;
-    height: 300px !important;
+  .chart-card {
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-title {
+    font-size: 0.8rem;
   }
 
-  .card {
-    width: 100% !important;
-    margin-bottom: 15px;
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .chart-card {
+    min-height: 320px;
+  }
+}
+
+/* Pie Chart*/
+
+@media (max-width: 768px) {
+  .pie-font {
+    font-size: 14px !important;
   }
 }
