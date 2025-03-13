@@ -1,4 +1,5 @@
-import { Form, Image, Button } from 'react-bootstrap'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Form, Image, Button, Alert } from 'react-bootstrap'
 import '../auth/login.css'
 import profile from '../../assets/profile.png'
 import './profile.css'
@@ -9,8 +10,7 @@ import axios from 'axios'
 function Profile() {
   const auth = useAuth()
   const firstName = auth.data?.session?.firstName
-  const verified = auth.data?.session.verified
-  console.log(verified)
+  const verified = auth.data?.session?.verified
   const lastName = auth.data?.session?.lastName
   const email = auth.data?.session?.email
   const role = auth.data?.session?.role
@@ -25,21 +25,49 @@ function Profile() {
     hour12: false,
   }).format(sdate)
 
-  console.log(auth.data?.session)
   const [isVerifyDisabled, setIsVerifyDisabled] = useState(false)
   const [isResetDisabled, setIsResetDisabled] = useState(false)
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertVariant, setAlertVariant] = useState('success')
 
-  const handleButtonClick = async (type: string) => {
+  const handleButtonClick = async (type: any) => {
     if (type === 'verify') {
       setIsVerifyDisabled(true)
+      try {
+        await axios.post(
+          'https://backend-tests.conceptocar.xyz/auth/request-verification',
+          { d: 'd' },
+          { withCredentials: true }
+        )
+        setAlertMessage('Verification email sent.')
+        setAlertVariant('success')
+      } catch (error: any) {
+        setAlertMessage(
+          error.response?.data?.message || 'Error sending verification email'
+        )
+        setAlertVariant('danger')
+      }
       setTimeout(() => setIsVerifyDisabled(false), 120000)
-      await axios.post(
-        'https://backend-tests.conceptocar.xyz/auth/request-verification',
-        { d: 'd' },
-        { withCredentials: true }
-      )
     } else if (type === 'reset') {
       setIsResetDisabled(true)
+      try {
+        // Calling the request-password-change endpoint
+        await axios.post(
+          'https://backend-tests.conceptocar.xyz/auth/request-password-change',
+          {}, // no payload needed as backend uses session email
+          { withCredentials: true }
+        )
+        setAlertMessage(
+          'A password reset email has been sent. Please check your inbox.'
+        )
+        setAlertVariant('success')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        setAlertMessage(
+          error.response?.data?.message || 'Error sending password reset email'
+        )
+        setAlertVariant('danger')
+      }
       setTimeout(() => setIsResetDisabled(false), 120000)
     }
   }
@@ -73,11 +101,11 @@ function Profile() {
               </div>
 
               <div
-                className="flex-grow-1 d-flex flex-column align-items-start "
+                className="flex-grow-1 d-flex flex-column align-items-start"
                 style={{ marginTop: '0px', fontSize: '18px' }}
               >
                 <div
-                  className="d-flex justify-content-start gap-3 "
+                  className="d-flex justify-content-start gap-3"
                   style={{
                     whiteSpace: 'nowrap',
                     minWidth: '100%',
@@ -106,7 +134,7 @@ function Profile() {
                   <strong>Join Date:</strong> {date}
                 </span>
                 <div className="d-flex justify-content-between align-items-center w-100">
-                  {!verified ? (
+                  {!verified && (
                     <Button
                       variant="dark"
                       className="mt-3"
@@ -114,10 +142,10 @@ function Profile() {
                       disabled={isVerifyDisabled}
                     >
                       {isVerifyDisabled
-                        ? 'Verify your email address..'
+                        ? 'Sending verification...'
                         : 'Verify Email'}
                     </Button>
-                  ) : null}
+                  )}
 
                   <Button
                     variant="dark"
@@ -126,11 +154,19 @@ function Profile() {
                     disabled={isResetDisabled}
                   >
                     {isResetDisabled
-                      ? 'Verify your email address..'
+                      ? 'Sending reset email...'
                       : 'Reset Password'}
                   </Button>
                 </div>
               </div>
+              {alertMessage && (
+                <Alert
+                  variant={alertVariant}
+                  className="mt-3 w-100 text-center"
+                >
+                  {alertMessage}
+                </Alert>
+              )}
             </Form>
           </div>
         </div>

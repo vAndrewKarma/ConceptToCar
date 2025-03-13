@@ -294,7 +294,7 @@ const authcontroller = {
         {
           to: email,
           subject: 'Password Change Validation',
-          body: `Please click the following link to change your password: https://conceptocar.xyz/change-password/${verificationCode}`,
+          body: `Please click the following link to change your password: https://conceptocar.xyz/new-password/${verificationCode}`,
         },
         rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.options
       )
@@ -347,7 +347,24 @@ const authcontroller = {
       throw err
     }
   },
+  async verifyLinksExist(req, res) {
+    try {
+      const redis = req.server.redis
+      console.log(JSON.stringify(req.body))
 
+      const { code } = req.body
+      const key = `password_change:${code}`
+      console.log(key)
+
+      const emailredis = await redis.get(key)
+      console.log(emailredis)
+      if (!emailredis) throw new BadRequestError('Invalid or expired key')
+
+      res.send({ message: 'Good link' })
+    } catch (err) {
+      throw err
+    }
+  },
   async me(req, res) {
     try {
       if (!req.sessionData) return res.send({ auth: false })

@@ -93,7 +93,7 @@ function App() {
             }
           />
           <Route path="/recover" element={<Recover />} />
-          <Route path="/new-password" element={<NewPassword />} />
+          <Route path="/new-password/:code" element={<NewPassword />} />
 
           <Route
             path="/email-verification/:code"

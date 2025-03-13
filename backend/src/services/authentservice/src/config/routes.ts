@@ -45,6 +45,12 @@ const routes: Record<string, RouteGroup> = {
       controller: authcontroller.verifyYourEmail,
       schema: verifyEmailSchema,
     },
+    verifyPasswordchangge: {
+      method: 'POST',
+      routeName: '/verify-password-change',
+      controller: authcontroller.verifyLinksExist,
+      schema: verifyEmailSchema,
+    },
     reqEmailverify: {
       method: 'POST',
       routeName: '/request-verification',
