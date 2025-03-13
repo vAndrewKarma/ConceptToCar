@@ -40,9 +40,14 @@ const routes: Record<string, RouteGroup> = {
     },
     verifyEmail: {
       method: 'POST',
-      routeName: '/verify_email',
+      routeName: '/verify-email',
       controller: authcontroller.verifyYourEmail,
       schema: verifyEmailSchema,
+    },
+    reqEmailverify: {
+      method: 'POST',
+      routeName: '/request-verification',
+      controller: authcontroller.requestEmailVerify,
     },
     me: {
       method: 'GET',

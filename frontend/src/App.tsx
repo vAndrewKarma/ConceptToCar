@@ -103,8 +103,9 @@ function App() {
           />
           <Route path="/recover" element={<Recover />} />
           <Route path="/new-password" element={<NewPassword />} />
+
           <Route
-            path="/email-verification/:id"
+            path="/email-verification/:code"
             element={<EmailVerification />}
           />
           <Route path="*" element={<PageNotFound />} />

@@ -9,6 +9,7 @@ export const protected_routes = {
       '/initiate_product',
       '/create-product',
       '/get-product',
+      '/request-verification',
       '/get-products',
       '/initiate_material',
       '/create-material',
@@ -20,6 +21,13 @@ export const protected_routes = {
     ],
   },
   SC: {
-    routes: ['/health', '/', '/logout', '/metrics', '/register-key'], // sc = shouldn t care
+    routes: [
+      '/health',
+      '/',
+      '/logout',
+      '/metrics',
+      '/register-key',
+      '/verify-email',
+    ], // sc = shouldn t care
   },
 }

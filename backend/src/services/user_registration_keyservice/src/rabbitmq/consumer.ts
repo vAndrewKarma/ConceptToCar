@@ -4,7 +4,6 @@ import {
 } from '@karma-packages/conceptocar-common'
 import generateToken from '@karma-packages/conceptocar-common/dist/helper/generateToken'
 import { createUserModel } from '../db/m_m'
-import { randomBytes } from 'crypto'
 async function startKeyConsumers(channel, server) {
   try {
     const queue = rabbitConfig.queues.AUTH_CREATE_USER_SESSION.name
