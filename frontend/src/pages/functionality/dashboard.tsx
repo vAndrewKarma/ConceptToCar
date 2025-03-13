@@ -13,7 +13,6 @@ import {
 } from 'recharts'
 import { useState, useEffect } from 'react'
 import '../auth/login.css'
-import './dashboard2.css'
 
 const stats = [
   {
