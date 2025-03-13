@@ -230,7 +230,7 @@ const authcontroller = {
       console.log(user)
       if (!user) throw new BadRequestError('Invalid or expired')
       if (user.verified) throw new BadRequestError('Email already verified')
-      await usermodel.updateUser(user._id, { emailVerified: true })
+      await usermodel.updateUser(user._id, { verified: true })
       await redis.del(key)
       res.send({ message: 'Email verified' })
     } catch (err) {
