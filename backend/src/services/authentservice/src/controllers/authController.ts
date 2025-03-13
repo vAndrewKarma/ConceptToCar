@@ -222,6 +222,7 @@ const authcontroller = {
       const usermodel = req.server.userModel
       const { code } = req.body
       const key = `email_validation:${code}`
+      console.log(key)
       const emailredis = await redis.get(key)
       console.log(emailredis)
       if (!emailredis) throw new BadRequestError('Invalid or expired key')
