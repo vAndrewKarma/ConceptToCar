@@ -100,7 +100,7 @@ function Profile() {
                 </span>
                 <span style={{ paddingTop: '10px', lineHeight: '1.5' }}>
                   <strong>Email status:</strong>{' '}
-                  {verified || 'not implemented at that point'}
+                  {verified ? 'Verified' : 'Not Verified'}
                 </span>
                 <span style={{ paddingTop: '10px', lineHeight: '1.5' }}>
                   <strong>Join Date:</strong> {date}
@@ -113,7 +113,9 @@ function Profile() {
                       onClick={() => handleButtonClick('verify')}
                       disabled={isVerifyDisabled}
                     >
-                      {isVerifyDisabled ? 'Please wait...' : 'Verify Email'}
+                      {isVerifyDisabled
+                        ? 'Verify your email address..'
+                        : 'Verify Email'}
                     </Button>
                   ) : null}
 
@@ -123,7 +125,9 @@ function Profile() {
                     onClick={() => handleButtonClick('reset')}
                     disabled={isResetDisabled}
                   >
-                    {isResetDisabled ? 'Please wait...' : 'Reset Password'}
+                    {isResetDisabled
+                      ? 'Verify your email address..'
+                      : 'Reset Password'}
                   </Button>
                 </div>
               </div>

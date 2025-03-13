@@ -249,7 +249,7 @@ const authcontroller = {
       if (!user) {
         throw new BadRequestError('Email not registered')
       }
-
+      if (user.verified) throw new BadRequestError('Email already verified')
       const verificationCode = generateToken(20)
       await redis.set(
         `email_validation:${verificationCode}`,

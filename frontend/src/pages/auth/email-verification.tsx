@@ -4,8 +4,11 @@ import { Typewriter } from 'react-simple-typewriter'
 import './login.css'
 import './email-verification.css'
 import axios from 'axios'
+import { useQueryClient } from '@tanstack/react-query'
 
 function EmailVerification() {
+  const queryClient = useQueryClient()
+
   const { code } = useParams()
   const navigate = useNavigate()
   const [state, setState] = useState<{
@@ -38,7 +41,10 @@ function EmailVerification() {
 
         setState((s) => ({ ...s, loading: false, success: true }))
 
-        setTimeout(() => navigate('/dashboard'), 3000)
+        queryClient.removeQueries({ queryKey: ['authUser'] })
+        localStorage.removeItem('authUser')
+
+        window.location.replace('/sign-in')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.log(err)
@@ -69,7 +75,7 @@ function EmailVerification() {
           </div>
         ) : state.success ? (
           <div className="verification-success">
-            <span style={{ fontSize: '48px' }}>
+            <span style={{ fontSize: '48px', color: '#fff' }}>
               <Typewriter
                 words={['Your email has been successfully verified!']}
                 loop={1}
