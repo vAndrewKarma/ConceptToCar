@@ -11,7 +11,6 @@ import Contact from './pages/contact'
 import PageNotFound from './pages/404'
 // import Copyright from './components/copyright.tsx'
 import Recover from './pages/auth/forgot-password/recover.tsx'
-import NewPassword from './pages/auth/forgot-password/new-password.tsx'
 import EmailVerification from './pages/auth/email-verification.tsx'
 import PublicRoute from './pub_prot/public.tsx'
 import ProtectedRoute from './pub_prot/prot.tsx'
@@ -93,7 +92,7 @@ function App() {
             }
           />
           <Route path="/recover" element={<Recover />} />
-          <Route path="/new-password/:code" element={<NewPassword />} />
+          <Route path="/new-password/:code" element={<Recover />} />
 
           <Route
             path="/email-verification/:code"

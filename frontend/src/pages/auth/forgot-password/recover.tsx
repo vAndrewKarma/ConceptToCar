@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
-import { Form, Button } from 'react-bootstrap'
+import { Form, Button, Alert } from 'react-bootstrap'
 import { z, ZodType } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -8,14 +8,17 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { Eye, EyeOff } from 'lucide-react'
 
-import '../login.css'
+import './recover.css'
 
 function NewPassword() {
   // Extract the verification code from the URL
   const { code } = useParams()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [message, setMessage] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertVariant, setAlertVariant] = useState<
+    'success' | 'danger' | 'info'
+  >('danger')
   const [isLinkValid, setIsLinkValid] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -73,9 +76,14 @@ function NewPassword() {
           { withCredentials: true }
         )
         setIsLinkValid(true)
-        setMessage('')
+        setAlertMessage('')
       } catch (error: any) {
-        setMessage(error.response?.data?.message || 'Invalid or expired link.')
+        const errMsg =
+          error?.response?.data?.message ||
+          error.message ||
+          'Invalid or expired link.'
+        setAlertMessage(errMsg)
+        setAlertVariant('danger')
         setIsLinkValid(false)
       } finally {
         setLoading(false)
@@ -85,7 +93,8 @@ function NewPassword() {
       verifyLink()
     } else {
       setLoading(false)
-      setMessage('No code provided.')
+      setAlertMessage('No code provided.')
+      setAlertVariant('danger')
     }
   }, [code])
 
@@ -100,18 +109,40 @@ function NewPassword() {
         },
         { withCredentials: true }
       )
-      setMessage(response.data.message)
+      setAlertMessage(response.data.message)
+      setAlertVariant('success')
     } catch (error: any) {
-      setMessage(error.response?.data?.message || 'Error changing password')
+      const errMsg =
+        error?.response?.data?.message ||
+        error.message ||
+        'Error changing password'
+      setAlertMessage(errMsg)
+      setAlertVariant('danger')
     }
   }
 
   if (loading) {
-    return <div className="text-center mt-5">Loading...</div>
+    return (
+      <div className="color-overlay d-flex justify-content-center align-items-center">
+        <div className="text-center mt-5">
+          <Alert variant="info" style={{ fontSize: '24px' }}>
+            Loading...
+          </Alert>
+        </div>
+      </div>
+    )
   }
 
   if (!isLinkValid) {
-    return <div className="text-center mt-5">{message}</div>
+    return (
+      <div className="color-overlay d-flex justify-content-center align-items-center">
+        <div className="text-center mt-5">
+          <Alert variant="danger" style={{ fontSize: '24px' }}>
+            {alertMessage}
+          </Alert>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -135,6 +166,7 @@ function NewPassword() {
                   Set a new password
                 </Form.Label>
               </div>
+
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <div
                   className="d-flex justify-content"
@@ -225,7 +257,11 @@ function NewPassword() {
                   Change Password
                 </Button>
               </div>
-              {message && <div className="text-center mt-3">{message}</div>}
+              {alertMessage && (
+                <Alert className="mt-3 text-center" variant={alertVariant}>
+                  {alertMessage}
+                </Alert>
+              )}
             </Form>
           </div>
         </div>

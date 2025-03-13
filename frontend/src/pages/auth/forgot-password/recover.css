@@ -18,3 +18,13 @@
   margin-bottom: 1rem;
   padding: 0 1rem;
 }
+.color-overlay {
+  background: rgb(5, 10, 17);
+  background: linear-gradient(
+    208deg,
+    rgba(5, 10, 17, 1) 25%,
+    rgba(14, 69, 74, 1) 50%,
+    rgba(5, 10, 17, 1) 75%
+  );
+  height: 100vh;
+}
