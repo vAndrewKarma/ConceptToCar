@@ -214,6 +214,62 @@ const authcontroller = {
     }
   },
 
+  async verifyYourEmail(req, res) {
+    try {
+      const redis = req.server.redis
+
+      const usermodel = req.server.userModel
+      const { code } = req.body
+      const key = `email_validation:${code}`
+      const emailredis = await redis.get(key)
+      if (!emailredis) throw new BadRequestError('Invalid or expired key')
+      const user = usermodel.findUserByEmail(emailredis)
+      console.log(user)
+      if (!user) throw new BadRequestError('Invalid or expired')
+      if (user.verified) throw new BadRequestError('Email already verified')
+      await usermodel.updateUser(user._id, { emailVerified: true })
+      await redis.del(key)
+      res.send({ message: 'Email verified' })
+    } catch (err) {
+      throw err
+    }
+  },
+
+  async requestEmailVerify(req, res) {
+    try {
+      const redis = req.server.redis
+      const email = req.sessionData.email
+      const userModel = req.server.userModel
+      const user = await userModel.findUserByEmail(email)
+      if (!user) {
+        throw new BadRequestError('Email not registered')
+      }
+
+      const verificationCode = generateToken(20)
+      await redis.set(
+        `email_validation:${verificationCode}`,
+        email,
+        'EX',
+        86400
+      )
+
+      const { channel } = req.server.rabbitmq
+      await publishMessage(
+        channel,
+        rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.name,
+        {
+          to: email,
+          subject: 'Email Validation',
+          body: `Please click the following link to verify your email address: https://conceptocar.xyz/email-verification/${verificationCode}`,
+        },
+        rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.options
+      )
+      res.send({ message: 'Verification email sent' })
+    } catch (err) {
+      throw err
+    }
+  },
+
   async me(req, res) {
     try {
       if (!req.sessionData) return res.send({ auth: false })

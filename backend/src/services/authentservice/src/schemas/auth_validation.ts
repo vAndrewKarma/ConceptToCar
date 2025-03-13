@@ -183,3 +183,29 @@ export const initiateAuthSessionSchema = {
     additionalProperties: 'Invalid additional fields provided.',
   },
 }
+
+export const verifyEmailSchema = {
+  type: 'object',
+  required: ['code'],
+  properties: {
+    challenge: {
+      type: 'string',
+      minLength: 20,
+      maxLength: 45,
+      pattern: '^[a-zA-Z0-9-._~]+$',
+      errorMessage: {
+        minLength: 'Invalid code.',
+        maxLength: 'Invalid code.',
+        pattern: 'Invalid code.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      challenge: 'Invalid code.',
+      email: 'Invalid email.',
+    },
+    additionalProperties: 'Invalid code.',
+  },
+}

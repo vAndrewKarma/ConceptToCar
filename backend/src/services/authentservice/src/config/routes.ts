@@ -5,6 +5,7 @@ import {
   initiateAuthSessionSchema,
   loginSchema,
   registerSchema,
+  verifyEmailSchema,
 } from '../schemas/auth_validation'
 interface AuthRoute {
   method: string
@@ -36,6 +37,12 @@ const routes: Record<string, RouteGroup> = {
       routeName: '/initiate_login',
       controller: authcontroller.InitiateAuthSession,
       schema: initiateAuthSessionSchema,
+    },
+    verifyEmail: {
+      method: 'POST',
+      routeName: '/verify_email',
+      controller: authcontroller.verifyYourEmail,
+      schema: verifyEmailSchema,
     },
     me: {
       method: 'GET',

@@ -2,7 +2,9 @@ import {
   publishMessage,
   rabbitConfig,
 } from '@karma-packages/conceptocar-common'
+import generateToken from '@karma-packages/conceptocar-common/dist/helper/generateToken'
 import { createUserModel } from '../db/m_m'
+import { randomBytes } from 'crypto'
 async function startKeyConsumers(channel, server) {
   try {
     const queue = rabbitConfig.queues.AUTH_CREATE_USER_SESSION.name
@@ -21,19 +23,20 @@ async function startKeyConsumers(channel, server) {
         try {
           const userModel = createUserModel(server)
           await userModel.createUser(message)
+          const codeverify = generateToken(20)
           await publishMessage(
             channel,
             rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.name,
             {
-              to: 'karma.andrew16@gmail.com',
+              to: message.email,
               subject: 'Email Validation',
-              body: 'Please click the following link to verify your email address.',
+              body: `Please click the following link to verify your email address: https://conceptocar.xyz/email-verification/${codeverify}`,
             },
             rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.options
           )
           await server.redis.set(
-            `email_validation:${message.email}`,
-            'pending',
+            `email_validation:${codeverify}`,
+            message.email,
             'EX',
             86400
           )
