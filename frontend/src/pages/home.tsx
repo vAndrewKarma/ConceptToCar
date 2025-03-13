@@ -13,7 +13,7 @@ export default class Home extends Component {
           <img src={logo} alt="ConceptToCar Logo" className="home-logo" />
         </div>
         <div className="home d-flex justify-content-center align-items-center">
-          <span>
+          <div className="typewriter">
             <Typewriter
               words={[
                 'Design. Innovate. Drive.',
@@ -26,8 +26,8 @@ export default class Home extends Component {
               typeSpeed={100}
               deleteSpeed={50}
               delaySpeed={3000}
-            ></Typewriter>
-          </span>
+            />
+          </div>
         </div>
       </div>
     )

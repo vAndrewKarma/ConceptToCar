@@ -16,3 +16,9 @@
     top: 25px;
   }
 }
+
+th,
+td {
+  text-align: center;
+  vertical-align: middle;
+}
