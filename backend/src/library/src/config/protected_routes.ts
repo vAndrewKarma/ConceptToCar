@@ -1,3 +1,5 @@
+// not the safest prob but it works for now
+
 export const protected_routes = {
   PASG: {
     // protected against authenthicated users
