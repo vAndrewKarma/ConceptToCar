@@ -274,6 +274,79 @@ const authcontroller = {
       throw err
     }
   },
+  async requestPasswordChange(req, res) {
+    try {
+      const redis = req.server.redis
+      const email = req.sessionData.email
+      const userModel = req.server.userModel
+      const user = await userModel.findUserByEmail(email)
+      if (!user) {
+        throw new BadRequestError('Email not registered')
+      }
+
+      const verificationCode = generateToken(20)
+      await redis.set(`password_change:${verificationCode}`, email, 'EX', 86400)
+
+      const { channel } = req.server.rabbitmq
+      await publishMessage(
+        channel,
+        rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.name,
+        {
+          to: email,
+          subject: 'Password Change Validation',
+          body: `Please click the following link to change your password: https://conceptocar.xyz/change-password/${verificationCode}`,
+        },
+        rabbitConfig.queues.AUTH_SEND_EMAIL_VALIDATION.options
+      )
+      res.send({ message: 'Change password email sent' })
+    } catch (err) {
+      throw err
+    }
+  },
+  async changeYourPassword(req, res) {
+    try {
+      const redis = req.server.redis
+      const usermodel = req.server.userModel
+      console.log(JSON.stringify(req.body))
+
+      const { code, newPassword } = req.body
+      const key = `password_change:${code}`
+      console.log(key)
+
+      const emailredis = await redis.get(key)
+      console.log(emailredis)
+      if (!emailredis) throw new BadRequestError('Invalid or expired key')
+
+      const user = await usermodel.findUserByEmail(emailredis)
+      console.log(user)
+      if (!user) throw new BadRequestError('Invalid or expired user')
+
+      const isSame = await argon2.verify(user.password, newPassword)
+      if (isSame) {
+        throw new BadRequestError(
+          'New password cannot be the same as the old password.'
+        )
+      }
+
+      const hashedPassword = await argon2.hash(newPassword, {
+        memoryCost: 2 ** 15,
+        timeCost: 2,
+        parallelism: 2,
+        type: argon2.argon2id,
+      })
+
+      await usermodel.updateUser(user._id, {
+        password: hashedPassword,
+      })
+
+      clearCookie(res)
+      await redis.del(key)
+
+      res.send({ message: 'Password changed ' })
+    } catch (err) {
+      throw err
+    }
+  },
 
   async me(req, res) {
     try {

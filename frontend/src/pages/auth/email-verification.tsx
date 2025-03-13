@@ -41,10 +41,12 @@ function EmailVerification() {
 
         setState((s) => ({ ...s, loading: false, success: true }))
 
-        queryClient.removeQueries({ queryKey: ['authUser'] })
-        localStorage.removeItem('authUser')
+        setTimeout(() => {
+          queryClient.removeQueries({ queryKey: ['authUser'] })
+          localStorage.removeItem('authUser')
+          window.location.replace('/sign-in')
+        }, 5000)
 
-        window.location.replace('/sign-in')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.log(err)
@@ -83,7 +85,7 @@ function EmailVerification() {
                 typeSpeed={50}
               />
             </span>
-            <p>Redirecting to dashboard...</p>
+            <p>Redirecting to sign-in page...</p>
           </div>
         ) : (
           <div className="verification-error">

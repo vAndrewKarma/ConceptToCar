@@ -2,6 +2,7 @@ import { FastifySchema } from 'fastify'
 import authcontroller from '../controllers/authController'
 import checksController from '../controllers/checkController'
 import {
+  chanePassSChema,
   initiateAuthSessionSchema,
   loginSchema,
   registerSchema,
@@ -48,6 +49,17 @@ const routes: Record<string, RouteGroup> = {
       method: 'POST',
       routeName: '/request-verification',
       controller: authcontroller.requestEmailVerify,
+    },
+    reqPasswordChange: {
+      method: 'POST',
+      routeName: '/request-password-change',
+      controller: authcontroller.requestPasswordChange,
+    },
+    changeYourPass: {
+      method: 'POST',
+      routeName: '/change-password',
+      controller: authcontroller.changeYourPassword,
+      schema: chanePassSChema,
     },
     me: {
       method: 'GET',

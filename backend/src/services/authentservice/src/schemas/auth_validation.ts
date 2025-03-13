@@ -208,3 +208,41 @@ export const verifyEmailSchema = {
     additionalProperties: 'Invalid code.',
   },
 }
+
+export const chanePassSChema = {
+  type: 'object',
+  required: ['code', 'newPassword'],
+  properties: {
+    code: {
+      type: 'string',
+      minLength: 20,
+      maxLength: 45,
+      pattern: '^[a-zA-Z0-9-._~]+$',
+      errorMessage: {
+        minLength: 'Invalid code.',
+        maxLength: 'Invalid code.',
+        pattern: 'Invalid code.',
+      },
+    },
+    newPassword: {
+      type: 'string',
+      minLength: 8,
+      maxLength: 16,
+      pattern: '(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])',
+      errorMessage: {
+        minLength: 'New password must be at least 8 characters long.',
+        maxLength: 'New password cannot exceed 16 characters.',
+        pattern:
+          'New password must include at least one letter, one number, and one special character.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      code: 'Invalid code.',
+      newPassword: 'New password is required.',
+    },
+    additionalProperties: 'Invalid code.',
+  },
+}
