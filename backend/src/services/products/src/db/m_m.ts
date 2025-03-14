@@ -212,7 +212,9 @@ export class MaterialModel {
       throw error
     }
   }
-
+  async countProducts(): Promise<number> {
+    return await this.collection.countDocuments({})
+  }
   async getMaterialsByProduct(productId, page, limit) {
     const skip = (page - 1) * limit
     return await this.collection

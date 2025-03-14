@@ -152,18 +152,26 @@ const productsController = {
 
       const redis = req.server.redis
       const productModel = req.server.productModel
-
-      const cacheKey = 'products:count'
+      const materialModel = req.server.materialModel
+      const cacheKey = 'dash:count'
       const cachedCount = await redis.get(cacheKey)
       if (cachedCount) {
-        return res.send({ count: Number(cachedCount) })
+        return res.send(cachedCount)
       }
 
       const count = await productModel.countProducts()
+      const materialcount = await materialModel.countProducts()
+      await redis.set(
+        cacheKey,
+        {
+          count: String(count),
+          materialcount: String(materialcount),
+        },
+        'EX',
+        3600
+      )
 
-      await redis.set(cacheKey, String(count), 'EX', 3600)
-
-      res.send({ count })
+      res.send({ count: count, materialcount: materialcount })
     } catch (err) {
       console.error(err)
       throw err
