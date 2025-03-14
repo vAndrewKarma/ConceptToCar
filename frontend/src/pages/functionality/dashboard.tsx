@@ -14,6 +14,7 @@ import {
 import { useState, useEffect } from 'react'
 import '../auth/login.css'
 import './dashboard.css'
+import axios from 'axios'
 
 const statsTemplate = [
   { title: 'Total Accounts', value: '10' },
@@ -73,23 +74,34 @@ function Dashboard2() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          'https://backend-tests.conceptocar.xyz/products/dashboard'
+        // Fetch user data
+        const userResponse = await axios.get(
+          'https://backend-tests.conceptocar.xyz/auth/user-dash',
+          { withCredentials: true }
         )
-        const data = await response.json()
+
+        // Fetch product data
+        const productResponse = await axios.get(
+          'https://backend-tests.conceptocar.xyz/products/dashboard',
+          { withCredentials: true }
+        )
+
+        const userData = userResponse.data
+        const productData = productResponse.data
 
         // Update stats
         const newStats = [...statsTemplate]
-        newStats[1].value = data.totalProducts
-        newStats[2].value = data.totalMaterials
-        setStats(newStats)
+        newStats[0].value = userData.totalUsers.toString()
+        newStats[1].value = productData.totalProducts.toString()
+        newStats[2].value = productData.totalMaterials.toString()
 
         // Process bar chart data for all months
         const monthlyData = monthOrder.map((month) => ({
           name: month,
           value:
-            data.prodbymonth.find((m: { name: string }) => m.name === month)
-              ?.value || 0,
+            productData.prodbymonth.find(
+              (m: { name: string }) => m.name === month
+            )?.value || 0,
         }))
         setBarChartData(monthlyData)
 
@@ -105,10 +117,9 @@ function Dashboard2() {
           growthRate =
             ((currentMonthValue - prevMonthValue) / prevMonthValue) * 100
         } else if (currentMonthValue > 0) {
-          growthRate = 100 // Handle 0→positive growth
+          growthRate = 100
         }
 
-        // Update growth rate in stats (index 3)
         newStats[3].value = `${Math.abs(growthRate).toFixed(1)}% ${
           growthRate >= 0 ? '🔼' : '🔽'
         }`
@@ -118,7 +129,7 @@ function Dashboard2() {
         const stageData = stageOrder.map((stage) => ({
           name: stage.name,
           value:
-            data.productsByStage.find(
+            productData.productsByStage.find(
               (s: { name: string }) => s.name === stage.key
             )?.value || 0,
         }))
