@@ -19,18 +19,26 @@ const stats = [
   {
     title: 'Total Accounts',
     value: '10',
+    change: '↑ 20%',
+    description: 'vs previous 30 days',
   },
   {
     title: 'Total Products',
     value: '37',
+    change: '↑ 15',
+    description: 'vs previous 30 days',
   },
   {
     title: 'Average Contract',
     value: '$1,553',
+    change: '↑ 7.3%',
+    description: 'vs previous 30 days',
   },
   {
     title: 'Growth Rate',
     value: '8.29%',
+    change: '↑ 1.3%',
+    description: 'vs previous 30 days',
   },
 ]
 
@@ -87,6 +95,8 @@ function Dashboard2() {
               <Card className="p-3 text-center bg-dark text-light shadow-sm">
                 <h6 className="stat-title">{stat.title}</h6>
                 <h2 className="fw-bold stat-value">{stat.value}</h2>
+                <p className="text-success mb-1">{stat.change}</p>
+                <small>{stat.description}</small>
               </Card>
             </Col>
           ))}
@@ -127,7 +137,7 @@ function Dashboard2() {
             </Card>
           </Col>
 
-          {/*  AICI AM ADAUGAT PIE CHART-UL */}
+          {/* 🟢 AICI AM ADAUGAT PIE CHART-UL */}
           <Col lg={4} md={10} sm={12} xs={12}>
             <Card className="p-3 bg-dark text-white shadow chart-card ">
               <h5 className="chart-title">Stage Statistics</h5>
