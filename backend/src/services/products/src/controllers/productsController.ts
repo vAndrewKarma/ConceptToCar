@@ -153,7 +153,8 @@ const productsController = {
       const productModel = req.server.productModel
       const materialModel = req.server.materialModel
       const cacheKey = 'dash:count'
-      const year = Number(req.body.year) || new Date().getFullYear()
+      const year = new Date().getFullYear()
+      console.log(year)
       const prodbymonth = await productModel.countProductsByMonth(year)
 
       const cachedData = await redis.get(cacheKey)
