@@ -276,6 +276,7 @@ const authcontroller = {
   },
   async requestPasswordChange(req, res) {
     try {
+      if (!req.sessionData) throw new BadRequestError('Not logged in')
       const redis = req.server.redis
       const email = req.sessionData.email
       console.log(req.sessionData)
