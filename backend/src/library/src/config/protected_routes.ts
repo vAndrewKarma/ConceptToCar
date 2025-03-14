@@ -35,6 +35,6 @@ export const protected_routes = {
       '/metrics',
       '/register-key',
       '/verify-email',
-    ], // sc = shouldn t care
+    ], // sc = shouldn t  care
   },
 }
