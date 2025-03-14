@@ -167,7 +167,7 @@ function Dashboard2() {
 
         {/* Charts Section */}
         <Row className="justify-content-center" style={{ paddingTop: '40px' }}>
-          <Col lg={8} md={10} sm={12} xs={12} className="mb-4">
+          <Col lg={6} md={10} sm={12} xs={12} className="mb-4">
             <Card className="p-3 bg-dark text-white shadow chart-card">
               <h5 className="chart-title">Monthly Product Statistics</h5>
               <p className="chart-subtitle">All Months {currentYear}</p>
@@ -206,7 +206,7 @@ function Dashboard2() {
             </Card>
           </Col>
 
-          <Col lg={4} md={10} sm={12} xs={12}>
+          <Col lg={6} md={10} sm={12} xs={12}>
             <Card className="p-3 bg-dark text-white shadow chart-card">
               <h5 className="chart-title">Stage Statistics</h5>
               <p className="chart-subtitle">All Months {currentYear}</p>

@@ -88,7 +88,6 @@
 }
 
 .modal-style {
-  font-style: italic;
   font-weight: 600;
   padding-top: 10px;
 }
@@ -117,16 +116,13 @@
   border: 1px solid #ccc;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   font-size: 14px;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   min-width: 0; /* Prevents flex from breaking */
 }
 
 .awesome-search:focus {
   border-color: #80bdff;
-  box-shadow:
-    inset 0 1px 3px rgba(0, 0, 0, 0.1),
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1),
     0 0 8px rgba(128, 189, 255, 0.6);
   outline: none;
 }

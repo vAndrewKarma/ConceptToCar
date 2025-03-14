@@ -168,7 +168,7 @@ const AddProductModal = ({
           </Form.Group>
           <Form.Group controlId="addProductLength" className="mb-3">
             <Form.Label className="text-light fw-bold">
-              Estimated Height (kg):
+              Estimated Height (cm):
             </Form.Label>
             <Form.Control
               type="number"
