@@ -123,14 +123,65 @@ export class ProductModel {
       },
     ]
 
-    // Aggregate counts by stage
     const productsByStage = await this.collection
       .aggregate<{ name: Stage; value: number }>(pipeline)
       .toArray()
-    // Compute total by summing counts from all stages
+
     const total = productsByStage.reduce((sum, stage) => sum + stage.value, 0)
 
     return { total, productsByStage }
+  }
+  async countProductsByMonth(
+    year: number
+  ): Promise<{ name: string; value: number }[]> {
+    const start = new Date(year, 0, 1) // January 1st of the year
+    const end = new Date(year + 1, 0, 1) // January 1st of the next year
+
+    const pipeline = [
+      {
+        $match: {
+          created_at: { $gte: start, $lt: end },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$created_at' },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sort by month number ascending
+      },
+      {
+        $project: {
+          _id: 0,
+          name: {
+            $arrayElemAt: [
+              [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+              ],
+              { $subtract: ['$_id', 1] },
+            ],
+          },
+          value: '$count',
+        },
+      },
+    ]
+
+    return await this.collection
+      .aggregate<{ name: string; value: number }>(pipeline)
+      .toArray()
   }
 
   async updateProduct(

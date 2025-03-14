@@ -127,7 +127,7 @@ function Dashboard2() {
             </Card>
           </Col>
 
-          {/* 🟢 AICI AM ADAUGAT PIE CHART-UL */}
+          {/*  AICI AM ADAUGAT PIE CHART-UL */}
           <Col lg={4} md={10} sm={12} xs={12}>
             <Card className="p-3 bg-dark text-white shadow chart-card ">
               <h5 className="chart-title">Stage Statistics</h5>
