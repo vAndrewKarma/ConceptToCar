@@ -53,7 +53,7 @@ const authcontroller = {
         .set(`email_validation:${user.email}`, 'pending', 'EX', 86400)
         .set(`locked_key:${hashedRedisKey}`, 'proc', 'EX', '30')
         .exec()
-
+      await redis.del('dash:count:users')
       res.status(201).send({ message: 'Check your email for validation.' })
     } catch (err) {
       throw err
@@ -302,6 +302,36 @@ const authcontroller = {
       res.send({ message: 'Change password email sent' })
     } catch (err) {
       console.log(err)
+      throw err
+    }
+  },
+
+  async Dashboard(req, res) {
+    try {
+      const redis = req.server.redis
+      const userModel = req.server.userModel
+      const cacheKey = 'dash:count:users'
+      const users = await userModel.countUsers()
+      const cachedData = await redis.get(cacheKey)
+      if (cachedData) {
+        let parsedData
+        try {
+          parsedData = JSON.parse(cachedData)
+        } catch (err) {
+          console.error('Error parsing cached data:', err)
+          parsedData = cachedData
+        }
+        return res.send(parsedData)
+      }
+
+      const data = {
+        totalUsers: users,
+      }
+
+      await redis.set(cacheKey, JSON.stringify(data), 'EX', 900)
+      res.send(data)
+    } catch (err) {
+      console.error(err)
       throw err
     }
   },

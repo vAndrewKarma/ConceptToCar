@@ -15,6 +15,8 @@ export const protected_routes = {
       '/get-products',
       '/initiate_material',
       '/create-material',
+      '/dashboard',
+      '/user-dash',
       '/update-material',
       '/get-material',
       '/get-materials',
@@ -26,7 +28,6 @@ export const protected_routes = {
     routes: [
       '/health',
       '/',
-      '/dashboard',
       '/request-password-change',
       '/verify-password-change',
       '/change-password',

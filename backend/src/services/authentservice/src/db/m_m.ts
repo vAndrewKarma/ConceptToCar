@@ -58,7 +58,9 @@ class UserModel {
       throw err
     }
   }
-
+  async countUsers(): Promise<number> {
+    return await this.collection.countDocuments({})
+  }
   async findUserById(uid: string): Promise<User | null> {
     return await this.collection.findOne({ _id: new ObjectId(uid) })
   }
