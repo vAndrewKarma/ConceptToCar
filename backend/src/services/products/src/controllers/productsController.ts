@@ -163,13 +163,11 @@ const productsController = {
           parsedData = JSON.parse(cachedData)
         } catch (err) {
           console.error('Error parsing cached data:', err)
-          // Fallback: use the cached data directly (or optionally ignore it)
           parsedData = cachedData
         }
         return res.send(parsedData)
       }
 
-      // Use the aggregation to get stage counts and total products
       const { total, productsByStage } =
         await productModel.countProductsAndStages()
       const totalMaterials = await materialModel.countProducts()
@@ -181,7 +179,6 @@ const productsController = {
         prodbymonth,
       }
 
-      // Cache the result (ensure data is stringified)
       await redis.set(cacheKey, JSON.stringify(data), 'EX', 900)
       res.send(data)
     } catch (err) {
