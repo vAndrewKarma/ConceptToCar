@@ -105,7 +105,7 @@ function NewPassword() {
       const response = await axios.post(
         'https://backend-tests.conceptocar.xyz/auth/change-password',
         {
-          code, // from the URL parameter
+          code,  
           newPassword: data.password,
         },
         { withCredentials: true }

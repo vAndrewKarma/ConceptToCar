@@ -300,6 +300,7 @@ const authcontroller = {
       )
       res.send({ message: 'Change password email sent' })
     } catch (err) {
+      console.log(err)
       throw err
     }
   },
@@ -344,6 +345,7 @@ const authcontroller = {
 
       res.send({ message: 'Password changed ' })
     } catch (err) {
+      console.log(err)
       throw err
     }
   },
