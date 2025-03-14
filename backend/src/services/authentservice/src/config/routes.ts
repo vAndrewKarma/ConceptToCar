@@ -63,6 +63,12 @@ const routes: Record<string, RouteGroup> = {
       controller: authcontroller.requestPasswordChange,
       schema: reqpasschange,
     },
+    dashboard: {
+      method: 'GET',
+      routeName: '/user-dash',
+      controller: authcontroller.Dashboard,
+    },
+
     changeYourPass: {
       method: 'POST',
       routeName: '/change-password',
