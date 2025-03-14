@@ -279,7 +279,9 @@ const authcontroller = {
       if (!req.sessionData) throw new BadRequestError('Not logged in')
       const redis = req.server.redis
       const email = req.sessionData.email
-      console.log(req.sessionData)
+      console.log(JSON.stringify(req.sessionData))
+      console.log(JSON.stringify(req.sessionData))
+      console.log(JSON.stringify(req.sessionData))
       console.log(email)
       const userModel = req.server.userModel
       const user = await userModel.findUserByEmail(email)
