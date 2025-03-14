@@ -154,14 +154,23 @@ const productsController = {
       const materialModel = req.server.materialModel
       const cacheKey = 'dash:count'
 
+      // Retrieve cached data
       const cachedData = await redis.get(cacheKey)
       if (cachedData) {
-        return res.send(JSON.parse(cachedData))
+        let parsedData
+        try {
+          parsedData = JSON.parse(cachedData)
+        } catch (err) {
+          console.error('Error parsing cached data:', err)
+          // Fallback: use the cached data directly (or optionally ignore it)
+          parsedData = cachedData
+        }
+        return res.send(parsedData)
       }
 
+      // Use the aggregation to get stage counts and total products
       const { total, productsByStage } =
         await productModel.countProductsAndStages()
-
       const totalMaterials = await materialModel.countProducts()
 
       const data = {
@@ -170,6 +179,7 @@ const productsController = {
         totalMaterials,
       }
 
+      // Cache the result (ensure data is stringified)
       await redis.set(cacheKey, JSON.stringify(data), 'EX', 900)
       res.send(data)
     } catch (err) {
