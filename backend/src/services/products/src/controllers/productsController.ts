@@ -148,37 +148,35 @@ const productsController = {
 
   async Dashboard(req, res) {
     try {
-      console.log('EXECUTED GetProductsCount')
-
+      console.log('EXECUTED Dashboard')
       const redis = req.server.redis
       const productModel = req.server.productModel
       const materialModel = req.server.materialModel
       const cacheKey = 'dash:count'
 
-      const cachedCount = await redis.get(cacheKey)
-      if (cachedCount) {
-        return res.send(JSON.stringify(cachedCount))
+      const cachedData = await redis.get(cacheKey)
+      if (cachedData) {
+        return res.send(JSON.parse(cachedData))
       }
 
-      const count = await productModel.countProducts()
-      const materialcount = await materialModel.countProducts()
-      await redis.set(
-        cacheKey,
-        {
-          count: String(count),
-          materialcount: String(materialcount),
-        },
-        'EX',
-        900
-      )
+      const { total, productsByStage } =
+        await productModel.countProductsAndStages()
 
-      res.send({ count: count, materialcount: materialcount })
+      const totalMaterials = await materialModel.countProducts()
+
+      const data = {
+        totalProducts: total,
+        productsByStage,
+        totalMaterials,
+      }
+
+      await redis.set(cacheKey, JSON.stringify(data), 'EX', 900)
+      res.send(data)
     } catch (err) {
       console.error(err)
       throw err
     }
   },
-
   async GetProducts(req, res) {
     try {
       if (!req.sessionData) throw new Unauthorized('Not authorized')

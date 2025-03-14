@@ -19,26 +19,18 @@ const stats = [
   {
     title: 'Total Accounts',
     value: '10',
-    change: '↑ 20%',
-    description: 'vs previous 30 days',
   },
   {
     title: 'Total Products',
     value: '37',
-    change: '↑ 15',
-    description: 'vs previous 30 days',
   },
   {
     title: 'Average Contract',
     value: '$1,553',
-    change: '↑ 7.3%',
-    description: 'vs previous 30 days',
   },
   {
     title: 'Growth Rate',
     value: '8.29%',
-    change: '↑ 1.3%',
-    description: 'vs previous 30 days',
   },
 ]
 
@@ -95,8 +87,6 @@ function Dashboard2() {
               <Card className="p-3 text-center bg-dark text-light shadow-sm">
                 <h6 className="stat-title">{stat.title}</h6>
                 <h2 className="fw-bold stat-value">{stat.value}</h2>
-                <p className="text-success mb-1">{stat.change}</p>
-                <small>{stat.description}</small>
               </Card>
             </Col>
           ))}

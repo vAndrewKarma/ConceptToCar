@@ -103,8 +103,34 @@ export class ProductModel {
 
     return this.collection.find(query).skip(skip).limit(queryLimit).toArray()
   }
-  async countProducts(): Promise<number> {
-    return await this.collection.countDocuments({})
+  async countProductsAndStages(): Promise<{
+    total: number
+    productsByStage: { name: Stage; value: number }[]
+  }> {
+    const pipeline = [
+      {
+        $group: {
+          _id: '$stage',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          name: '$_id',
+          value: '$count',
+        },
+      },
+    ]
+
+    // Aggregate counts by stage
+    const productsByStage = await this.collection
+      .aggregate<{ name: Stage; value: number }>(pipeline)
+      .toArray()
+    // Compute total by summing counts from all stages
+    const total = productsByStage.reduce((sum, stage) => sum + stage.value, 0)
+
+    return { total, productsByStage }
   }
 
   async updateProduct(
