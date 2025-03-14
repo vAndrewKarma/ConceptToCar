@@ -26,6 +26,7 @@ export const protected_routes = {
     routes: [
       '/health',
       '/',
+      '/dashboard',
       '/request-password-change',
       '/verify-password-change',
       '/change-password',

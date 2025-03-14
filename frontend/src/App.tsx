@@ -19,6 +19,7 @@ import Products from './pages/functionality/products.tsx'
 import Profile from './pages/account/profile.tsx'
 import Product from './pages/functionality/product.tsx'
 import Materials from './pages/functionality/materials.tsx'
+import RequestNewPassword from './pages/auth/forgot-password/reqnewpass.tsx'
 
 function App() {
   const auth = useAuth()
@@ -91,7 +92,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/recover" element={<Recover />} />
+          <Route
+            path="/request-password-change"
+            element={
+              <PublicRoute>
+                <RequestNewPassword />
+              </PublicRoute>
+            }
+          />
           <Route path="/new-password/:code" element={<Recover />} />
 
           <Route

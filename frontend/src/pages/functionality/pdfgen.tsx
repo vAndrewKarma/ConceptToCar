@@ -415,7 +415,7 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
 
   const footerText = document.createElementNS(svgNS, 'text')
   footerText.setAttribute('x', (width / 2).toString())
-  footerText.setAttribute('y', (height - 20).toString())
+  footerText.setAttribute('y', (height - 5).toString())
   footerText.setAttribute('text-anchor', 'middle')
   footerText.setAttribute('fill', 'rgba(255, 255, 255, 0.8)')
   footerText.setAttribute('font-size', '12px')
@@ -444,7 +444,7 @@ const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
 
     // Set up links – white text, with white underline.
     let linkX = 85 // starting X coordinate
-    const linkY = 700 // Y coordinate for links
+    const linkY = 800 // Y coordinate for links
 
     pdf.setFontSize(14)
     pdf.setTextColor(255, 255, 255) // white text for links

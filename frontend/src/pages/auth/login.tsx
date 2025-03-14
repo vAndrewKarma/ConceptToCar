@@ -134,7 +134,7 @@ function Login() {
                     className="text-right cb-b"
                     style={{ fontSize: '12px' }}
                   >
-                    <Link to="/recover"> Forgot password?</Link>
+                    <Link to="/request-password-change"> Forgot password?</Link>
                   </Form.Label>
                 </div>
                 {/* <OverlayTrigger

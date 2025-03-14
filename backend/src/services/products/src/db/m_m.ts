@@ -91,7 +91,6 @@ export class ProductModel {
     const queryLimit = displayLimit + 1
     const skip = (page - 1) * displayLimit
 
-   
     const query: Filter<Product> = {}
 
     if (searchTerms?.trim()) {
@@ -103,6 +102,9 @@ export class ProductModel {
     }
 
     return this.collection.find(query).skip(skip).limit(queryLimit).toArray()
+  }
+  async countProducts(): Promise<number> {
+    return await this.collection.countDocuments({})
   }
 
   async updateProduct(
