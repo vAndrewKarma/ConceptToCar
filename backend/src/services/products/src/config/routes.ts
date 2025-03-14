@@ -62,7 +62,7 @@ const routes: Record<string, RouteGroup> = {
       schema: deleteproductschema,
     },
     dashboard: {
-      method: 'POST',
+      method: 'GET',
       routeName: '/dashboard',
       controller: productsController.Dashboard,
     },
