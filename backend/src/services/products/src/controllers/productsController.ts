@@ -149,7 +149,6 @@ const productsController = {
   async Dashboard(req, res) {
     try {
       console.log('EXECUTED GetProductsCount')
-      if (!req.sessionData) throw new Unauthorized('Not authorized')
 
       const redis = req.server.redis
       const productModel = req.server.productModel
