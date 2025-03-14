@@ -246,3 +246,26 @@ export const chanePassSChema = {
     additionalProperties: 'Invalid code.',
   },
 }
+
+export const reqpasschange = {
+  type: 'object',
+  required: ['email'],
+  properties: {
+    email: {
+      type: 'string',
+      format: 'email',
+      maxLength: 40,
+      errorMessage: {
+        format: 'Invalid credentials.',
+        maxLength: 'Invalid credentials.',
+      },
+    },
+  },
+  additionalProperties: false,
+  errorMessage: {
+    required: {
+      email: 'Invalid credentials.',
+    },
+    additionalProperties: 'Invalid additional fields provided.',
+  },
+}

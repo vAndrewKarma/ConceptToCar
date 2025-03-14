@@ -6,6 +6,7 @@ import {
   initiateAuthSessionSchema,
   loginSchema,
   registerSchema,
+  reqpasschange,
   verifyEmailSchema,
 } from '../schemas/auth_validation'
 interface AuthRoute {
@@ -60,6 +61,7 @@ const routes: Record<string, RouteGroup> = {
       method: 'POST',
       routeName: '/request-password-change',
       controller: authcontroller.requestPasswordChange,
+      schema: reqpasschange,
     },
     changeYourPass: {
       method: 'POST',

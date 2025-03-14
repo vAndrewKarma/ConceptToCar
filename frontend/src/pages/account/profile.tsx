@@ -36,7 +36,7 @@ function Profile() {
       try {
         await axios.post(
           'https://backend-tests.conceptocar.xyz/auth/request-verification',
-          { d: 'd' },
+          { email: auth.data?.session?.email },
           { withCredentials: true }
         )
         setAlertMessage('Verification email sent.')
@@ -54,7 +54,7 @@ function Profile() {
         // Calling the request-password-change endpoint
         await axios.post(
           'https://backend-tests.conceptocar.xyz/auth/request-password-change',
-          {}, // no payload needed as backend uses session email
+          { email: auth.data?.session?.email },
           { withCredentials: true }
         )
         setAlertMessage(
