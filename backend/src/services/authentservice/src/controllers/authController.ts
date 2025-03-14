@@ -278,6 +278,8 @@ const authcontroller = {
     try {
       const redis = req.server.redis
       const email = req.sessionData.email
+      console.log(req.sessionData)
+      console.log(email)
       const userModel = req.server.userModel
       const user = await userModel.findUserByEmail(email)
       if (!user) {
