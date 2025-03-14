@@ -83,6 +83,7 @@ const MaterialsController = {
       if (keys.length) {
         pipeline.del(...keys)
       }
+      await redis.del('dash:count')
       await pipeline.exec()
       res.send(200)
     } catch (err) {
@@ -321,6 +322,7 @@ const MaterialsController = {
       const keys = await redis.keys(`materials_lists:*`)
       if (keys.length) pipeline.del(...keys)
       await pipeline.exec()
+      await redis.del('dash:count')
       res.send(200)
     } catch (err) {
       throw err

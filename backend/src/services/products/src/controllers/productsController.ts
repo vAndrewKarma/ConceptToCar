@@ -90,7 +90,7 @@ const productsController = {
         if (keys.length) {
           pipeline.del(...keys)
         }
-
+        await redis.del('dash:count')
         await pipeline.exec()
       } catch (err) {
         throw err
@@ -154,9 +154,10 @@ const productsController = {
       const productModel = req.server.productModel
       const materialModel = req.server.materialModel
       const cacheKey = 'dash:count'
+
       const cachedCount = await redis.get(cacheKey)
       if (cachedCount) {
-        return res.send(cachedCount)
+        return res.send(JSON.stringify(cachedCount))
       }
 
       const count = await productModel.countProducts()
@@ -168,7 +169,7 @@ const productsController = {
           materialcount: String(materialcount),
         },
         'EX',
-        3600
+        900
       )
 
       res.send({ count: count, materialcount: materialcount })
@@ -448,7 +449,7 @@ const productsController = {
 
       const deleted = await productModel.deleteProduct(productId)
       if (!deleted) throw new BadRequestError('Product deletion failed')
-
+      await redis.del('dash:count')
       await redis.del(`product: ${currentProduct.name}`)
       const keys = await redis.keys('products:all:*')
       if (keys.length) {
