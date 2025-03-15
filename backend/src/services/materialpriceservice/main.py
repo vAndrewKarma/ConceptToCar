@@ -1,3 +1,10 @@
+
+# CURRENTLY NOT WORKING DUE TO DUCKDUCKGO CHANGES , ALSO IN DEVELOPMENT
+
+# CURRENTLY NOT WORKING DUE TO DUCKDUCKGO CHANGES , ALSO IN DEVELOPMENT
+
+# CURRENTLY NOT WORKING DUE TO DUCKDUCKGO CHANGES , ALSO IN DEVELOPMENT
+
 import re
 import logging
 from typing import List, Dict
@@ -7,7 +14,6 @@ import spacy
 from urllib.parse import urlparse, parse_qs, unquote
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-
 class CarPartsPriceScraper:
     def __init__(self):
         self.config = {
@@ -65,14 +71,12 @@ class CarPartsPriceScraper:
         """Extract prices with context validation"""
         prices = []
         doc = self.nlp(text)
-        
-        # Regex-based extraction
+         
         for match in self.price_pattern.finditer(text):
             price = self.normalize_price(match.group())
             if price and self.is_valid_price(price):
                 prices.append({'value': price, 'original': match.group(), 'source': 'regex'})
-        
-        # NLP-based extraction with context checking
+         
         for ent in doc.ents:
             if ent.label_ == "MONEY":
                 prev_words = " ".join([t.text for t in ent.sent[:ent.start]][-3:])
@@ -83,8 +87,7 @@ class CarPartsPriceScraper:
                     price = self.normalize_price(ent.text)
                     if price and self.is_valid_price(price):
                         prices.append({'value': price, 'original': ent.text, 'source': 'nlp'})
-        
-        # Deduplicate results
+         
         seen = set()
         return [p for p in prices if not (p['value'], p['original']) in seen and seen.add((p['value'], p['original'])) is None]
 
@@ -115,12 +118,10 @@ class CarPartsPriceScraper:
             
             soup = BeautifulSoup(response.text, 'html.parser')
             links = []
-            
-            # Updated selector for DuckDuckGo's current HTML structure
+             
             for result in soup.select('div.result__body'):
                 link = result.find('a', class_='result__url')
-                if link and (href := link.get('href')):
-                    # Decode DuckDuckGo's redirect URLs
+                if link and (href := link.get('href')): 
                     if href.startswith('/l/?uddg='):
                         query_params = parse_qs(urlparse(href).query)
                         if 'uddg' in query_params:
@@ -143,8 +144,7 @@ class CarPartsPriceScraper:
         try:
             response = self.session.get(url, timeout=self.config['timeout'])
             soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Try to find structured data
+             
             structured_price = None
             price_element = soup.find(attrs={'itemprop': 'price'}) or \
                            soup.find(class_=re.compile(r'price|cost|amount', re.I))
@@ -154,8 +154,7 @@ class CarPartsPriceScraper:
                 price = self.normalize_price(structured_price)
                 if price and self.is_valid_price(price):
                     return [{'value': price, 'original': structured_price, 'source': 'structured'}]
-            
-            # Fallback to text analysis
+             
             text = self.get_clean_text(soup)
             return self.extract_prices(text)
         except Exception as e:
@@ -173,8 +172,7 @@ class CarPartsPriceScraper:
             prices = self.scrape_page(url)
             if prices:
                 results.extend(prices)
-        
-        # Filter and sort results
+         
         valid_results = [p for p in results if p['value'] is not None]
         return sorted(valid_results, key=lambda x: x['value'])
 
