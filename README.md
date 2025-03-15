@@ -66,6 +66,27 @@ ConceptToCar is a comprehensive web application developed to manage the entire l
   - **Frontend:**
     - React
 
+## Estimated Capacity
+
+Based on the current Kubernetes configurations and resource allocations, the ConceptToCar backend system is estimated to handle approximately: 7000~ users
+
+**HPA Configuration:**
+
+- **Target CPU Utilization:** 50%
+- **Minimum Replicas:** 2
+- **Maximum Replicas:** 10
+
+**Scaling Behavior:**
+
+- **Scale Up:** When CPU utilization exceeds 50%, HPA increases the number of pod replicas to distribute the load.
+- **Scale Down:** When CPU utilization falls below 50%, HPA reduces the number of pod replicas to conserve resources.
+
+### User Estimation
+
+- Assuming an average user generates 1 request per second, the system can handle approximately **7000 concurrent users**.
+
+- ⚠️ These estimates are based on the current configurations and may vary depending on the actual workload and resource usage patterns.
+
 ## Services Overview
 
 | Service Name                   | Language   | Description                                                                 |
