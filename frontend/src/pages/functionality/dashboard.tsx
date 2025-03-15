@@ -145,7 +145,6 @@ function Dashboard2() {
   return (
     <div className="color-background scroll-container">
       <Container fluid>
-        {/* Stats Section */}
         <Row className="justify-content-center" style={{ paddingTop: '80px' }}>
           {stats.map((stat, index) => (
             <Col key={index} md={3} sm={6} xs={12} className="mb-3">
@@ -157,7 +156,6 @@ function Dashboard2() {
           ))}
         </Row>
 
-        {/* Charts Section */}
         <Row className="justify-content-center" style={{ paddingTop: '40px' }}>
           <Col lg={6} md={10} sm={12} xs={12} className="mb-4">
             <Card className="p-3 bg-dark text-white shadow chart-card">
