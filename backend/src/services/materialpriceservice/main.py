@@ -51,12 +51,10 @@ class CarPartsPriceScraper:
             r'\d{1,3}(?:[,.]\d{3})*(?:[,.]\d{2})?\s?(?:USD|EUR|GBP|\$|€|£)'
         )
 
-    def is_valid_price(self, price: float) -> bool:
-        """Check if price is within reasonable range for car parts"""
+    def is_valid_price(self, price: float) -> bool: 
         return self.config['min_price'] <= price <= self.config['max_price']
 
-    def normalize_price(self, price_str: str) -> float:
-        """Convert price string to normalized float"""
+    def normalize_price(self, price_str: str) -> float: 
         try:
             clean = re.sub(r'[^\d.,]', '', price_str)
             if ',' in clean and '.' in clean:
@@ -67,8 +65,7 @@ class CarPartsPriceScraper:
         except (ValueError, TypeError):
             return None
 
-    def extract_prices(self, text: str) -> List[dict]:
-        """Extract prices with context validation"""
+    def extract_prices(self, text: str) -> List[dict]: 
         prices = []
         doc = self.nlp(text)
          
@@ -91,15 +88,13 @@ class CarPartsPriceScraper:
         seen = set()
         return [p for p in prices if not (p['value'], p['original']) in seen and seen.add((p['value'], p['original'])) is None]
 
-    def get_clean_text(self, soup: BeautifulSoup) -> str:
-        """Extract clean text from page with boilerplate removal"""
+    def get_clean_text(self, soup: BeautifulSoup) -> str: 
         for tag in ['script', 'style', 'nav', 'footer', 'header', 'form', 'iframe']:
             for element in soup(tag):
                 element.decompose()
         return ' '.join(soup.stripped_strings)
 
-    def search_duckduckgo(self, query: str) -> List[str]:
-        """Search DuckDuckGo with updated selectors and URL decoding"""
+    def search_duckduckgo(self, query: str) -> List[str]: 
         query += " site:amazon.com OR site:ebay.com OR site:autoparts.com OR site:rockauto.com"
         params = {
             'q': query,
@@ -140,7 +135,7 @@ class CarPartsPriceScraper:
 
 
     def scrape_page(self, url: str) -> List[dict]:
-        """Scrape a single page with improved content extraction"""
+      
         try:
             response = self.session.get(url, timeout=self.config['timeout'])
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -161,8 +156,7 @@ class CarPartsPriceScraper:
             logging.error(f"Scraping failed for {url}: {str(e)}")
             return []
 
-    def get_prices(self, query: str) -> List[dict]:
-        """Main method to get prices for a query"""
+    def get_prices(self, query: str) -> List[dict]: 
         results = []
         urls = self.search_duckduckgo(query)
         logging.info(f"Found {len(urls)} relevant URLs")
