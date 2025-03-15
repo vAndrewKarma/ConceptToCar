@@ -95,9 +95,8 @@ const routes: Record<string, RouteGroup> = {
     indexCheck: {
       method: 'GET',
       routeName: '/',
-      controller: checksController.healthcheck, // todo add metrics
+      controller: checksController.healthcheck,
     },
   },
-  userRoute: null, // todo may not need it, vad pe viitor
 }
 export default routes
