@@ -317,7 +317,7 @@ These security measures help ensure that the ConceptToCar backend is secure and 
 
 ---
 
-## Documentation & Diagrams
+## Diagrams
 
 For system architecture, CI/CD flow, and service interactions, check out the **diagrams** in [`docs/diagrams`](./docs/diagrams).
 
