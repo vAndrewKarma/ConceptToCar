@@ -491,13 +491,15 @@ function Products() {
                   </option>
                 ))}
               </Form.Select>
-              <FaPlusCircle
-                size={24}
-                className="add-icon"
-                style={{ color: 'green' }}
-                title="Add Product"
-                onClick={() => handleAddShow({} as Product)}
-              />
+              {role != 'Admin' ? null : (
+                <FaPlusCircle
+                  size={24}
+                  className="add-icon"
+                  style={{ color: 'green' }}
+                  title="Add Product"
+                  onClick={() => handleAddShow({} as Product)}
+                />
+              )}
             </div>
           </div>
 
