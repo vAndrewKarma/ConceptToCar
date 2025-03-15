@@ -8,7 +8,7 @@
 
 ---
 
-##[LICENSE](./LICENSE)
+## [LICENSE](./LICENSE)
 
 This project is the exclusive property of its creators and contributors. All rights are reserved, and the code, documentation, and any associated assets cannot be copied, used, modified, or claimed by any individual or organization without explicit permission. Unauthorized use or reproduction of any part of this project is strictly prohibited
 
