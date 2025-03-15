@@ -50,12 +50,31 @@ ConceptToCar is a comprehensive web application developed to manage the entire l
 
 - **Environment:**
 
-  - A compatible operating system for web applications.
-  - A supported database (MySQL, PostgreSQL, MongoDB, etc.) or file-based storage configuration.
-  - [Optional] Docker for containerized deployment.
+  - A compatible operating system for web applications (Windows, macOS, Linux).
+  - MongoDB for database storage.
+  - Redis for caching and session management.
+  - RabbitMQ for message brokering.
+  - [Optional] Skaffold for a clear development enviorement.
+  - [Optional] Kubernetes (K8s) for orchestration and Helm for package management.
 
 - **Dependencies:**  
-  Refer to the specific backend and frontend documentation for details on installation and required dependencies (e.g., Node.js, Python, etc.).
+  Refer to the specific backend and frontend documentation for details on installation and required dependencies:
+  - **Backend:**
+    - Node.js
+    - Go
+    - Python
+  - **Frontend:**
+    - React
+
+# Services Overview
+
+| Service Name                   | Language   | Description                                                                 |
+| ------------------------------ | ---------- | --------------------------------------------------------------------------- |
+| **AuthentService**             | TypeScript | Handles user registration, login, and email verification.                   |
+| **EmailService**               | Go         | Handles sending emails for user verification and password recovery.         |
+| **ProductsService**            | TypeScript | Manages products and materials, including creation, updating, and deletion. |
+| **UserRegistrationKeyService** | TypeScript | Handles user registration keys and related operations.                      |
+| **MaterialPriceService**       | Python     | Gets the material price for a product.                                      |
 
 ## Installation and Configuration
 
