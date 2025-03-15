@@ -136,21 +136,13 @@ function Login() {
                     <Link to="/request-password-change"> Forgot password?</Link>
                   </Form.Label>
                 </div>
-                {/* <OverlayTrigger
-                  placement="top"
-                  overlay={
-                    <Tooltip>
-                      Between 8-16, 1 upper, 1 number, 1 special character.
-                    </Tooltip>
-                  }
-                > */}
+
                 <Form.Control
                   type="password"
                   placeholder="Enter Password"
                   isInvalid={!!errors.password}
                   {...register('password')}
                 />
-                {/* </OverlayTrigger> */}
 
                 {(errors.password || errors.email) && (
                   <span className="error-message">

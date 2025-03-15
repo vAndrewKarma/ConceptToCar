@@ -580,7 +580,6 @@ function Products() {
         </div>
       </div>
 
-      {/* Delete Modal */}
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header className="bg-danger text-white">
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -606,7 +605,6 @@ function Products() {
         </Modal.Footer>
       </Modal>
 
-      {/* Edit Modal */}
       <Modal
         show={showEditModal}
         onHide={handleEditClose}
@@ -734,8 +732,6 @@ function Products() {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Add Modal */}
       <AddProductModal
         show={showAddModal}
         onClose={handleAddClose}

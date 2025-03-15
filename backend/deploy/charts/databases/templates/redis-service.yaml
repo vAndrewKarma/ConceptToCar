@@ -1,4 +1,4 @@
-{{- /* Precompute the service name and port for Redis */ -}}
+ 
 {{- $redisServiceName := .Values.redis.serviceName | default "redis-service" -}}
 {{- $redisPort := .Values.redis.port | default 6379 | int -}}
 apiVersion: v1

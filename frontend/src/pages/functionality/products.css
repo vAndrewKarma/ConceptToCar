@@ -11,30 +11,26 @@
   justify-content: center;
   align-items: center;
 }
-/* 1. Modal Container */
 .modal-dark .modal-content {
-  background-color: #1f1f1f; /* Dark gray background for the modal */
-  color: #fff; /* White text */
+  background-color: #1f1f1f;
+  color: #fff;
   border: 1px solid #ffc107;
   border-radius: 8px;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-/* 2. Form Controls (Inputs, Textareas, etc.) */
 .modal-dark .form-control {
-  background-color: #2b2b2b !important; /* Dark background */
-  color: #fff !important; /* White text */
+  background-color: #2b2b2b !important;
+  color: #fff !important;
   border: 1px solid #ffc107 !important;
   border-radius: 4px !important;
 }
 
-/* Placeholder color */
 .modal-dark .form-control::placeholder {
   color: #ccc !important;
 }
 
-/* Remove focus outline / box shadow */
 .modal-dark .form-control:focus {
   background-color: #3a3a3a !important;
   color: #fff !important;
@@ -43,14 +39,12 @@
   border: 1px solid #ffc107 !important;
 }
 
-/* 3. Alert Box (Error messages) */
 .modal-dark .alert-danger {
-  background-color: #66171a; /* Dark red background for error alert */
-  color: #fff; /* White text */
-  border-color: #ff4d4d; /* Lighter red border */
+  background-color: #66171a;
+  color: #fff;
+  border-color: #ff4d4d;
 }
 
-/* 4. Buttons */
 .modal-dark .btn.btn-warning {
   background-color: #ffc107;
   border: none;
@@ -98,26 +92,26 @@
 .awesome-search-container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Force icon to the right */
-  width: 100%; /* Ensure full width */
+  justify-content: space-between;
+  width: 100%;
 }
 .awesome-search-container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Ensures icon stays on the right */
+  justify-content: space-between;
   width: 100%;
   max-width: 100%;
 }
 
 .awesome-search {
-  flex: 1; /* Makes search bar take up all available space */
+  flex: 1;
   border-radius: 25px;
   padding: 10px 20px;
   border: 1px solid #ccc;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
-  min-width: 0; /* Prevents flex from breaking */
+  min-width: 0;
 }
 
 .awesome-search:focus {
@@ -128,10 +122,10 @@
 }
 
 .add-icon {
-  margin-left: 15px; /* Ensures space from search */
+  margin-left: 15px;
   cursor: pointer;
   transition: transform 0.2s ease;
-  flex-shrink: 0; /* Prevents icon from resizing */
+  flex-shrink: 0;
 }
 .filter-select {
   width: 200px;
@@ -141,17 +135,16 @@
   border: 1px solid #6c757d;
 }
 .add-icon:hover {
-  transform: scale(1.2); /* Icon zoom on hover */
+  transform: scale(1.2);
 }
 
-/* Ensure full width on small screens */
 @media (max-width: 768px) {
   .awesome-search-container {
     width: 100%;
   }
 
   .awesome-search {
-    width: 100%; /* Force full width */
+    width: 100%;
   }
   .filter-select {
     width: 130px;

@@ -1,4 +1,4 @@
-{{- /* Precompute the namespace */ -}}
+ 
 {{- $namespace := .Release.Namespace | default .Values.namespace }}
 
 {{- range $serviceName, $serviceConfig := .Values.services }}

@@ -461,7 +461,6 @@ function Materials() {
         </div>
       </div>
 
-      {/* Delete Material Modal */}
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header className="bg-danger text-white">
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -487,7 +486,6 @@ function Materials() {
         </Modal.Footer>
       </Modal>
 
-      {/* Add Material Modal */}
       <AddMaterialModal
         show={showAddModal}
         onClose={handleAddClose}

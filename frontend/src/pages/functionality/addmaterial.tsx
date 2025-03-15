@@ -141,7 +141,6 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
           onSubmit={handleSubmit}
           className="text-light modal-form bg-dark rounded"
         >
-          {/* Name */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style text-light">Name:</Form.Label>
             <Form.Control
@@ -152,7 +151,6 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
             />
           </Form.Group>
 
-          {/* Quantity */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">Quantity:</Form.Label>
             <Form.Control
@@ -163,7 +161,6 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
             />
           </Form.Group>
 
-          {/* Length (sent as length_unit) */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">
               Estimated Length (cm):
@@ -176,7 +173,6 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
             />
           </Form.Group>
 
-          {/* Estimated Width */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">
               Estimated Width (cm):
@@ -189,7 +185,6 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
             />
           </Form.Group>
 
-          {/* Estimated Height */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">
               Estimated Height (cm):
@@ -202,7 +197,6 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
             />
           </Form.Group>
 
-          {/* Estimated Weight */}
           <Form.Group className="mb-3">
             <Form.Label className="modal-style">
               Estimated Weight (kg):
