@@ -1,5 +1,7 @@
 ### TEAM NAME: © Karma Devs 2025
 
+![ConceptToCar Logo](./logo.png)
+
 # ConceptToCar: Product Lifecycle Management System
 
 ## License & Copyright
