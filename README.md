@@ -80,6 +80,14 @@ ConceptToCar is a comprehensive web application developed to manage the entire l
 
 For communication between services, **RabbitMQ** will be used as a message broker for pub/sub and work queue patterns. RabbitMQ is a reliable, scalable, and widely used message broker that facilitates communication between distributed systems.
 
+## Library
+
+We've developed a shared library named `@karma-packages/conceptocar-common`, which is deployed to npm. This library contains common functions and utilities that are used across various services in the ConceptToCar project. By centralizing these functions, we ensure consistency and reduce code duplication.
+
+### How it Works:
+
+The `@karma-packages/conceptocar-common` library includes a variety of helper functions, middleware, and configurations that facilitate the development and maintenance of our microservices.
+
 ### How it Works:
 
 1. **Publisher-Subscriber Model**:
