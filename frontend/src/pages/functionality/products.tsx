@@ -644,19 +644,26 @@ function Products() {
                 value={editStage || ''}
                 onChange={(e) => setEditStage(e.target.value as Stage)}
               >
-                {[
-                  'Concept',
-                  'Feasibility',
-                  'Design',
-                  'Production',
-                  'Withdrawal',
-                  'Standby',
-                  'Cancelled',
-                ].map((stageOption, idx) => (
-                  <option key={idx} value={stageOption}>
-                    {stageOption}
-                  </option>
-                ))}
+                {role !== 'Designer' &&
+                  [
+                    'Concept',
+                    'Feasibility',
+                    'Design',
+                    'Production',
+                    'Withdrawal',
+                    'Standby',
+                    'Cancelled',
+                  ].map((stageOption, idx) => (
+                    <option key={idx} value={stageOption}>
+                      {stageOption}
+                    </option>
+                  ))}
+                {role === 'Designer' &&
+                  ['Feasibility'].map((stageOption, idx) => (
+                    <option key={idx} value={stageOption}>
+                      {stageOption}
+                    </option>
+                  ))}
               </Form.Control>
             </Form.Group>
 
