@@ -1,6 +1,6 @@
-# TEAM NAME: © Karma Devs 2025
+### TEAM NAME: © Karma Devs 2025
 
-# ConceptToCar: Product Lifecycle Management System © Karma Devs 2025
+# ConceptToCar: Product Lifecycle Management System
 
 ## License & Copyright
 
