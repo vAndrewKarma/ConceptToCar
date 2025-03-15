@@ -234,7 +234,6 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
 
       {error && (
         <Alert variant="danger" className="mt-3">
-          {' '}
           {error}
         </Alert>
       )}
