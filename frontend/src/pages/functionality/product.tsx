@@ -64,11 +64,9 @@ function Product() {
   const navigate = useNavigate()
   const { data } = useAuth()
   const role = data.session.role
-  // Modal visibility states
   const [showModal, setShowModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
-  // Edit form states (controlled inputs)
   const [editName, setEditName] = useState('')
   const [editDescription, setEditDescription] = useState('')
   const [serror, ssetError] = useState('')
@@ -104,7 +102,6 @@ function Product() {
   const handleClose = () => setShowModal(false)
   const handleShow = () => setShowModal(true)
 
-  // Axios hook for fetching the product
   const [{ loading, error }, execute] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-product',
@@ -114,7 +111,6 @@ function Product() {
     { manual: true }
   )
 
-  // Axios hook for updating the product
   const [, executeUpdate] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/update-product',
@@ -124,7 +120,6 @@ function Product() {
     { manual: true }
   )
 
-  // Axios hook for initiating an update (security challenge)
   const [, executeInit] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/initiate_product',
@@ -133,7 +128,6 @@ function Product() {
     { manual: true }
   )
 
-  // Axios hook for deletion (unchanged)
   const [, executedelete] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/delete-product',
@@ -201,9 +195,6 @@ function Product() {
     handleClose()
   }
 
-  // Use defaultProduct if product data has not been fetched yet.
-
-  // Open the edit modal and populate the edit states with the current product data.
   const handleEditShow = () => {
     if (product) {
       setEditName(product.name)
@@ -218,7 +209,6 @@ function Product() {
   }
   const handleEditClose = () => setShowEditModal(false)
 
-  // Save the changes by calling the update endpoint.
   const handleSaveChanges = async () => {
     if (!product) return
     try {
@@ -246,7 +236,6 @@ function Product() {
         withCredentials: true,
       })
 
-      // Update the local product state to reflect the changes.
       await execute({ data: { name: editName } })
 
       setShowEditModal(false)

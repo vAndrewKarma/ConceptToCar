@@ -91,7 +91,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   svg.setAttribute('width', width.toString())
   svg.setAttribute('height', height.toString())
 
-  // Background gradient
   const defs = document.createElementNS(svgNS, 'defs')
   const gradient = document.createElementNS(svgNS, 'linearGradient')
   gradient.setAttribute('id', 'background-gradient')
@@ -121,7 +120,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   background.setAttribute('fill', 'url(#background-gradient)')
   svg.appendChild(background)
 
-  // Header
   const headerHeight = 100
   const header = document.createElementNS(svgNS, 'rect')
   header.setAttribute('x', '0')
@@ -150,7 +148,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   reportTitle.textContent = 'Product Development Report'
   svg.appendChild(reportTitle)
 
-  // Metadata
   const metadataGroup = document.createElementNS(svgNS, 'g')
   let metaY = 30
   const addMetadata = (label: string, value?: string) => {
@@ -183,7 +180,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   }
   svg.appendChild(metadataGroup)
 
-  // Content area
   const contentX = 40
   const contentY = headerHeight + 20
   const contentWidth = width - 80
@@ -198,7 +194,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   contentBg.setAttribute('fill', 'rgba(255, 255, 255, 0.1)')
   svg.appendChild(contentBg)
 
-  // Product information
   let textY = contentY + 30
   const labelX = contentX + 20
   const valueX = labelX + 140
@@ -247,7 +242,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     addTextBlock('Estimated Width', product.estimated_width, 'cm')
   }
 
-  // Materials Used
   if (product) {
     const pdftimestamp = document.createElementNS(svgNS, 'text')
     pdftimestamp.setAttribute('x', labelX.toString())
@@ -260,7 +254,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     textY += 25
   }
 
-  // Stage History
   if (product) {
     textY += 20
     let stageHistory: StageHistory[] = []
@@ -306,7 +299,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
     }
   }
 
-  // Dynamic chart positioning
   const chartRadius = 50
   const strokeWidth = 9
   const chartVerticalSpacing = 50
@@ -314,7 +306,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
   const chartCenterY = textY / 2 + chartVerticalSpacing
   const chartCenterX = contentX + 400
 
-  // Progress chart
   const chartGroup = document.createElementNS(svgNS, 'g')
   const circumference = 2 * Math.PI * chartRadius
 
@@ -403,7 +394,6 @@ const generateChartSVG = (product: ProductData | null): SVGSVGElement => {
 
   svg.appendChild(chartGroup)
 
-  // Footer
   const footerHeight = 60
   const footer = document.createElementNS(svgNS, 'rect')
   footer.setAttribute('x', '0')
@@ -442,29 +432,25 @@ const ExportChartPDF: React.FC<ExportChartPDFProps> = ({ product }) => {
     const materialsURL = `${productURL}/materials`
     const homeURL = baseURL
 
-    // Set up links – white text, with white underline.
-    let linkX = 85 // starting X coordinate
-    const linkY = 800 // Y coordinate for links
+    let linkX = 85
+    const linkY = 800
 
     pdf.setFontSize(14)
-    pdf.setTextColor(255, 255, 255) // white text for links
-    pdf.setDrawColor(255, 255, 255) // white color for underline
+    pdf.setTextColor(255, 255, 255)
+    pdf.setDrawColor(255, 255, 255)
     pdf.setLineWidth(0.5)
 
-    // Link 1: "View Product Page"
     const linkText1 = 'View Product Page'
     pdf.textWithLink(linkText1, linkX, linkY, { url: productURL })
     const textWidth1 = pdf.getTextWidth(linkText1)
     pdf.line(linkX, linkY + 2, linkX + textWidth1, linkY + 2)
 
-    // Link 2: "View Materials Page"
     linkX += 175
     const linkText2 = 'View Materials Page'
     pdf.textWithLink(linkText2, linkX, linkY, { url: materialsURL })
     const textWidth2 = pdf.getTextWidth(linkText2)
     pdf.line(linkX, linkY + 2, linkX + textWidth2, linkY + 2)
 
-    // Link 3: "Go to Homepage"
     linkX += 175
     const linkText3 = 'Go to Homepage'
     pdf.textWithLink(linkText3, linkX, linkY, { url: homeURL })

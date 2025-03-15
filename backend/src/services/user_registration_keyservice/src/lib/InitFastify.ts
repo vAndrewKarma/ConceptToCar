@@ -23,7 +23,7 @@ export default async function fastify_loader() {
         messages: true,
         $data: true,
       },
-      plugins: [ajvKeywords, ajvErrors], // Register AJV plugins
+      plugins: [ajvKeywords, ajvErrors],
     },
   })
 

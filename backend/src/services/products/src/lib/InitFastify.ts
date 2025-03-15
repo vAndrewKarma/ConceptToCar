@@ -37,7 +37,7 @@ export default async function fastify_loader() {
   await server.register(fastifyCookie, {
     secret: 'secret', // TODO add env variable to change it
     hook: 'onRequest',
-    parseOptions: {}, // Keep as default
+    parseOptions: {},
   })
   const allowedOrigins = ['http://localhost:5173', 'https://conceptocar.xyz/']
 

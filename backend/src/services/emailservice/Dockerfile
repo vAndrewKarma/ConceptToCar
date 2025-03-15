@@ -8,12 +8,9 @@ COPY . .
 RUN go build -o main .
 
 FROM alpine:latest
-
-# Copy the built binary into a standard location (e.g., /usr/local/bin)
+ 
 COPY --from=builder /app/main /usr/local/bin/main
-
-# Ensure the binary has execute permissions
+ 
 RUN chmod +x /usr/local/bin/main
-
-# Use an absolute path in CMD
+ 
 CMD ["/usr/local/bin/main"]

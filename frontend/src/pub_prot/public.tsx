@@ -8,7 +8,7 @@ const PublicRoute = ({ children }: { children: ReactNode }) => {
   const auth: any = useAuthContext()
 
   if (!auth || auth.isLoading) {
-    return <div>Loading...</div> // Or a proper loading spinner
+    return <div>Loading...</div>
   }
 
   if (auth?.data?.auth) {

@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailservice-deployment
+  namespace: deployments
+  labels:
+    app: mailservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailservice
+  template:
+    metadata:
+      labels:
+        app: mailservice
+    spec:
+      serviceAccountName: mailservice-sa
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: mailservice
+              topologyKey: 'kubernetes.io/hostname'
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: 'kubernetes.io/hostname'
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: mailservice
+      containers:
+        - name: server
+          image: gcr.io/spheric-temple-451313-b7/mailservice:latest
+          ports:
+            - containerPort: 50051
+          envFrom:
+            - secretRef:
+                name: authservice-secrets
+          resources:
+            requests:
+              cpu: '250m'
+              memory: '256Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mailservice-hpa
+  namespace: deployments
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mailservice-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mailservice-sa
+  namespace: deployments
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list', 'watch']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mailservice-role
+  namespace: deployments
+rules:
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mailservice-rolebinding
+  namespace: deployments
+subjects:
+  - kind: ServiceAccount
+    name: mailservice-sa
+    namespace: deployments
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mailservice-role

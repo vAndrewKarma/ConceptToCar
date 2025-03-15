@@ -10,8 +10,6 @@ interface Material {
   estimated_weight: number
   qty: number
   length_unit: string
-
-  // additional fields as needed
 }
 
 interface UpdateMaterialModalProps {
@@ -51,13 +49,11 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
   onSuccess,
   selectedMaterial,
 }) => {
-  // Get productName and productId from URL if needed.
   const { productName: urlProductName, productId: urlProductId } = useParams<{
     productName: string
     productId: string
   }>()
 
-  // Local state for each field. When the modal opens, pre-fill the values.
   const [name, setName] = useState('')
   const [originalName, setOriginalName] = useState('')
   const [estimatedHeight, setEstimatedHeight] = useState('')
@@ -131,10 +127,9 @@ const UpdateMaterialModal: React.FC<UpdateMaterialModalProps> = ({
         { withCredentials: true }
       )
 
-      // On success, trigger the onSuccess callback and close/reset.
       if (onSuccess) onSuccess()
       onClose()
-      // Reset state
+
       window.location.reload()
       setName('')
       setOriginalName('')

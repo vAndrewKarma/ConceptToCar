@@ -14,7 +14,6 @@ function unslugify(slug: string): string {
     .map((word) => word.charAt(0) + word.slice(1))
     .join(' ')
 }
-// Generate a PKCE code verifier.
 const generateCodeVerifier = (length: number): string => {
   const allowedChars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
@@ -26,7 +25,6 @@ const generateCodeVerifier = (length: number): string => {
   ).join('')
 }
 
-// Generate the code challenge from the verifier.
 const generateCodeChallenge = async (verifier: string): Promise<string> => {
   const encoder = new TextEncoder()
   const data = encoder.encode(verifier)
@@ -40,19 +38,17 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  // Extract productName and productId from URL: /product/:productName/:productId/materials
   const { productName, productId } = useParams<{
     productName: string
     productId: string
   }>()
 
-  // Form state for required fields per the new schema.
   const [name, setName] = useState('')
   const [qty, setQty] = useState('')
   const [estimatedHeight, setEstimatedHeight] = useState('')
   const [estimatedWidth, setEstimatedWidth] = useState('')
   const [estimatedWeight, setEstimatedWeight] = useState('')
-  const [length, setLength] = useState('') // This will be sent as "length_unit"
+  const [length, setLength] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -61,7 +57,6 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
     setError('')
     setLoading(true)
 
-    // Basic validation – ensure all required fields are provided.
     if (
       !name ||
       !qty ||
@@ -76,11 +71,9 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
     }
 
     try {
-      // 1. Generate PKCE code verifier and challenge.
       const codeVerifier = generateCodeVerifier(43)
       const challenge = await generateCodeChallenge(codeVerifier)
 
-      // 2. Initiate material creation (BomModify endpoint).
       const initiateResponse = await axios.post(
         'https://backend-tests.conceptocar.xyz/products/initiate_material',
         { challenge },
@@ -103,14 +96,11 @@ const AddMaterialModal: React.FC<AddMaterialModalProps> = ({
         productName: unslugify(productName || ''),
       }
 
-      // 4. Create the material (CreateBom endpoint).
       await axios.post(
         'https://backend-tests.conceptocar.xyz/products/create-material',
         payload,
         { withCredentials: true }
       )
-
-      // On success, call onSuccess, close the modal, and reset fields.
       if (onSuccess) onSuccess()
       onClose()
       window.location.reload()

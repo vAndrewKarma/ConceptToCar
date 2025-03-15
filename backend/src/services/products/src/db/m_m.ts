@@ -134,8 +134,9 @@ export class ProductModel {
   async countProductsByMonth(
     year: number
   ): Promise<{ name: string; value: number }[]> {
-    const start = new Date(year, 0, 1) // January 1st of the year
-    const end = new Date(year + 1, 0, 1) // January 1st of the next year
+    const start = new Date(year, 0, 1)
+
+    const end = new Date(year + 1, 0, 1)
 
     const pipeline = [
       {
@@ -150,7 +151,7 @@ export class ProductModel {
         },
       },
       {
-        $sort: { _id: 1 }, // Sort by month number ascending
+        $sort: { _id: 1 },
       },
       {
         $project: {
@@ -231,9 +232,7 @@ export class ProductStageHistoryModel {
 
   async getHistoryByProductId(productId: string, skip = 0, limit = 5) {
     return await this.collection
-      // Convert productId to ObjectId to match the stored type
       .find({ product_id: new ObjectId(productId) })
-      // Sort by the timestamp field we actually use
       .sort({ start_of_stage: -1 })
       .skip(skip)
       .limit(limit)

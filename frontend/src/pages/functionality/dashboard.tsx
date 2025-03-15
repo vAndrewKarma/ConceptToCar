@@ -20,7 +20,7 @@ const statsTemplate = [
   { title: 'Total Accounts', value: '10' },
   { title: 'Total Products', value: '0' },
   { title: 'Total Materials', value: '0' },
-  { title: 'Growth Rate', value: '0.0%' }, // Add this line
+  { title: 'Growth Rate', value: '0.0%' },
 ]
 
 const monthOrder = [
@@ -38,7 +38,6 @@ const monthOrder = [
   'December',
 ]
 
-// Add current year
 const currentYear = new Date().getFullYear()
 
 const stageOrder = [
@@ -74,13 +73,11 @@ function Dashboard2() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch user data
         const userResponse = await axios.get(
           'https://backend-tests.conceptocar.xyz/auth/user-dash',
           { withCredentials: true }
         )
 
-        // Fetch product data
         const productResponse = await axios.get(
           'https://backend-tests.conceptocar.xyz/products/dashboard',
           { withCredentials: true }
@@ -89,13 +86,11 @@ function Dashboard2() {
         const userData = userResponse.data
         const productData = productResponse.data
 
-        // Update stats
         const newStats = [...statsTemplate]
         newStats[0].value = userData.totalUsers.toString()
         newStats[1].value = productData.totalProducts.toString()
         newStats[2].value = productData.totalMaterials.toString()
 
-        // Process bar chart data for all months
         const monthlyData = monthOrder.map((month) => ({
           name: month,
           value:
@@ -105,7 +100,6 @@ function Dashboard2() {
         }))
         setBarChartData(monthlyData)
 
-        // Calculate growth rate
         const currentMonthIndex = new Date().getMonth()
         const currentMonthValue = monthlyData[currentMonthIndex]?.value || 0
         const prevMonthIndex =
@@ -124,8 +118,6 @@ function Dashboard2() {
           growthRate >= 0 ? '🔼' : '🔽'
         }`
         setStats(newStats)
-
-        // Process pie chart data
         const stageData = stageOrder.map((stage) => ({
           name: stage.name,
           value:

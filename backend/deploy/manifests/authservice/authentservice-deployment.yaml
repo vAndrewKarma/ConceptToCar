@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentservice-deployment
+  namespace: deployments
+  labels:
+    app: authentservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentservice
+  template:
+    metadata:
+      labels:
+        app: authentservice
+    spec:
+      serviceAccountName: authentservice-sa
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: authentservice
+              topologyKey: 'kubernetes.io/hostname'
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: 'kubernetes.io/hostname'
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: authentservice
+      containers:
+        - name: server
+          image: gcr.io/spheric-temple-451313-b7/authentservice:latest
+          ports:
+            - containerPort: 50051
+          envFrom:
+            - secretRef:
+                name: authservice-secrets
+          resources:
+            requests:
+              cpu: '250m'
+              memory: '256Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 50051
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 50051
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: authentservice-hpa
+  namespace: deployments
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: authentservice-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: authentservice-sa
+  namespace: deployments
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: authentservice-role
+  namespace: deployments
+rules:
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: authentservice-rolebinding
+  namespace: deployments
+subjects:
+  - kind: ServiceAccount
+    name: authentservice-sa
+    namespace: deployments
+roleRef:
+  kind: Role
+  name: authentservice-role
+  apiGroup: rbac.authorization.k8s.io

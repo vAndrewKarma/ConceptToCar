@@ -86,7 +86,6 @@ function Materials() {
     }
   }>({})
 
-  // Axios hooks for API calls.
   const [, execute] = useAxios(
     {
       url: 'https://backend-tests.conceptocar.xyz/products/get-materials',
@@ -112,12 +111,10 @@ function Materials() {
     { manual: true }
   )
 
-  // Fetch materials when productId, currentPage, or searchTerm changes.
   useEffect(() => {
     const fetchMaterials = async () => {
       setError(null)
       setLoadingState(true)
-      // Create a cache key including page and search term.
       const cacheKey = `${currentPage}-${searchTerm}`
       const now = Date.now()
       const cached = cacheRef.current[cacheKey]
@@ -135,7 +132,6 @@ function Materials() {
             data: {
               productId: unslugify(productId || ''),
               page: currentPage,
-              // Pass searchTerms (empty string if not provided)
               searchTerms: searchTerm,
             },
           })
@@ -196,14 +192,12 @@ function Materials() {
     }
   }, [currentPage, productId, searchTerm, execute])
 
-  // Trigger search on Enter key: reset page, update searchTerm, and clear cache.
   const triggerSearch = () => {
     setCurrentPage(1)
     setSearchTerm(searchInput)
     cacheRef.current = {}
   }
 
-  // Modal & deletion handlers.
   const handleShow = (id: string) => {
     setSelectedId(id)
     setShowModal(true)
@@ -244,7 +238,6 @@ function Materials() {
         })
 
         setMaterials((prev) => prev.filter((m) => m._id !== selectedId))
-        // Invalidate cache for the current page/search.
         delete cacheRef.current[`${currentPage}-${searchTerm}`]
         cacheRef.current = {}
         window.location.reload()
@@ -263,14 +256,12 @@ function Materials() {
   }
   const handleEditClose = () => setShowEditModal(false)
   const refreshMaterials = async () => {
-    // Clear cache and reset to first page.
     cacheRef.current = {}
     setCurrentPage(1)
     await triggerSearch()
     window.location.reload()
   }
 
-  // Columns for the table.
   const columns = [
     {
       accessorKey: 'index',
@@ -331,7 +322,6 @@ function Materials() {
     },
   ]
 
-  // Use materials directly since backend search returns filtered results.
   const table = useReactTable({
     columns,
     data: materials,

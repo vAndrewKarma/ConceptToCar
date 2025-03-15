@@ -23,6 +23,5 @@ const routes = {
       controller: checksController.healthcheck, // todo add metrics
     },
   },
-  userRoute: null, // todo may not need it, vad pe viitor
 }
 export default routes

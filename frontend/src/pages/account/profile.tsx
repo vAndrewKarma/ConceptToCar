@@ -51,7 +51,6 @@ function Profile() {
     } else if (type === 'reset') {
       setIsResetDisabled(true)
       try {
-        // Calling the request-password-change endpoint
         await axios.post(
           'https://backend-tests.conceptocar.xyz/auth/request-password-change',
           { email: auth.data?.session?.email },

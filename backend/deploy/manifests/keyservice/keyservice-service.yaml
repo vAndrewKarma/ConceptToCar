@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: productservice
+  name: keyservice
   namespace: deployments
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
     prometheus.io/scrape: 'true'
     prometheus.io/path: '/metrics'
-    prometheus.io/port: '50051' # Port where Prometheus scrapes metrics
+    prometheus.io/port: '50051'
 spec:
   type: ClusterIP
   selector:
-    app: productservice
+    app: keyservice
   ports:
     - name: http
       port: 80

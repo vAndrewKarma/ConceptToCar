@@ -83,7 +83,6 @@ const ClickableName = ({ name, id }: { name: string; id: string }) => {
 function Products() {
   const { data } = useAuth()
   const role = data.session.role
-  // For demo purposes, assume the currentUserRole is hard-coded.
   const [filterCategory, setFilterCategory] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [hasNextPage, setHasNextPage] = useState(false)
@@ -96,7 +95,6 @@ function Products() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [error, setError] = useState<string | null>(null)
-  // Controlled fields for editing
   const [editName, setEditName] = useState('')
   const [editDescription, setEditDescription] = useState('')
   const [editStage, setEditStage] = useState<Stage>('concept')
@@ -106,7 +104,6 @@ function Products() {
   const [editEstimatedLength, setEditEstimatedLength] = useState('')
   const [serror, ssetError] = useState('')
 
-  // Refresh products: clear cache, reset page, and re-fetch.
   const refreshProducts = async () => {
     const response = await execute({ data: { page: currentPage } })
     if (response && response.data) {
@@ -243,7 +240,6 @@ function Products() {
       setEditEstimatedWidth(selectedProduct.estimated_width?.toString() || '')
       setEditEstimatedWeight(selectedProduct.estimated_weight?.toString() || '')
       setEditEstimatedLength(selectedProduct.estimated_length?.toString() || '')
-      // Set other unit fields if needed.
     }
   }, [selectedProduct])
 
@@ -273,7 +269,6 @@ function Products() {
     setSelectedProduct(null)
   }
 
-  // Updated: After saving changes, clear the cache and refresh the product list.
   const handleSaveChanges = async () => {
     if (!selectedProduct) return
     try {
@@ -301,7 +296,6 @@ function Products() {
         withCredentials: true,
       })
 
-      // Clear cache and refresh the product list.
       handleEditClose()
 
       await refreshProducts()

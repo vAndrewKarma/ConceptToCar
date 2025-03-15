@@ -72,7 +72,6 @@ function Login() {
     try {
       setError(null)
 
-      // Generate PKCE code verifier and challenge
       const code_verifier = generateCodeVerifier(43)
       const challenge = await generateCodeChallenge(code_verifier)
       const res = await executeInit({

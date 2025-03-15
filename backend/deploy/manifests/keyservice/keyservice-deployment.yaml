@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keyservice-deployment
+  namespace: deployments
+  labels:
+    app: keyservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keyservice
+  template:
+    metadata:
+      labels:
+        app: keyservice
+    spec:
+      serviceAccountName: keyservice-sa
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: keyservice
+              topologyKey: 'kubernetes.io/hostname'
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: 'kubernetes.io/hostname'
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: keyservice
+      containers:
+        - name: server
+          image: gcr.io/spheric-temple-451313-b7/keys:latest
+          ports:
+            - containerPort: 50051
+          envFrom:
+            - secretRef:
+                name: authservice-secrets
+          resources:
+            requests:
+              cpu: '250m'
+              memory: '256Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
+          readinessProbe:
+            httpGet:
+              path: /keys/healthz
+              port: 50051
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /keys/healthz
+              port: 50051
+            initialDelaySeconds: 30
+            periodSeconds: 20
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: keyservice-hpa
+  namespace: deployments
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: keyservice-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keyservice-sa
+  namespace: deployments
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keyservice-role
+  namespace: deployments
+rules:
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keyservice-rolebinding
+  namespace: deployments
+subjects:
+  - kind: ServiceAccount
+    name: keyservice-sa
+    namespace: deployments
+roleRef:
+  kind: Role
+  name: keyservice-role
+  apiGroup: rbac.authorization.k8s.io
+rules:
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']

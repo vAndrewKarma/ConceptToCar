@@ -17,7 +17,7 @@ spec:
         app: {{ .Values.redis.name }}
     spec:
       securityContext:
-        fsGroup: 999  # Matches Redis container user
+        fsGroup: 999   
       initContainers:
         - name: fix-redis-permissions
           image: busybox:1.35

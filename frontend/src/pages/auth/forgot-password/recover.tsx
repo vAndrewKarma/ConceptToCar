@@ -67,7 +67,6 @@ function NewPassword() {
     resolver: zodResolver(schema),
   })
 
-  // Verify that the link is valid using the verify-password-change endpoint
   useEffect(() => {
     async function verifyLink() {
       try {
@@ -101,11 +100,10 @@ function NewPassword() {
 
   const submitData = async (data: FormData) => {
     try {
-      // Call your change-password endpoint with the code and new password
       const response = await axios.post(
         'https://backend-tests.conceptocar.xyz/auth/change-password',
         {
-          code,  
+          code,
           newPassword: data.password,
         },
         { withCredentials: true }
