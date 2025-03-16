@@ -63,6 +63,11 @@ const AddProductModal = ({
         setLoading(false)
         return
       }
+      if (addName && addName.endsWith(' ')) {
+        setError('Name cannot end with a space')
+        setLoading(false)
+        return
+      }
 
       const productData = {
         name: addName,
