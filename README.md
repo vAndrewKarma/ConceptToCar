@@ -1,3 +1,7 @@
+### OUT OF DEVELOPMENT - 3RD PLACE DRX-IT CONTEST
+
+
+
 ### TEAM NAME: © Karma Devs 2025
 
 ![ConceptToCar Logo](./logo.png)
